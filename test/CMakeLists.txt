@@ -1,0 +1,25 @@
+cmake_minimum_required(VERSION 3.24)
+project(RayTracerChallengeTests)
+
+find_package(GTest REQUIRED)
+
+if (NOT TARGET RayTracerChallenge::Lib)
+    find_package(RayTracerChallenge::Lib CONFIG REQUIRED)
+endif()
+
+find_package(Boost COMPONENTS filesystem REQUIRED)
+
+#set(THREADS_PREFER_PTHREAD_FLAG ON)
+#find_package(Threads REQUIRED)
+
+add_executable(RayTracerChallengeTests test_rtc.cpp)
+target_link_libraries(RayTracerChallengeTests
+        PRIVATE
+            #Threads::Threads
+            RayTracerChallenge::Lib
+            GTest::gtest
+            GTest::gtest_main
+            ${Boost_LIBRARIES})
+
+include(GoogleTest)
+gtest_discover_tests(RayTracerChallengeTests)
