@@ -12,7 +12,11 @@ find_package(Boost COMPONENTS filesystem REQUIRED)
 #set(THREADS_PREFER_PTHREAD_FLAG ON)
 #find_package(Threads REQUIRED)
 
-add_executable(RayTracerChallengeTests test_rtc.cpp)
+set(SRCS
+        test_tuple.cpp)
+
+add_executable(RayTracerChallengeTests ${SRCS})
+
 target_link_libraries(RayTracerChallengeTests
         PRIVATE
             #Threads::Threads
