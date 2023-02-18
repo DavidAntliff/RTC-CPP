@@ -1,102 +1,122 @@
-#ifndef RTC_MATHS_H
-#define RTC_MATHS_H
+#ifndef RTC_LIB_TUPLE_H
+#define RTC_LIB_TUPLE_H
 
 #include <ostream>
 #include <cmath>
 
+#include "math.h"
+
 // Left-Handed Coordinate System
+
 // TODO: investigate constexpr here
 // TODO: benchmark if `const Scalar &` is faster than `Scalar`
 
-// Implementing operators:
+// Rules for implementing operators:
 //  https://stackoverflow.com/a/4421719
 
-namespace rtc {
+// Desired style of Factory functions from this namespace:
+//
+// tuple()
+// tuple<double>()
+// tuple<float>()
 
-template <typename T>
-inline bool almost_equal(const T & lhs, const T & rhs, T epsilon=0.00001) {
-    return abs(lhs - rhs) < epsilon;
-}
+namespace rtc::default_tuple {
 
-template <typename T=double>
+using default_t = double;
+
+template <typename T=default_t>
 struct Tuple {
-    using ValueType = T;
+    using value_t = T;
 
     Tuple() = default;
     Tuple(T x, T y, T z, T w) {
-        this->x = x;
-        this->y = y;
-        this->z = z;
-        this->w = w;
+        x_ = x;
+        y_ = y;
+        z_ = z;
+        w_ = w;
     }
 
+    T x() const { return x_; }
+    T y() const { return y_; }
+    T z() const { return z_; }
+    T w() const { return w_; }
+
     bool is_point() const {
-        return w == 1.0;
+        return w_ == 1.0;
     }
 
     bool is_vector() const {
-        return w == 0.0;
+        return w_ == 0.0;
     }
 
     Tuple & operator+=(const Tuple & rhs) {
-        x += rhs.x;
-        y += rhs.y;
-        z += rhs.z;
-        w += rhs.w;
+        x_ += rhs.x_;
+        y_ += rhs.y_;
+        z_ += rhs.z_;
+        w_ += rhs.w_;
         return *this;
     }
 
     Tuple & operator-=(const Tuple & rhs) {
-        x -= rhs.x;
-        y -= rhs.y;
-        z -= rhs.z;
-        w -= rhs.w;
+        x_ -= rhs.x_;
+        y_ -= rhs.y_;
+        z_ -= rhs.z_;
+        w_ -= rhs.w_;
         return *this;
     }
 
     Tuple operator-() const {
-        return Tuple {-x, -y, -z, -w};
+        return Tuple {-x_, -y_, -z_, -w_};
     }
 
     template <typename Scalar>
     Tuple & operator*=(const Scalar & rhs) {
-        x *= rhs;
-        y *= rhs;
-        z *= rhs;
-        w *= rhs;
+        x_ *= rhs;
+        y_ *= rhs;
+        z_ *= rhs;
+        w_ *= rhs;
         return *this;
     }
 
     template <typename Scalar>
     Tuple & operator/=(const Scalar & rhs) {
-        x /= rhs;
-        y /= rhs;
-        z /= rhs;
-        w /= rhs;
+        x_ /= rhs;
+        y_ /= rhs;
+        z_ /= rhs;
+        w_ /= rhs;
         return *this;
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Tuple & t) {
-        return os << "tuple(" << t.x
-                  << ", " << t.y
-                  << ", " << t.z
-                  << ", " << t.w << ")";
+        return os << "tuple(" << t.x_
+                  << ", " << t.y_
+                  << ", " << t.z_
+                  << ", " << t.w_ << ")";
     }
 
-    T x, y, z, w;
+
+protected:
+    T x_, y_, z_, w_;
 };
 
 // Free functions:
 
 // Strict equality for floating point types
 template <typename T>
-inline bool operator==(const Tuple<T> lhs, const Tuple<T> & rhs) {
-     return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z && lhs.w == rhs.w;
+inline bool operator==(const Tuple<T> & lhs, const Tuple<T> & rhs) {
+     return lhs.x() == rhs.x()
+         && lhs.y() == rhs.y()
+         && lhs.z() == rhs.z()
+         && lhs.w() == rhs.w();
 }
 
 template <typename T>
-inline bool almost_equal(const Tuple<T> lhs, const Tuple<T> & rhs) {
-    return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z && lhs.w == rhs.w;
+inline bool almost_equal(const Tuple<T> & lhs, const Tuple<T> & rhs) {
+    using rtc::almost_equal;
+    return almost_equal(lhs.x(), rhs.x())
+           && almost_equal(lhs.y(), rhs.y())
+           && almost_equal(lhs.z(), rhs.z())
+           && almost_equal(lhs.w(), rhs.w());
 }
 
 template <typename T>
@@ -135,10 +155,10 @@ inline Tuple<T> operator/(Tuple<T> lhs, const Scalar & rhs)
 template <typename T>
 inline T magnitude(const Tuple<T> & t)
 {
-    return std::sqrt(t.x * t.x
-        + t.y * t.y
-        + t.z * t.z
-        + t.w * t.w);
+    return std::sqrt(t.x() * t.x()
+        + t.y() * t.y()
+        + t.z() * t.z()
+        + t.w() * t.w());
 }
 
 template <typename T>
@@ -149,41 +169,38 @@ inline Tuple<T> normalize(const Tuple<T> & t)
 
 template <typename T>
 inline T dot(const Tuple<T> & a, const Tuple<T> & b) {
-    return a.x * b.x
-         + a.y * b.y
-         + a.z * b.z
-         + a.w * b.w;
+    return a.x() * b.x()
+         + a.y() * b.y()
+         + a.z() * b.z()
+         + a.w() * b.w();
 }
 
 // 3D cross-product, ignore .w
 template <typename T>
 inline Tuple<T> cross(const Tuple<T> & a, const Tuple<T> & b) {
-    return {a.y * b.z - a.z * b.y,
-            a.z * b.x - a.x * b.z,
-            a.x * b.y - a.y * b.x,
+    return {a.y() * b.z() - a.z() * b.y(),
+            a.z() * b.x() - a.x() * b.z(),
+            a.x() * b.y() - a.y() * b.x(),
             T(0)};
 }
 
 
-
 // Factory functions:
-template <typename ValueType=double, typename TupleType=Tuple<ValueType>>
-inline TupleType tuple(ValueType x, ValueType y, ValueType z, ValueType w) {
-    return TupleType {x, y, z, w};
+template <typename T=default_t>
+inline Tuple<T> tuple(T x, T y, T z, T w) {
+    return Tuple<T> {x, y, z, w};
 }
 
-template <typename ValueType=double, typename TupleType=Tuple<ValueType>>
-inline TupleType point(ValueType x, ValueType y, ValueType z) {
-    return TupleType {x, y, z, 1};
+template <typename T=default_t>
+inline Tuple<T> point(T x, T y, T z) {
+    return Tuple<T> {x, y, z, 1};
 }
 
-template <typename ValueType=double, typename TupleType=Tuple<ValueType>>
-inline TupleType vector(ValueType x, ValueType y, ValueType z) {
-    return TupleType {x, y, z, 0};
+template <typename T=default_t>
+inline Tuple<T> vector(T x, T y, T z) {
+    return Tuple<T> {x, y, z, 0};
 }
 
+} // namespace rtc::default_tuple
 
-
-} // namespace rtc
-
-#endif // RTC_MATHS_H
+#endif // RTC_LIB_TUPLE_H

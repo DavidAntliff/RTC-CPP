@@ -1,4 +1,8 @@
+# The Ray Tracer Challenge - C++
 
+## Conventions
+
+This codebase uses the Left Hand Coordinate system.
 
 ## Building
 

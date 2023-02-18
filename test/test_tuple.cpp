@@ -1,38 +1,38 @@
+// Chapter 1: Tuples, Points and Vectors
+
 #include <gtest/gtest.h>
 
 #include <ray_tracer_challenge/tuple.h>
 
-using namespace rtc;
-
-// Chapter 1: Tuples
+using namespace rtc::default_tuple;
 
 // The default Tuple is all zero
 TEST(TestTuple, default_tuple) {
     auto a = Tuple();
-    EXPECT_EQ(a.x, 0);
-    EXPECT_EQ(a.y, 0);
-    EXPECT_EQ(a.z, 0);
-    EXPECT_EQ(a.w, 0);
+    EXPECT_EQ(a.x(), 0);
+    EXPECT_EQ(a.y(), 0);
+    EXPECT_EQ(a.z(), 0);
+    EXPECT_EQ(a.w(), 0);
 }
 
 // A tuple with w=1.0 is a point
 TEST(TestTuple, tuple_is_a_point) {
-    auto a = tuple(4.3, -4.2, 3.1, 1.0);
-    EXPECT_DOUBLE_EQ(a.x, 4.3);
-    EXPECT_DOUBLE_EQ(a.y, -4.2);
-    EXPECT_DOUBLE_EQ(a.z, 3.1);
-    EXPECT_EQ(a.w, 1.0);
+    auto a = tuple<float>(4.3, -4.2, 3.1, 1.0);
+    EXPECT_FLOAT_EQ(a.x(), 4.3);
+    EXPECT_FLOAT_EQ(a.y(), -4.2);
+    EXPECT_FLOAT_EQ(a.z(), 3.1);
+    EXPECT_EQ(a.w(), 1.0);
     EXPECT_TRUE(a.is_point());
     EXPECT_FALSE(a.is_vector());
 }
 
 // A tuple with w=0 is a vector
 TEST(TestTuple, tuple_is_a_vector) {
-    auto a = tuple(4.3, -4.2, 3.1, 0.0);
-    EXPECT_DOUBLE_EQ(a.x, 4.3);
-    EXPECT_DOUBLE_EQ(a.y, -4.2);
-    EXPECT_DOUBLE_EQ(a.z, 3.1);
-    EXPECT_EQ(a.w, 0.0);
+    auto a = tuple<float>(4.3, -4.2, 3.1, 0.0);
+    EXPECT_FLOAT_EQ(a.x(), 4.3);
+    EXPECT_FLOAT_EQ(a.y(), -4.2);
+    EXPECT_FLOAT_EQ(a.z(), 3.1);
+    EXPECT_EQ(a.w(), 0.0);
     EXPECT_FALSE(a.is_point());
     EXPECT_TRUE(a.is_vector());
 }
@@ -140,14 +140,14 @@ TEST(TestTuple, compute_magnitude_vector_0_0_1) {
 
 // Computing the magnitude of vector(1, 2, 3)
 TEST(TestTuple, compute_magnitude_vector_1_2_3) {
-    auto v = vector(1., 2., 3.);
-    EXPECT_DOUBLE_EQ(magnitude(v), std::sqrt(14));
+    auto v = vector<float>(1., 2., 3.);
+    EXPECT_FLOAT_EQ(magnitude(v), std::sqrt(14));
 }
 
 // Computing the magnitude of vector(-1, -2, -3)
 TEST(TestTuple, compute_magnitude_vector_n1_n2_n3) {
     auto v = vector(-1., -2., -3.);
-    EXPECT_DOUBLE_EQ(magnitude(v), std::sqrt(14));
+    EXPECT_FLOAT_EQ(magnitude(v), std::sqrt(14));
 }
 
 // Normalizing vector(4, 0, 0) gives (1, 0, 0)
@@ -165,15 +165,15 @@ TEST(TestTuple, normalizing_vector_1_2_3) {
 
 // The magnitude of a normalized vector
 TEST(TestTuple, magnitude_of_normalized_vector) {
-    auto v = vector(1., 2., 3.);
+    auto v = vector<float>(1., 2., 3.);
     auto norm = normalize(v);
-    EXPECT_DOUBLE_EQ(magnitude(norm), 1.0);
+    EXPECT_FLOAT_EQ(magnitude(norm), 1.0);
 }
 
 // The dot product of two tuples
 TEST(TestTuple, dot_product_of_two_tuples) {
-    auto a = vector(1., 2., 3.);
-    auto b = vector(2., 3., 4.);
+    auto a = vector<float>(1., 2., 3.);
+    auto b = vector<float>(2., 3., 4.);
     EXPECT_DOUBLE_EQ(dot(a, b), 20.0);
 }
 
