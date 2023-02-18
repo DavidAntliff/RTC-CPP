@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.24)
 
 set(SRCS
-        dummy.cpp)
+        tuple.cpp)
 
 set(HDRS
-        include/ray_tracer_challenge/dummy.h)
+        include/ray_tracer_challenge/tuple.h)
 
 add_library(RayTracerChallenge-Lib ${SRCS} ${HDRS})
 
