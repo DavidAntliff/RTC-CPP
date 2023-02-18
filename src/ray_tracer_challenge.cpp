@@ -4,7 +4,7 @@
 #include <boost/log/trivial.hpp>
 #include <boost/log/expressions.hpp>
 
-#include <ray_tracer_challenge/dummy.h>
+#include <ray_tracer_challenge/tuple.h>
 
 int main() {
     BOOST_LOG_TRIVIAL(info) << "The Ray Tracer Challenge";
