@@ -11,6 +11,32 @@
 
 namespace rtc {
 
+namespace detail {
+
+template <typename T>
+void add_value(std::string & row, T value) {
+    value = std::min(std::max(value, 0.0), 1.0);
+    const int ivalue = std::round(value * 255);
+    if (!row.empty()) {
+        row += ' ';
+    }
+    row += std::to_string(ivalue);
+}
+
+void split_line_by(std::vector<std::string> & lines,
+                   std::string_view line, int limit) {
+    if (line.length() > 70) {
+        const auto idx = line.rfind(' ', 70 - 1);
+        lines.push_back(std::string(line.substr(0, idx)));
+        line = line.substr(idx + 1);
+        split_line_by(lines, line, limit);
+    } else {
+        lines.push_back(std::string(line));
+    }
+}
+
+} // namespace detail
+
 template <typename PixelType>
 class Canvas {
 public:
@@ -67,7 +93,7 @@ private:
 
 template <typename PixelType=Color<>>
 auto canvas(int width, int height) {
-    return Canvas<PixelType>(width, height);
+    return Canvas<PixelType> {width, height};
 }
 
 template <typename PixelType=Color<>>
@@ -78,28 +104,6 @@ auto pixel_at(const Canvas<PixelType> & canvas, int x, int y) {
 template <typename Canvas>
 auto write_pixel(Canvas & canvas, int x, int y, const typename Canvas::pixel_t & color) {
     canvas.write_pixel(x, y, color);
-}
-
-template <typename T>
-void add_value(std::string & row, T value) {
-    value = std::min(std::max(value, 0.0), 1.0);
-    const int ivalue = std::round(value * 255);
-    if (!row.empty()) {
-        row += ' ';
-    }
-    row += std::to_string(ivalue);
-}
-
-void split_line_by(std::vector<std::string> & lines,
-                   std::string_view line, int limit) {
-    if (line.length() > 70) {
-        const auto idx = line.rfind(' ', 70 - 1);
-        lines.push_back(std::string(line.substr(0, idx)));
-        line = line.substr(idx + 1);
-        split_line_by(lines, line, limit);
-    } else {
-        lines.push_back(std::string(line));
-    }
 }
 
 template <typename Canvas>
@@ -113,13 +117,13 @@ auto ppm_from_canvas(Canvas & canvas) {
         for (auto x = 0; x < canvas.width(); ++x) {
             const auto p = canvas.pixel_at(x, y);
 
-            add_value(row, p->red());
-            add_value(row, p->green());
-            add_value(row, p->blue());
+            detail::add_value(row, p->red());
+            detail::add_value(row, p->green());
+            detail::add_value(row, p->blue());
         }
 
         std::vector<std::string> lines;
-        split_line_by(lines, row, 70);
+        detail::split_line_by(lines, row, 70);
 
         for (auto & i : lines) {
             data += i + '\n';

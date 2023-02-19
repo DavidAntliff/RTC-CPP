@@ -33,7 +33,7 @@ TEST(TestColor, subtracting_colors) {
 // Multiplying a color by a scalar
 TEST(TestColor, multiplying_color_by_scalar) {
     auto c = color(0.2, 0.3, 0.4);
-    EXPECT_EQ(c * 2, color(0.4, 0.6, 0.8));
+    EXPECT_EQ(c * 2.0, color(0.4, 0.6, 0.8));
 }
 
 // Multiplying colors

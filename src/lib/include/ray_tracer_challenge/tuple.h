@@ -41,6 +41,16 @@ struct Tuple {
     T z() const { return z_; }
     T w() const { return w_; }
 
+    T at(int i) const {
+        switch (i) {
+            case 0: return x_;
+            case 1: return y_;
+            case 2: return z_;
+            case 3: return w_;
+            default: return T(0);
+        }
+    }
+
     bool is_point() const {
         return w_ == 1.0;
     }
@@ -142,21 +152,21 @@ inline Tuple<T> operator-(Tuple<T> lhs, const Tuple<T> & rhs)
     return lhs;
 }
 
-template <typename T, typename Scalar>
-inline Tuple<T> operator*(Tuple<T> lhs, const Scalar & rhs)
+template <typename T>
+inline Tuple<T> operator*(Tuple<T> lhs, const T & rhs)
 {
     lhs *= rhs;
     return lhs;
 }
 
-template <typename T, typename Scalar>
-inline Tuple<T> operator*(const Scalar & lhs, Tuple<T> rhs)
+template <typename T>
+inline Tuple<T> operator*(const T & lhs, Tuple<T> rhs)
 {
     return rhs * lhs;
 }
 
-template <typename T, typename Scalar>
-inline Tuple<T> operator/(Tuple<T> lhs, const Scalar & rhs)
+template <typename T>
+inline Tuple<T> operator/(Tuple<T> lhs, const T & rhs)
 {
     return lhs /= rhs;
 }
@@ -196,17 +206,17 @@ inline Tuple<T> cross(const Tuple<T> & a, const Tuple<T> & b) {
 
 // Factory functions:
 template <typename T=default_t>
-inline Tuple<T> tuple(T x, T y, T z, T w) {
+inline auto tuple(T x, T y, T z, T w) {
     return Tuple<T> {x, y, z, w};
 }
 
 template <typename T=default_t>
-inline Tuple<T> point(T x, T y, T z) {
+inline auto point(T x, T y, T z) {
     return Tuple<T> {x, y, z, 1};
 }
 
 template <typename T=default_t>
-inline Tuple<T> vector(T x, T y, T z) {
+inline auto vector(T x, T y, T z) {
     return Tuple<T> {x, y, z, 0};
 }
 
