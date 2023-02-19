@@ -99,6 +99,15 @@ protected:
     T x_, y_, z_, w_;
 };
 
+// TODO: still deciding if these are useful...
+//template <typename T=default_t>
+//using Point = Tuple<T>;
+//
+//template <typename T=default_t>
+//using Vector = Tuple<T>;
+using Point = Tuple<>;
+using Vector = Tuple<>;
+
 // Free functions:
 
 // Strict equality for floating point types
