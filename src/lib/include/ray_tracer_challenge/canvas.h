@@ -27,11 +27,11 @@ void split_line_by(std::vector<std::string> & lines,
                    std::string_view line, int limit) {
     if (line.length() > 70) {
         const auto idx = line.rfind(' ', 70 - 1);
-        lines.push_back(std::string(line.substr(0, idx)));
+        lines.emplace_back(line.substr(0, idx));
         line = line.substr(idx + 1);
         split_line_by(lines, line, limit);
     } else {
-        lines.push_back(std::string(line));
+        lines.emplace_back(line);
     }
 }
 
