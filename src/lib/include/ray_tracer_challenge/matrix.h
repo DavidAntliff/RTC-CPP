@@ -8,7 +8,7 @@
 
 #include <boost/format.hpp>
 
-#include "math.h"
+#include "./math.h"
 
 // Comment out to disable run-time range checking on row, column indices
 #define RANGE_CHECKING
@@ -45,9 +45,7 @@ public:
         }
     }
 
-    Matrix(const Matrix & other) = default;//{
-        //elements_ = other.elements_;
-   // }
+    Matrix(const Matrix & other) = default;
 
     int dim() const { return N; }
 
@@ -67,19 +65,7 @@ public:
         elements_[row][column] = value;
     }
 
-    //    Matrix4x4(std::array<std::array<T, 4>, 4> elements) :
-//            elements_(elements) {}
-
-//    Matrix4x4(std::array<std::array<T, 4>, 4> && elements) :
-//        elements_(std::move(elements)) {}
-
-//    Matrix4x4(std::array<T, 4> r0,
-//              std::array<T, 4> r1,
-//              std::array<T, 4> r2,
-//              std::array<T, 4> r3)
-//    {}
-
-    //friend bool operator== <T, N>(const Matrix<T, N> & lhs, const Matrix<T, N> & rhs);
+    // Strict equality for floating point types
     friend bool operator==(const Matrix & lhs, const Matrix & rhs) {
         return lhs.elements_ == rhs.elements_;
     }
@@ -113,12 +99,6 @@ public:
 private:
     std::array<std::array<T, N>, N> elements_;
 };
-
-// Strict equality for floating point types
-//template <typename T, int N>
-//inline bool operator==(const Matrix<T, N> & lhs, const Matrix<T, N> & rhs) {
-//    return true;// lhs.elements_[0] = rhs.elements_[0];
-//}
 
 template <typename T, int N>
 inline bool almost_equal(const Matrix<T, N> & lhs, const Matrix<T, N> & rhs) {
@@ -295,9 +275,6 @@ inline auto identity4x4() {
         {T(0), T(0), T(0), T(1)},
     };
 }
-
-
-
 
 } // namespace rtc
 
