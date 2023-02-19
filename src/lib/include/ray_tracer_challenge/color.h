@@ -9,6 +9,7 @@ template <typename Base=default_tuple::Tuple<>>
 struct Color : Base {
     using value_t = Base::value_t;
 
+    Color() = default;
     Color(value_t red, value_t green, value_t blue) :
         Base(red, green, blue, 0) {}
     virtual ~Color() = default;
