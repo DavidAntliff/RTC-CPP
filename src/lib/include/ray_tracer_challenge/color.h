@@ -52,11 +52,11 @@ T hadamard(const Color<T> & lhs, const Color<T> & rhs) {
 }
 
 template <typename T=default_tuple::Tuple<>>
-inline Color<T> color(
+inline auto color(
         typename Color<T>::value_t r,
         typename Color<T>::value_t g,
         typename Color<T>::value_t b) {
-    return {r, g, b};
+    return Color<T> {r, g, b};
 }
 
 } // namespace rtc

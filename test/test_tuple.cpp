@@ -117,7 +117,7 @@ TEST(TestTuple, multiplying_tuple_by_fraction_prefix) {
 // Dividing a tuple by a scalar
 TEST(TestTuple, dividing_tuple_by_scalar) {
     auto a = tuple(1., -2., 3., -4.);
-    EXPECT_EQ(a / 2, tuple(0.5, -1., 1.5, -2.));
+    EXPECT_EQ(a / 2.0, tuple(0.5, -1., 1.5, -2.));
 }
 
 // Computing the magnitude of vector(1, 0, 0)
