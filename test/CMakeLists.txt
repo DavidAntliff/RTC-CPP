@@ -17,6 +17,8 @@ set(SRCS
         test_color.cpp
         test_canvas.cpp
         test_matrix.cpp
+        test_transformations.cpp
+        test_matrix_builder.cpp
 )
 
 add_executable(RayTracerChallengeTests ${SRCS})
