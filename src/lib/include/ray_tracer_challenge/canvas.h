@@ -15,8 +15,8 @@ namespace detail {
 
 template <typename T>
 void add_value(std::string & row, T value) {
-    value = std::min(std::max(value, 0.0), 1.0);
-    const int ivalue = std::round(value * 255);
+    const auto v = std::min(std::max(value, 0.0), 1.0);
+    const unsigned int ivalue = std::rint(v * 255);
     if (!row.empty()) {
         row += ' ';
     }
@@ -42,31 +42,23 @@ class Canvas {
 public:
     using pixel_t = PixelType;
 
-    Canvas(int width, int height) :
+    Canvas(unsigned int width, unsigned int height) :
         width_(width), height_(height),
         pixels_(width_ * height_) {}
 
-//    Canvas (const Canvas &) = delete;
-//    Canvas & operator= (const Canvas &) = delete;
-//
-//    Canvas(Canvas && other) :
-//        width_(std::move(other.width_)),
-//        height_(std::move(other.height_)),
-//        pixels_(std::move(other.pixels_)) {}
+    unsigned int width() const { return width_; }
+    unsigned int height() const { return height_; }
 
-    int width() const { return width_; }
-    int height() const { return height_; }
-
-    std::optional<PixelType> pixel_at(int x, int y) const {
+    std::optional<PixelType> pixel_at(unsigned int x, unsigned int y) const {
         auto index = index_of_(x, y);
         if (index) {
             return pixels_[*index];
         } else {
-            return {};
+            return std::nullopt;
         }
     }
 
-    void write_pixel(int x, int y, PixelType p) {
+    void write_pixel(unsigned int x, unsigned int y, PixelType p) {
         auto index = index_of_(x, y);
         if (index) {
             pixels_[*index] = p;
@@ -74,12 +66,11 @@ public:
     }
 
 private:
-    std::optional<int> index_of_(int x, int y) const {
-        if (x >= 0 && x < width_ &&
-            y >= 0 && y < height_) {
+    std::optional<unsigned int> index_of_(unsigned int x, unsigned int y) const {
+        if (x < width_ && y < height_) {
             return x + y * width_;
         }
-        return {};
+        return std::nullopt;
     }
 
 private:
@@ -92,17 +83,17 @@ private:
 };
 
 template <typename PixelType=Color<>>
-auto canvas(int width, int height) {
+auto canvas(unsigned int width, unsigned int height) {
     return Canvas<PixelType> {width, height};
 }
 
 template <typename PixelType=Color<>>
-auto pixel_at(const Canvas<PixelType> & canvas, int x, int y) {
+auto pixel_at(const Canvas<PixelType> & canvas, unsigned int x, unsigned int y) {
     return canvas.pixel_at(x, y);
 }
 
 template <typename Canvas>
-auto write_pixel(Canvas & canvas, int x, int y, const typename Canvas::pixel_t & color) {
+auto write_pixel(Canvas & canvas, unsigned int x, unsigned int y, const typename Canvas::pixel_t & color) {
     canvas.write_pixel(x, y, color);
 }
 

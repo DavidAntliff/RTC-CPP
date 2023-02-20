@@ -12,7 +12,8 @@ TEST(TestMatrix, default_matrix_is_zero) {
     Matrix<double, 4> a;
     for (auto r = 0; r < a.dim(); ++r) {
         for (auto c = 0; c < a.dim(); ++c) {
-            EXPECT_EQ(a.at(r, c), 0.0);
+            EXPECT_EQ(a(r, c), 0.0);
+            EXPECT_EQ(*a.at(r, c), 0.0);
         }
     }
 }
@@ -27,6 +28,16 @@ TEST(TestMatrix, matrix_from_vector) {
         { 3.0,  4.0,   5.0},
         { 6.0,  7.0,   8.0},
     }));
+}
+
+TEST(TestMatrix, invalid_access) {
+    auto m = Matrix<double, 4> {};
+    EXPECT_EQ(m.at(0, -1), std::nullopt);
+    EXPECT_EQ(m.at(-1, 0), std::nullopt);
+    EXPECT_EQ(m.at(-1, -1), std::nullopt);
+    EXPECT_EQ(m.at(4, 0), std::nullopt);
+    EXPECT_EQ(m.at(0, 4), std::nullopt);
+    EXPECT_EQ(m.at(4, 4), std::nullopt);
 }
 
 // Constructing and inspecting a 4x4 matrix
@@ -45,13 +56,13 @@ TEST(TestMatrix, constructing_and_inspecting_4x4) {
         {13.5, 14.5, 15.5, 16.5},
     });
 
-    EXPECT_EQ(m.at(0, 0), 1.0);
-    EXPECT_EQ(m.at(0, 3), 4.0);
-    EXPECT_EQ(m.at(1, 0), 5.5);
-    EXPECT_EQ(m.at(1, 2), 7.5);
-    EXPECT_EQ(m.at(2, 2), 11.0);
-    EXPECT_EQ(m.at(3, 0), 13.5);
-    EXPECT_EQ(m.at(3, 2), 15.5);
+    EXPECT_EQ(m(0, 0), 1.0);
+    EXPECT_EQ(m(0, 3), 4.0);
+    EXPECT_EQ(m(1, 0), 5.5);
+    EXPECT_EQ(m(1, 2), 7.5);
+    EXPECT_EQ(m(2, 2), 11.0);
+    EXPECT_EQ(m(3, 0), 13.5);
+    EXPECT_EQ(m(3, 2), 15.5);
 }
 
 // Constructing and inspecting a 2x2 matrix
@@ -66,10 +77,10 @@ TEST(TestMatrix, constructing_and_inspecting_2x2) {
         {  1.0, -2.0},
     });
 
-    EXPECT_EQ(m.at(0, 0), -3.0);
-    EXPECT_EQ(m.at(0, 1), 5.0);
-    EXPECT_EQ(m.at(1, 0), 1.0);
-    EXPECT_EQ(m.at(1, 1), -2.0);
+    EXPECT_EQ(m(0, 0), -3.0);
+    EXPECT_EQ(m(0, 1), 5.0);
+    EXPECT_EQ(m(1, 0), 1.0);
+    EXPECT_EQ(m(1, 1), -2.0);
 }
 
 // Constructing and inspecting a 3x3 matrix
@@ -86,9 +97,9 @@ TEST(TestMatrix, constructing_and_inspecting_3x3) {
         {  0.0,  1.0,  1.0},
     });
 
-    EXPECT_EQ(m.at(0, 0), -3.0);
-    EXPECT_EQ(m.at(1, 1), -2.0);
-    EXPECT_EQ(m.at(2, 2), 1.0);
+    EXPECT_EQ(m(0, 0), -3.0);
+    EXPECT_EQ(m(1, 1), -2.0);
+    EXPECT_EQ(m(2, 2), 1.0);
 }
 
 // Matrix equality with identical matrices
@@ -329,9 +340,9 @@ TEST(TestMatrix, calculate_inverse_of_matrix) {
     auto b = inverse(a);
     EXPECT_EQ(determinant(a), 532.0);
     EXPECT_EQ(cofactor(a, 2, 3), -160.0);
-    EXPECT_EQ(b.at(3, 2), -160.0 / 532.0);
+    EXPECT_EQ(b(3, 2), -160.0 / 532.0);
     EXPECT_EQ(cofactor(a, 3, 2), 105.0);
-    EXPECT_EQ(b.at(2, 3), 105.0 / 532.0);
+    EXPECT_EQ(b(2, 3), 105.0 / 532.0);
     EXPECT_TRUE(almost_equal(b, matrix4x4({
         { 0.21805,   0.45113,   0.24060,  -0.04511},
         {-0.80827,  -1.45677,  -0.44361,   0.52068},
