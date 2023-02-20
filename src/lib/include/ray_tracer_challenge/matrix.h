@@ -35,8 +35,8 @@ public:
     Matrix(const std::vector<T> & elements) {
         assert(elements.size() == N * N);
         typename std::vector<T>::const_iterator iter = elements.begin();
-        for (auto r = 0; r < N; ++r) {
-            for (auto c = 0; c < N; ++c) {
+        for (auto r = 0U; r < N; ++r) {
+            for (auto c = 0U; c < N; ++c) {
                 elements_[r][c] = *iter;
                 ++iter;
             }
@@ -74,8 +74,8 @@ public:
     friend bool almost_equal(const Matrix & lhs, const Matrix & rhs) {
         using rtc::almost_equal;
 
-        for (auto row = 0; row < N; ++row) {
-            for (auto col = 0; col < N; ++col) {
+        for (auto row = 0U; row < N; ++row) {
+            for (auto col = 0U; col < N; ++col) {
                 if (!almost_equal(lhs(row, col), rhs(row, col))) {
                     return false;
                 }
@@ -86,9 +86,9 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Matrix & t) {
         os << "\nmatrix" << N << "x" << N << "({\n";
-        for (auto r = 0; r < N; ++r) {
+        for (auto r = 0U; r < N; ++r) {
             os << "    {";
-            for (auto c = 0; c < N; ++c) {
+            for (auto c = 0U; c < N; ++c) {
                 os << boost::format("%10.6f") % t(r, c) << ", ";
             }
             os << "},\n";
@@ -147,8 +147,8 @@ template <typename T>
 inline Matrix<T, 2> operator*(const Matrix<T, 2> & a, const Matrix<T, 2> & b)
 {
     return {
-            {mrc<T,0,0>(a, b), mrc<T,0,1>(a, b)},
-            {mrc<T,1,0>(a, b), mrc<T,1,1>(a, b)},
+        {mrc<T,0,0>(a, b), mrc<T,0,1>(a, b)},
+        {mrc<T,1,0>(a, b), mrc<T,1,1>(a, b)},
     };
 }
 
@@ -202,9 +202,9 @@ template <typename T, unsigned int N>
 inline auto submatrix(const Matrix<T, N> & m, unsigned int row, unsigned int column) {
     std::vector<T> el;
     el.reserve((N - 1) * (N - 1));
-    for (auto r = 0; r < N; ++r) {
+    for (auto r = 0U; r < N; ++r) {
         if (r != row) {
-            for (auto c = 0; c < N; ++c) {
+            for (auto c = 0U; c < N; ++c) {
                 if (c != column) {
                     el.push_back(m(r, c));
                 }
@@ -229,7 +229,7 @@ inline auto cofactor(const Matrix<T, N> & m, unsigned int row, unsigned int colu
 template <typename T, unsigned int N>
 inline T determinant(const Matrix<T, N> & m) {
     auto det = T(0);
-    for (auto c = 0; c < N; ++c) {
+    for (auto c = 0U; c < N; ++c) {
         det += m(0, c) * cofactor(m, 0, c);
     }
     return det;
@@ -245,8 +245,8 @@ inline Matrix<T, N> inverse(const Matrix<T, N> & m) {
     auto det = determinant(m);
 
     Matrix<T, N> m2;
-    for (auto row = 0; row < N; ++row) {
-        for (auto col = 0; col < N; ++col) {
+    for (auto row = 0U; row < N; ++row) {
+        for (auto col = 0U; col < N; ++col) {
             auto c = cofactor(m, row, col);
             // do transpose by swapping r, c here:
             m2.set(col, row, c / det);

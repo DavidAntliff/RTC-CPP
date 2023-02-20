@@ -74,8 +74,8 @@ private:
     }
 
 private:
-    int width_;
-    int height_;
+    unsigned int width_;
+    unsigned int height_;
 
     // Store pixels row by row, starting with
     // the top left (x = 0, y = 0)
@@ -103,9 +103,9 @@ auto ppm_from_canvas(Canvas & canvas) {
 
     std::string data;
 
-    for (auto y = 0; y < canvas.height(); ++y) {
+    for (auto y = 0U; y < canvas.height(); ++y) {
         std::string row;
-        for (auto x = 0; x < canvas.width(); ++x) {
+        for (auto x = 0U; x < canvas.width(); ++x) {
             const auto p = canvas.pixel_at(x, y);
 
             detail::add_value(row, p->red());
