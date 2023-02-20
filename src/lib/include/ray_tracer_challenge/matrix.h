@@ -10,6 +10,7 @@
 #include <boost/format.hpp>
 
 #include "./math.h"
+#include "./matrix_builder.h"
 
 namespace rtc {
 
@@ -17,7 +18,6 @@ namespace rtc {
 template <typename T, unsigned int N>
 class Matrix {
 public:
-
     Matrix() : elements_() {}
 
     Matrix(const std::initializer_list<std::initializer_list<T>> & elements)
@@ -96,6 +96,10 @@ public:
         os << "})";
         return os;
     }
+
+    // Fluent API support:
+    friend class MatrixBuilder<Matrix>;
+    static MatrixBuilder<Matrix> then(Matrix m) { return {m}; }
 
 private:
     std::array<std::array<T, N>, N> elements_;
