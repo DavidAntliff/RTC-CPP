@@ -12,7 +12,6 @@ struct Color : Base {
     Color() = default;
     Color(value_t red, value_t green, value_t blue) :
         Base(red, green, blue, 0) {}
-    virtual ~Color() = default;
 
     value_t red() const { return Base::x_; }
     value_t green() const { return Base::y_; }

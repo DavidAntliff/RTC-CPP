@@ -3,6 +3,7 @@
 
 #include <ostream>
 #include <cmath>
+#include <optional>
 
 #include "math.h"
 
@@ -24,7 +25,7 @@ namespace rtc::default_tuple {
 
 using default_t = double;
 
-template <typename T=default_t>
+template <typename T=default_t, unsigned int N=4>
 struct Tuple {
     using value_t = T;
 
@@ -36,12 +37,21 @@ struct Tuple {
         w_ = w;
     }
 
+    virtual ~Tuple() = default;
+
     T x() const { return x_; }
     T y() const { return y_; }
     T z() const { return z_; }
     T w() const { return w_; }
 
-    T at(int i) const {
+    std::optional<T> at(unsigned int i) const {
+        if (i < N)
+            return operator()(i);
+        else
+            return std::nullopt;
+    }
+
+    T operator()(int i) const {
         switch (i) {
             case 0: return x_;
             case 1: return y_;
@@ -103,7 +113,6 @@ struct Tuple {
                   << ", " << t.z_
                   << ", " << t.w_ << ")";
     }
-
 
 protected:
     T x_, y_, z_, w_;

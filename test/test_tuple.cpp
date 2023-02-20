@@ -15,6 +15,13 @@ TEST(TestTuple, default_tuple) {
     EXPECT_EQ(a.w(), 0);
 }
 
+// Invalid access via .at() returns empty optional
+TEST(TestTuple, invalid_access) {
+    auto a = Tuple();
+    EXPECT_EQ(a.at(-1), std::nullopt);
+    EXPECT_EQ(a.at(4), std::nullopt);
+}
+
 // A tuple with w=1.0 is a point
 TEST(TestTuple, tuple_is_a_point) {
     auto a = tuple<float>(4.3, -4.2, 3.1, 1.0);
@@ -22,6 +29,17 @@ TEST(TestTuple, tuple_is_a_point) {
     EXPECT_FLOAT_EQ(a.y(), -4.2);
     EXPECT_FLOAT_EQ(a.z(), 3.1);
     EXPECT_EQ(a.w(), 1.0);
+
+    EXPECT_FLOAT_EQ(a(0), 4.3);
+    EXPECT_FLOAT_EQ(a(1), -4.2);
+    EXPECT_FLOAT_EQ(a(2), 3.1);
+    EXPECT_EQ(a(3), 1.0);
+
+    EXPECT_FLOAT_EQ(*a.at(0), 4.3);
+    EXPECT_FLOAT_EQ(*a.at(1), -4.2);
+    EXPECT_FLOAT_EQ(*a.at(2), 3.1);
+    EXPECT_EQ(*a.at(3), 1.0);
+
     EXPECT_TRUE(a.is_point());
     EXPECT_FALSE(a.is_vector());
 }
