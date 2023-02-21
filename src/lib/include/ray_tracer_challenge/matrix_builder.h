@@ -8,19 +8,19 @@ namespace rtc {
 template <typename Matrix>
 class MatrixBuilder {
 public:
-    MatrixBuilder(Matrix m) : matrix(m) {}
+    MatrixBuilder() = default;
+    MatrixBuilder(Matrix m) : matrix_(m) {}
 
     // Use explicit type to invoke implicit conversion to Matrix:
-    operator Matrix() const { return std::move(matrix); }
+    operator Matrix() const { return std::move(matrix_); }
 
     // Or use .end() suffix to have auto deduce the type as Matrix:
-    auto end() { return std::move(matrix); }
+    auto end() const { return std::move(matrix_); }
 
-    MatrixBuilder & then(Matrix m) { matrix = m * matrix; return *this; }
-
+    MatrixBuilder & then(Matrix m) { matrix_ = m * matrix_; return *this; }
 
 private:
-    Matrix matrix;
+    Matrix matrix_ {};
 };
 
 }
