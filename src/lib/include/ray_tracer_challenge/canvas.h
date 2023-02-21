@@ -42,6 +42,7 @@ class Canvas {
 public:
     using pixel_t = PixelType;
 
+    Canvas() = default;
     Canvas(unsigned int width, unsigned int height) :
         width_(width), height_(height),
         pixels_(width_ * height_) {}
@@ -74,12 +75,12 @@ private:
     }
 
 private:
-    unsigned int width_;
-    unsigned int height_;
+    unsigned int width_ {};
+    unsigned int height_ {};
 
     // Store pixels row by row, starting with
     // the top left (x = 0, y = 0)
-    std::vector<PixelType> pixels_;
+    std::vector<PixelType> pixels_ {};
 };
 
 template <typename PixelType=Color<>>

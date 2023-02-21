@@ -18,7 +18,7 @@ namespace rtc {
 template <typename T, unsigned int N>
 class Matrix {
 public:
-    Matrix() : elements_() {}
+    Matrix() = default;
 
     Matrix(const std::initializer_list<std::initializer_list<T>> & elements)
     {
@@ -98,11 +98,12 @@ public:
     }
 
     // Fluent API support:
+    // TODO: does this actually work properly?
     friend class MatrixBuilder<Matrix>;
     static MatrixBuilder<Matrix> then(Matrix m) { return {m}; }
 
 private:
-    std::array<std::array<T, N>, N> elements_;
+    std::array<std::array<T, N>, N> elements_ {};
 };
 
 template <typename T, unsigned int N>

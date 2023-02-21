@@ -25,17 +25,25 @@ namespace rtc::default_tuple {
 
 using default_t = double;
 
+// Abstract base class, with special methods re-enabled, after
+// providing the recommended virtual destructor.
+struct TupleBase {
+    TupleBase() = default;
+    virtual ~TupleBase() = default;
+    TupleBase(TupleBase &&) = default;
+    TupleBase& operator=(TupleBase &&) = default;
+    TupleBase(const TupleBase&) = default;
+    TupleBase& operator=(const TupleBase&) = default;
+};
+
 template <typename T=default_t, unsigned int N=4>
-struct Tuple {
+struct Tuple : public TupleBase {
     using value_t = T;
 
     Tuple() = default;
-    Tuple(T x, T y, T z, T w) {
-        x_ = x;
-        y_ = y;
-        z_ = z;
-        w_ = w;
-    }
+    Tuple(T x, T y, T z, T w) :
+        TupleBase{},
+        x_ {x}, y_ {y}, z_{z}, w_{w} {}
 
     virtual ~Tuple() = default;
 
@@ -115,7 +123,10 @@ struct Tuple {
     }
 
 protected:
-    T x_, y_, z_, w_;
+    T x_ {};
+    T y_ {};
+    T z_ {};
+    T w_ {};
 };
 
 // TODO: still deciding if these are useful...
