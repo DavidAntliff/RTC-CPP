@@ -6,7 +6,6 @@
 #include <ray_tracer_challenge/transformations.h>
 
 using namespace rtc;
-using namespace rtc::default_tuple;
 
 template <typename Canvas>
 void set_pixel(Canvas & c, double x, double y) {

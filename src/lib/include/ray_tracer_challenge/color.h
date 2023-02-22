@@ -5,7 +5,7 @@
 
 namespace rtc {
 
-template <typename Base=default_tuple::Tuple<>>
+template <typename Base=Tuple<>>
 struct Color : Base {
     using value_t = Base::value_t;
 
@@ -50,7 +50,7 @@ T hadamard(const Color<T> & lhs, const Color<T> & rhs) {
     return lhs * rhs;
 }
 
-template <typename T=default_tuple::Tuple<>>
+template <typename T=Tuple<>>
 inline auto color(
         typename Color<T>::value_t r,
         typename Color<T>::value_t g,

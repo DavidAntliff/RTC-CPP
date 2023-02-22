@@ -6,7 +6,6 @@
 #include <ray_tracer_challenge/tuple.h>
 
 using namespace rtc;
-using namespace rtc::default_tuple;
 
 TEST(TestMatrix, default_matrix_is_zero) {
     Matrix<double, 4> A;
