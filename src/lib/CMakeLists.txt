@@ -11,8 +11,7 @@ set(HDRS
         include/ray_tracer_challenge/canvas.h
         include/ray_tracer_challenge/matrix.h
         include/ray_tracer_challenge/transformations.h
-        include/ray_tracer_challenge/matrix_builder.h
-)
+        )
 
 add_library(RayTracerChallenge-Lib ${SRCS} ${HDRS})
 
