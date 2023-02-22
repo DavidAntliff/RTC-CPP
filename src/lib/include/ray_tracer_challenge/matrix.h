@@ -10,7 +10,6 @@
 #include <boost/format.hpp>
 
 #include "./math.h"
-#include "./matrix_builder.h"
 
 namespace rtc {
 
@@ -98,9 +97,10 @@ public:
     }
 
     // Fluent API support:
-    // TODO: does this actually work properly?
-    friend class MatrixBuilder<Matrix>;
-    static MatrixBuilder<Matrix> then(Matrix m) { return {m}; }
+    Matrix then(const Matrix & m) {
+        *this = m * *this;
+        return *this;
+    }
 
 private:
     std::array<std::array<T, N>, N> elements_ {};
