@@ -9,7 +9,6 @@
 #include <ray_tracer_challenge/transformations.h>
 
 using namespace rtc;
-using namespace rtc::default_tuple;
 
 // Multiplying by a translation matrix
 TEST(TestTransformations, multiplying_by_translation_matrix) {

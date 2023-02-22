@@ -4,7 +4,7 @@
 
 #include <ray_tracer_challenge/tuple.h>
 
-using namespace rtc::default_tuple;
+using namespace rtc;
 
 // The default Tuple is all zero
 TEST(TestTuple, default_tuple) {

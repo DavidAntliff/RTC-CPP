@@ -4,7 +4,6 @@
 #include <ray_tracer_challenge/tuple.h>
 
 using namespace rtc;
-using namespace rtc::default_tuple;
 
 int main(int argc, char * argv[]) {
     (void)argc;

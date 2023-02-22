@@ -21,7 +21,7 @@
 // tuple<double>()
 // tuple<float>()
 
-namespace rtc::default_tuple {
+namespace rtc {
 
 using default_t = double;
 
@@ -240,6 +240,6 @@ inline auto vector(T x, T y, T z) {
     return Tuple<T> {x, y, z, 0};
 }
 
-} // namespace rtc::default_tuple
+} // namespace rtc
 
 #endif // RTC_LIB_TUPLE_H
