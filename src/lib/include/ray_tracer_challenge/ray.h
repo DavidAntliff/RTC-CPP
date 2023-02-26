@@ -5,6 +5,7 @@
 
 #include "./math.h"
 #include "tuple.h"
+#include "matrix.h"
 #include "transformations.h"
 
 namespace rtc {
@@ -39,23 +40,33 @@ inline auto position(Ray const &ray,
     return ray.origin() + ray.direction() * t;
 }
 
-
+template <typename T=fp_t>
 class Sphere {
 public:
+    using matrix_t = Matrix<T, 4>;
+
     Sphere() = default;
     Sphere(int id) : id_{id} {}
 
+    matrix_t const & transform() const { return transform_; }
+
+    void set_transform(matrix_t const & m) {
+        transform_ = m;
+    }
+
 private:
     int id_ {};
+    matrix_t transform_ {identity4x4()};
 };
 
 inline auto sphere(int id) {
     return Sphere {id};
 }
 
-
+template <typename T=fp_t>
 struct Intersection {
-    Intersection(fp_t t, Sphere const * object) :
+    Intersection() = default;
+    Intersection(fp_t t, Sphere<T> const * object) :
         t_{t}, object_{object} {}
 
     auto t() const { return t_; }
@@ -68,36 +79,66 @@ struct Intersection {
 
 private:
     fp_t t_ {};
-    Sphere const * object_ {};
+    Sphere<T> const * object_ {};
 };
 
-using Intersections = std::vector<Intersection>;
-
-inline auto intersection(fp_t t, Sphere const & object) {
+template <typename T=fp_t>
+inline auto intersection(fp_t t, Sphere<T> const & object) {
     return Intersection {t, &object};
 }
 
-// https://stackoverflow.com/questions/59655413/can-i-list-initialize-stdvector-with-perfect-forwarding-of-the-elements
+template <typename IntersectionType>
+using Intersections = std::vector<IntersectionType>;
+
+// https://stackoverflow.com/a/75569616
+// This simply forwards the parameters to std::vector
+//
+// May need this defined:
+//template<class T> Intersection(T) -> Intersection<T>;
+//
 template <typename... Args>
-inline Intersections intersections(Args&&... args) {
-    Intersections vec;
-    vec.reserve(sizeof...(Args));
-    (vec.emplace_back(std::forward<Args>(args)), ...);
+auto intersections2(Args&&... args) {
+    // use the std::vector deduction guide:
+    return std::vector{std::forward<Args>(args)...};
+
+    // or if you want `Object`s created from `args`:
+    //return std::vector{Object{std::forward<Args>(args)}...};
+}
+
+// https://stackoverflow.com/a/75571723
+// This ensures that the types are all the same.
+#include <type_traits>
+
+template <typename Head, typename... Tail>
+auto intersections(Head&& head, Tail&&... tail) {
+    using T = std::remove_cvref_t<Head>;
+    static_assert(std::conjunction_v<std::is_same<T, std::remove_cvref_t<Tail>>...>);
+
+    Intersections<T> vec;
+    vec.reserve(1 + sizeof...(Tail));
+    vec.emplace_back(std::forward<Head>(head));
+    (vec.emplace_back(std::forward<Tail>(tail)), ...);
     return vec;
 }
 
-template<typename Ray>
-inline Intersections intersect(Sphere const & sphere,
-                               Ray const & ray) {
+// See also:
+// https://www.scs.stanford.edu/~dm/blog/param-pack.html#homogeneous-intro
+
+template <typename T, typename Ray>
+inline Intersections<Intersection<T>> intersect(Sphere<T> const & sphere,
+                                  Ray const & ray) {
+    // Apply the inverse of the Sphere's transformation
+    auto ray2 = transform(ray, inverse(sphere.transform()));
+
     // TODO: A more stable algorithm at:
     // https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
 
     // The vector from the sphere's centre, to the ray origin
     // Remember, the sphere is centred at the world origin
-    auto sphere_to_ray = ray.origin() - point<typename Ray::Point::value_t>(0.0, 0.0, 0.0);
+    auto sphere_to_ray = ray2.origin() - point<typename Ray::Point::value_t>(0.0, 0.0, 0.0);
 
-    auto a = dot(ray.direction(), ray.direction());
-    auto b = 2.0 * dot(ray.direction(), sphere_to_ray);
+    auto a = dot(ray2.direction(), ray2.direction());
+    auto b = 2.0 * dot(ray2.direction(), sphere_to_ray);
     auto c = dot(sphere_to_ray, sphere_to_ray) - 1.0;
 
     auto discriminant = b * b - 4.0 * a * c;
@@ -112,10 +153,11 @@ inline Intersections intersect(Sphere const & sphere,
     return {{t1, &sphere}, {t2, &sphere}};
 }
 
-inline std::optional<Intersection> hit(Intersections & intersections) {
+template <typename T>
+inline std::optional<Intersection<T>> hit(Intersections<Intersection<T>> & intersections) {
     std::sort(intersections.begin(), intersections.end());
 
-    auto is_positive = [](Intersection x){ return x.t() >= 0; };
+    auto is_positive = [](Intersection<T> x){ return x.t() >= 0; };
     auto iterator = std::ranges::find_if(intersections, is_positive);
 
     if (iterator != intersections.end()) {
@@ -123,6 +165,16 @@ inline std::optional<Intersection> hit(Intersections & intersections) {
     } else {
         return {};
     }
+}
+
+template <typename Ray, typename Matrix>
+inline Ray transform(Ray const & r, Matrix const & m) {
+    return { m * r.origin(), m * r.direction() };
+}
+
+template <typename Shape, typename Matrix>
+inline void set_transform(Shape & shape, Matrix const & m) {
+    shape.set_transform(m);
 }
 
 } // namespace rtc

@@ -144,3 +144,55 @@ TEST(TestRay, the_hit_is_always_the_lowest_non_negative) {
     auto i = hit(xs);
     EXPECT_THAT(i, Optional(i4));
 }
+
+// Translating a ray
+TEST(TestRay, translating_a_ray) {
+    auto r = ray(point(1.0, 2.0, 3.0), vector(0.0, 1.0, 0.0));
+    auto m = translation(3.0, 4.0, 5.0);
+    auto r2 = transform(r, m);
+    EXPECT_EQ(r2.origin(), point(4.0, 6.0, 8.0));
+    EXPECT_EQ(r2.direction(), vector(0.0, 1.0, 0.0));
+}
+
+// Scaling a ray
+TEST(TestRay, scaling_a_ray) {
+    auto r = ray(point(1.0, 2.0, 3.0), vector(0.0, 1.0, 0.0));
+    auto m = scaling(2.0, 3.0, 4.0);
+    auto r2 = transform(r, m);
+    EXPECT_EQ(r2.origin(), point(2.0, 6.0, 12.0));
+    EXPECT_EQ(r2.direction(), vector(0.0, 3.0, 0.0));
+}
+
+// A sphere's default transformation
+TEST(TestRay, sphere_default_transformation) {
+    auto s = sphere(1);
+    EXPECT_EQ(s.transform(), identity4x4());
+}
+
+// Changing a sphere's transformation
+TEST(TestRay, changing_sphere_transformation) {
+    auto s = sphere(1);
+    auto t = translation(2.0, 3.0, 4.0);
+    set_transform(s, t);
+    EXPECT_EQ(s.transform(), t);
+}
+
+// Intersecting a scaled sphere with a ray
+TEST(TestRay, intersecting_a_scaled_sphere_with_ray) {
+    auto r = ray(point(0.0, 0.0, -5.0), vector(0.0, 0.0, 1.0));
+    auto s = sphere(1);
+    set_transform(s, scaling(2.0, 2.0, 2.0));
+    auto xs = intersect(s, r);
+    EXPECT_EQ(xs.size(), 2);
+    EXPECT_EQ(xs[0].t(), 3.0);
+    EXPECT_EQ(xs[1].t(), 7.0);
+}
+
+// Intersecting a translated sphere with a ray
+TEST(TestRay, intersecting_translated_sphere_with_ray) {
+    auto r = ray(point(0.0, 0.0, -5.0), vector(0.0, 0.0, 1.0));
+    auto s = sphere(1);
+    set_transform(s, translation(5.0, 0.0, 0.0));
+    auto xs = intersect(s, r);
+    EXPECT_EQ(xs.size(), 0);
+}

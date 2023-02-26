@@ -14,7 +14,7 @@
 namespace rtc {
 
 // Square Matrices only
-template <typename T, unsigned int N>
+template <typename T=fp_t, unsigned int N=0>
 class Matrix {
 public:
     Matrix() = default;
@@ -105,6 +105,9 @@ public:
 private:
     std::array<std::array<T, N>, N> elements_ {};
 };
+
+template <typename T>
+using Matrix4x4 = Matrix<T, 4>;
 
 template <typename T, unsigned int N>
 inline bool almost_equal(const Matrix<T, N> & lhs, const Matrix<T, N> & rhs) {
@@ -272,7 +275,7 @@ inline auto matrix4x4(const std::initializer_list<std::initializer_list<T>> & el
     return Matrix<T, 4> {elements};
 }
 
-template <typename T>
+template <typename T=fp_t>
 inline auto identity4x4() {
     return Matrix<T, 4> {
         {T(1), T(0), T(0), T(0)},
