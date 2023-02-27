@@ -99,3 +99,76 @@ TEST(TestSpheres, intersecting_translated_sphere_with_ray) {
     auto xs = intersect(s, r);
     EXPECT_EQ(xs.size(), 0);
 }
+
+// Chapter 6 - Light and Shading
+
+// The normal on a sphere at a point on the x axis
+TEST(TestSpheres, normal_on_sphere_at_point_on_x_axis) {
+    auto s = sphere(1);
+    auto n = normal_at(s, point(1.0, 0.0, 0.0));
+    EXPECT_EQ(n, vector(1.0, 0.0, 0.0));
+}
+
+// The normal on a sphere at a point on the y axis
+TEST(TestSpheres, normal_on_sphere_at_point_on_y_axis) {
+    auto s = sphere(1);
+    auto n = normal_at(s, point(0.0, 1.0, 0.0));
+    EXPECT_EQ(n, vector(0.0, 1.0, 0.0));
+}
+
+// The normal on a sphere at a point on the z axis
+TEST(TestSpheres, normal_on_sphere_at_point_on_z_axis) {
+    auto s = sphere(1);
+    auto n = normal_at(s, point(0.0, 0.0, 1.0));
+    EXPECT_EQ(n, vector(0.0, 0.0, 1.0));
+}
+
+// The normal on a sphere at a non-axial point
+TEST(TestSpheres, normal_on_sphere_at_non_axial_point) {
+    auto s = sphere(1);
+    auto k = sqrt(3.0) / 3.0;
+    auto n = normal_at(s, point(k, k, k));
+    EXPECT_EQ(n, vector(k, k, k));
+}
+
+// The normal is a normalized vector
+TEST(TestSphere, normal_is_normalized_vector) {
+    auto s = sphere(1);
+    auto k = sqrt(3.0) / 3.0;
+    auto n = normal_at(s, point(k, k, k));
+    EXPECT_EQ(n, normalize(n));
+}
+
+// Computing the normal on a translated sphere
+TEST(TestSphere, compute_normal_on_translated_sphere) {
+    auto s = sphere(1);
+    set_transform(s, translation(0.0, 1.0, 0.0));
+    auto n = normal_at(s, point(0.0, 1.70711, -0.70711));
+    EXPECT_TRUE(almost_equal(n, vector(0.0, 0.70711, -0.70711), 1e-4));
+}
+
+// Computing the normal on a transformed sphere
+TEST(TestSphere, compute_normal_on_transformed_sphere) {
+    auto s = sphere(1);
+    auto m = scaling(1.0, 0.5, 1.0) * rotation_z(std::numbers::pi / 5.0);
+    set_transform(s, m);
+    auto k = sqrt(2.0) / 2.0;
+    auto n = normal_at(s, point(0.0, k, -k));
+    EXPECT_TRUE(almost_equal(n, vector(0.0, 0.97014, -0.24245), 1e-4));
+}
+
+// A sphere has a default material
+TEST(TestSphere, sphere_has_default_material) {
+    auto s = sphere(1);
+    auto m = s.material();
+    EXPECT_EQ(m, material());
+}
+
+// A sphere may be assigned a material
+TEST(TestSphere, sphere_may_be_assigned_material) {
+    auto s = sphere(1);
+    auto m = material();
+    m.set_ambient(1.0);
+    s.set_material(m);
+    EXPECT_EQ(s.material(), m);
+}

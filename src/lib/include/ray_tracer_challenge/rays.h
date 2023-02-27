@@ -35,7 +35,7 @@ inline auto ray(T const &origin,
 }
 
 template<typename Ray>
-inline auto position(Ray const &ray,
+inline auto position(Ray const & ray,
                      typename Ray::Point::value_t t) {
     return ray.origin() + ray.direction() * t;
 }

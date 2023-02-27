@@ -202,3 +202,22 @@ TEST(TestTuples, cross_product_of_two_vectors) {
     EXPECT_EQ(cross(a, b), vector(-1., 2., -1.));
     EXPECT_EQ(cross(b, a), vector(1., -2., 1.));
 }
+
+// Chapter 6 - Light and Shading
+
+// Reflecting a vector approaching at 45 degrees
+TEST(TestTuples, reflecting_vector_at_45_degrees) {
+    auto v = vector(1.0, -1.0, 0.0);
+    auto n = vector(0.0, 1.0, 0.0);
+    auto r = reflect(v, n);
+    EXPECT_EQ(r, vector(1.0, 1.0, 0.0));
+}
+
+// Reflecting a vector off a slanted surface
+TEST(TestTuples, reflecting_vector_off_slanted_surface) {
+    auto v = vector(0.0, -1.0, 0.0);
+    auto k = sqrt(2.0) / 2.0;
+    auto n = vector(k, k, 0.0);
+    auto r = reflect(v, n);
+    EXPECT_TRUE(almost_equal(r, vector(1.0, 0.0, 0.0)));
+}
