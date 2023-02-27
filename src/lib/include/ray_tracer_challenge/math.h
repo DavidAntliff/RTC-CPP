@@ -7,7 +7,7 @@ namespace rtc {
 using fp_t = double;
 
 template <typename T>
-inline bool almost_equal(const T & lhs, const T & rhs, T epsilon=0.00001) {
+inline bool almost_equal(const T & lhs, const T & rhs, T epsilon=1e-5) {
     return abs(lhs - rhs) < epsilon;
 }
 

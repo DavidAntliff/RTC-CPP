@@ -5,7 +5,7 @@
 #include <cmath>
 #include <optional>
 
-#include "math.h"
+#include "math.h" // NOLINT(modernize-deprecated-headers)
 
 // Left-Handed Coordinate System
 
@@ -23,8 +23,6 @@
 
 namespace rtc {
 
-using default_t = double;
-
 // Abstract base class, with special methods re-enabled, after
 // providing the recommended virtual destructor.
 struct TupleBase {
@@ -34,9 +32,11 @@ struct TupleBase {
     TupleBase& operator=(TupleBase &&) = default;
     TupleBase(const TupleBase&) = default;
     TupleBase& operator=(const TupleBase&) = default;
+
+    bool operator==(TupleBase const &) const = default;
 };
 
-template <typename T=default_t, unsigned int N=4>
+template <typename T=fp_t, unsigned int N=4>
 struct Tuple : public TupleBase {
     using value_t = T;
 
@@ -69,6 +69,16 @@ struct Tuple : public TupleBase {
         }
     }
 
+    void set(unsigned int i, T value) {
+        switch (i) {
+            case 0: x_ = value; break;
+            case 1: y_ = value; break;
+            case 2: z_ = value; break;
+            case 3: w_ = value; break;
+            default: break;
+        }
+    }
+
     bool is_point() const {
         return w_ == 1.0;
     }
@@ -76,6 +86,8 @@ struct Tuple : public TupleBase {
     bool is_vector() const {
         return w_ == 0.0;
     }
+
+    bool operator==(Tuple const &) const = default;
 
     Tuple & operator+=(const Tuple & rhs) {
         x_ += rhs.x_;
@@ -122,6 +134,13 @@ struct Tuple : public TupleBase {
                   << ", " << t.w_ << ")";
     }
 
+//    // Converting constructor
+//    Tuple(const Color<T> & color) :
+//        x_{color.red()},
+//        y_{color.green()},
+//        z_{color.blue()},
+//        w_{0} {}
+
 protected:
     T x_ {};
     T y_ {};
@@ -130,32 +149,25 @@ protected:
 };
 
 // TODO: still deciding if these are useful...
-//template <typename T=default_t>
-//using Point = Tuple<T>;
-//
-//template <typename T=default_t>
-//using Vector = Tuple<T>;
-using Point = Tuple<>;
-using Vector = Tuple<>;
+// Don't want a subclass because of speed, but maybe a static polymorphic subclass?
+template <typename T=fp_t>
+using Point = Tuple<T>;
+
+template <typename T=fp_t>
+using Vector = Tuple<T>;
+
+//using Point = Tuple<>;
+//using Vector = Tuple<>;
 
 // Free functions:
 
-// Strict equality for floating point types
 template <typename T>
-inline bool operator==(const Tuple<T> & lhs, const Tuple<T> & rhs) {
-     return lhs.x() == rhs.x()
-         && lhs.y() == rhs.y()
-         && lhs.z() == rhs.z()
-         && lhs.w() == rhs.w();
-}
-
-template <typename T>
-inline bool almost_equal(const Tuple<T> & lhs, const Tuple<T> & rhs) {
+inline bool almost_equal(const Tuple<T> & lhs, const Tuple<T> & rhs, T epsilon=1e-5) {
     using rtc::almost_equal;
-    return almost_equal(lhs.x(), rhs.x())
-           && almost_equal(lhs.y(), rhs.y())
-           && almost_equal(lhs.z(), rhs.z())
-           && almost_equal(lhs.w(), rhs.w());
+    return almost_equal(lhs.x(), rhs.x(), epsilon)
+           && almost_equal(lhs.y(), rhs.y(), epsilon)
+           && almost_equal(lhs.z(), rhs.z(), epsilon)
+           && almost_equal(lhs.w(), rhs.w(), epsilon);
 }
 
 template <typename T>
@@ -223,19 +235,24 @@ inline Tuple<T> cross(const Tuple<T> & a, const Tuple<T> & b) {
             T(0)};
 }
 
+template <typename T>
+inline auto reflect(Vector<T> const & in, Vector<T> const & normal) {
+    return in - normal * T(2) * dot(in, normal);
+}
+
 
 // Factory functions:
-template <typename T=default_t>
+template <typename T=fp_t>
 inline auto tuple(T x, T y, T z, T w) {
     return Tuple<T> {x, y, z, w};
 }
 
-template <typename T=default_t>
+template <typename T=fp_t>
 inline auto point(T x, T y, T z) {
     return Tuple<T> {x, y, z, 1};
 }
 
-template <typename T=default_t>
+template <typename T=fp_t>
 inline auto vector(T x, T y, T z) {
     return Tuple<T> {x, y, z, 0};
 }

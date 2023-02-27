@@ -5,13 +5,20 @@
 
 namespace rtc {
 
-template <typename Base=Tuple<>>
+template <typename Base=Tuple<fp_t>>
 struct Color : Base {
     using value_t = Base::value_t;
 
     Color() = default;
     Color(value_t red, value_t green, value_t blue) :
         Base(red, green, blue, 0) {}
+
+    // Rule of 5
+    virtual ~Color() = default;
+    Color(Color &&) = default;
+    Color& operator=(Color &&) = default;
+    Color(const Color&) = default;
+    Color& operator=(const Color&) = default;
 
     value_t red() const { return Base::x_; }
     value_t green() const { return Base::y_; }
@@ -23,6 +30,10 @@ struct Color : Base {
         Base::z_ *= rhs.blue();
         return *this;
     }
+
+    // Convert a Tuple into a Color
+    Color(Base const & t) : Base{t} {}
+
 };
 
 template <typename T>
