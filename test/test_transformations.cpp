@@ -4,8 +4,8 @@
 
 #include <numbers>
 
-#include <ray_tracer_challenge/tuple.h>
-#include <ray_tracer_challenge/matrix.h>
+#include <ray_tracer_challenge/tuples.h>
+#include <ray_tracer_challenge/matrices.h>
 #include <ray_tracer_challenge/transformations.h>
 
 using namespace rtc;

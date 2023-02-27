@@ -3,7 +3,7 @@
 
 #include <cmath>
 
-#include "matrix.h"
+#include "matrices.h"
 
 namespace rtc {
 

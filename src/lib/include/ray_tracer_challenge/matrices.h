@@ -1,5 +1,5 @@
-#ifndef RTC_LIB_MATRIX_H
-#define RTC_LIB_MATRIX_H
+#ifndef RTC_LIB_MATRICES_H
+#define RTC_LIB_MATRICES_H
 
 #include <array>
 #include <initializer_list>
@@ -287,4 +287,4 @@ inline auto identity4x4() {
 
 } // namespace rtc
 
-#endif // RTC_LIB_MATRIX_H
+#endif // RTC_LIB_MATRICES_H

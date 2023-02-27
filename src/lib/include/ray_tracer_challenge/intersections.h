@@ -1,73 +1,15 @@
-#ifndef RTC_LIB_RAYS_H
-#define RTC_LIB_RAYS_H
-
-#include <algorithm>
+#ifndef RTC_LIB_INTERSECTIONS_H
+#define RTC_LIB_INTERSECTIONS_H
 
 #include "./math.h"
-#include "tuple.h"
-#include "matrix.h"
-#include "transformations.h"
 
 namespace rtc {
-
-template <typename TupleType>
-class Ray {
-public:
-    using Point = TupleType;
-    using Vector = TupleType;
-
-    Ray() = default;
-    Ray(const Point & origin, const Vector & direction) :
-        origin_{origin}, direction_{direction} {}
-
-    Point origin() const { return origin_; }
-    Vector direction() const { return direction_; }
-
-private:
-    Point origin_ {};
-    Vector direction_ {};
-};
-
-template<typename T>
-inline auto ray(T const &origin,
-                T const &direction) {
-    return Ray<T>{origin, direction};
-}
-
-template<typename Ray>
-inline auto position(Ray const &ray,
-                     typename Ray::Point::value_t t) {
-    return ray.origin() + ray.direction() * t;
-}
-
-template <typename T=fp_t>
-class Sphere {
-public:
-    using matrix_t = Matrix<T, 4>;
-
-    Sphere() = default;
-    Sphere(int id) : id_{id} {}
-
-    matrix_t const & transform() const { return transform_; }
-
-    void set_transform(matrix_t const & m) {
-        transform_ = m;
-    }
-
-private:
-    int id_ {};
-    matrix_t transform_ {identity4x4()};
-};
-
-inline auto sphere(int id) {
-    return Sphere {id};
-}
 
 template <typename T=fp_t>
 struct Intersection {
     Intersection() = default;
     Intersection(fp_t t, Sphere<T> const * object) :
-        t_{t}, object_{object} {}
+            t_{t}, object_{object} {}
 
     auto t() const { return t_; }
     auto object() const { return object_; }
@@ -126,7 +68,7 @@ auto intersections(Head&& head, Tail&&... tail) {
 
 template <typename T, typename Ray>
 inline Intersections<Intersection<T>> intersect(Sphere<T> const & sphere,
-                                  Ray const & ray) {
+                                                Ray const & ray) {
     // Apply the inverse of the Sphere's transformation
     auto ray2 = transform(ray, inverse(sphere.transform()));
 
@@ -167,16 +109,6 @@ inline std::optional<Intersection<T>> hit(Intersections<Intersection<T>> & inter
     }
 }
 
-template <typename Ray, typename Matrix>
-inline Ray transform(Ray const & r, Matrix const & m) {
-    return { m * r.origin(), m * r.direction() };
-}
-
-template <typename Shape, typename Matrix>
-inline void set_transform(Shape & shape, Matrix const & m) {
-    shape.set_transform(m);
-}
-
 } // namespace rtc
 
-#endif // RTC_LIB_RAYS_H
+#endif // RTC_LIB_INTERSECTIONS_H

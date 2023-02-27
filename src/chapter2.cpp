@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include <ray_tracer_challenge/canvas.h>
-#include <ray_tracer_challenge/tuple.h>
+#include <ray_tracer_challenge/tuples.h>
 
 using namespace rtc;
 

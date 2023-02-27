@@ -6,12 +6,12 @@ set(SRCS
 
 set(HDRS
         include/ray_tracer_challenge/math.h
-        include/ray_tracer_challenge/tuple.h
+        include/ray_tracer_challenge/tuples.h
         include/ray_tracer_challenge/color.h
         include/ray_tracer_challenge/canvas.h
-        include/ray_tracer_challenge/matrix.h
+        include/ray_tracer_challenge/matrices.h
         include/ray_tracer_challenge/transformations.h
-        include/ray_tracer_challenge/ray.h
+        include/ray_tracer_challenge/rays.h
         )
 
 add_library(RayTracerChallenge-Lib ${SRCS} ${HDRS})
