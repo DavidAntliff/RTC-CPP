@@ -1,5 +1,5 @@
-#ifndef RTC_LIB_TUPLE_H
-#define RTC_LIB_TUPLE_H
+#ifndef RTC_LIB_TUPLES_H
+#define RTC_LIB_TUPLES_H
 
 #include <ostream>
 #include <cmath>
@@ -242,4 +242,4 @@ inline auto vector(T x, T y, T z) {
 
 } // namespace rtc
 
-#endif // RTC_LIB_TUPLE_H
+#endif // RTC_LIB_TUPLES_H

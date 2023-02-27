@@ -1,11 +1,13 @@
 #include <iostream>
 #include <numbers>
 
-#include <ray_tracer_challenge/matrix.h>
-#include <ray_tracer_challenge/tuple.h>
+#include <ray_tracer_challenge/matrices.h>
+#include <ray_tracer_challenge/tuples.h>
 #include <ray_tracer_challenge/canvas.h>
 #include <ray_tracer_challenge/transformations.h>
-#include <ray_tracer_challenge/ray.h>
+#include <ray_tracer_challenge/rays.h>
+#include <ray_tracer_challenge/spheres.h>
+#include <ray_tracer_challenge/intersections.h>
 
 using namespace rtc;
 

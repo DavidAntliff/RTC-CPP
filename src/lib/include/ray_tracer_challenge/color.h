@@ -1,7 +1,7 @@
 #ifndef RTC_LIB_COLOR_H
 #define RTC_LIB_COLOR_H
 
-#include "tuple.h"
+#include "tuples.h"
 
 namespace rtc {
 
@@ -44,7 +44,7 @@ inline Color<T> operator*(Color<T> lhs, const Color<T> & rhs)
 //template<typename T>
 //const auto hadamard = operator*<T>;
 
-// Instead, use a forwarding function:
+// Instead, use a wrapper function:
 template <typename T>
 T hadamard(const Color<T> & lhs, const Color<T> & rhs) {
     return lhs * rhs;

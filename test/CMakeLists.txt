@@ -13,12 +13,14 @@ find_package(Boost COMPONENTS filesystem REQUIRED)
 #find_package(Threads REQUIRED)
 
 set(SRCS
-        test_tuple.cpp
+        test_tuples.cpp
         test_color.cpp
         test_canvas.cpp
-        test_matrix.cpp
+        test_matrices.cpp
         test_transformations.cpp
-        test_ray.cpp
+        test_rays.cpp
+        test_spheres.cpp
+        test_intersections.cpp
         )
 
 add_executable(RayTracerChallengeTests ${SRCS})

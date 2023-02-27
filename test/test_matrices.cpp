@@ -2,12 +2,12 @@
 
 #include <gtest/gtest.h>
 
-#include <ray_tracer_challenge/matrix.h>
-#include <ray_tracer_challenge/tuple.h>
+#include <ray_tracer_challenge/matrices.h>
+#include <ray_tracer_challenge/tuples.h>
 
 using namespace rtc;
 
-TEST(TestMatrix, default_matrix_is_zero) {
+TEST(TestMatrices, default_matrix_is_zero) {
     Matrix<double, 4> A;
     for (auto r = 0; r < A.dim(); ++r) {
         for (auto c = 0; c < A.dim(); ++c) {
@@ -17,7 +17,7 @@ TEST(TestMatrix, default_matrix_is_zero) {
     }
 }
 
-TEST(TestMatrix, matrix_from_vector) {
+TEST(TestMatrices, matrix_from_vector) {
     std::vector<double> el = {
         0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0,
     };
@@ -29,7 +29,7 @@ TEST(TestMatrix, matrix_from_vector) {
     }));
 }
 
-TEST(TestMatrix, invalid_access) {
+TEST(TestMatrices, invalid_access) {
     auto M = Matrix<double, 4> {};
     EXPECT_EQ(M.at(0, -1), std::nullopt);
     EXPECT_EQ(M.at(-1, 0), std::nullopt);
@@ -40,7 +40,7 @@ TEST(TestMatrix, invalid_access) {
 }
 
 // Constructing and inspecting a 4x4 matrix
-TEST(TestMatrix, constructing_and_inspecting_4x4) {
+TEST(TestMatrices, constructing_and_inspecting_4x4) {
     Matrix<double, 4> M44 {
         { 1.0,  2.0,  3.0,  4.0},
         { 5.5,  6.5,  7.5,  8.5},
@@ -65,7 +65,7 @@ TEST(TestMatrix, constructing_and_inspecting_4x4) {
 }
 
 // Constructing and inspecting a 2x2 matrix
-TEST(TestMatrix, constructing_and_inspecting_2x2) {
+TEST(TestMatrices, constructing_and_inspecting_2x2) {
     Matrix<double, 2> M22 {
         { -3.0,  5.0},
         {  1.0, -2.0},
@@ -83,7 +83,7 @@ TEST(TestMatrix, constructing_and_inspecting_2x2) {
 }
 
 // Constructing and inspecting a 3x3 matrix
-TEST(TestMatrix, constructing_and_inspecting_3x3) {
+TEST(TestMatrices, constructing_and_inspecting_3x3) {
     Matrix<double, 3> M33 {
         { -3.0,  5.0,  0.0},
         {  1.0, -2.0, -7.0},
@@ -102,7 +102,7 @@ TEST(TestMatrix, constructing_and_inspecting_3x3) {
 }
 
 // Matrix equality with identical matrices
-TEST(TestMatrix, equality_with_identical_matrices) {
+TEST(TestMatrices, equality_with_identical_matrices) {
     auto A = matrix4x4({
         { 1.0,  2.0,  3.0,  4.0},
         { 5.0,  6.0,  7.0,  8.0},
@@ -119,7 +119,7 @@ TEST(TestMatrix, equality_with_identical_matrices) {
 }
 
 // Matrix equality with different matrices
-TEST(TestMatrix, equality_with_different_matrices) {
+TEST(TestMatrices, equality_with_different_matrices) {
     auto A = matrix4x4({
         { 1.0,  2.0,  3.0,  4.0},
         { 5.0,  6.0,  7.0,  8.0},
@@ -136,7 +136,7 @@ TEST(TestMatrix, equality_with_different_matrices) {
 }
 
 // Multiplying two matrices
-TEST(TestMatrix, multiplying_two_matrices) {
+TEST(TestMatrices, multiplying_two_matrices) {
     auto A = matrix4x4({
         { 1.0,  2.0,  3.0,  4.0},
         { 5.0,  6.0,  7.0,  8.0},
@@ -158,7 +158,7 @@ TEST(TestMatrix, multiplying_two_matrices) {
 }
 
 // A matrix multiplied by a tuple
-TEST(TestMatrix, matrix_multipied_by_tuple) {
+TEST(TestMatrices, matrix_multipied_by_tuple) {
     auto A = matrix4x4({
         { 1.0,  2.0,  3.0,  4.0},
         { 2.0,  4.0,  4.0,  2.0},
@@ -170,7 +170,7 @@ TEST(TestMatrix, matrix_multipied_by_tuple) {
 }
 
 // Multiplying a matrix by the identity matrix
-TEST(TestMatrix, matrix_multiplied_by_identity) {
+TEST(TestMatrices, matrix_multiplied_by_identity) {
     auto A = matrix4x4({
         { 0.0,  1.0,  2.0,  4.0},
         { 1.0,  2.0,  4.0,  8.0},
@@ -183,14 +183,14 @@ TEST(TestMatrix, matrix_multiplied_by_identity) {
 }
 
 // Multiplying the identity matrix by a tuple
-TEST(TestMatrix, identity_multiplied_by_tuple) {
+TEST(TestMatrices, identity_multiplied_by_tuple) {
     auto a = tuple(1.0, 2.0, 3.0, 4.0);
     auto I = identity4x4<double>();
     EXPECT_EQ(I * a, a);
 }
 
 // Transposing a matrix
-TEST(TestMatrix, transposing_a_matrix) {
+TEST(TestMatrices, transposing_a_matrix) {
     auto A = matrix4x4({
         { 0.0,  9.0,  3.0,  0.0},
         { 9.0,  8.0,  0.0,  8.0},
@@ -207,13 +207,13 @@ TEST(TestMatrix, transposing_a_matrix) {
 }
 
 // Transposing the identity matrix
-TEST(TestMatrix, transposing_the_identity) {
+TEST(TestMatrices, transposing_the_identity) {
     auto I = identity4x4<double>();
     EXPECT_EQ(transpose(I), I);
 }
 
 // Calculating the determinant of a 2x2 matrix
-TEST(TestMatrix, calculate_determinant_2x2) {
+TEST(TestMatrices, calculate_determinant_2x2) {
     auto A = matrix2x2({
         { 1.0, 5.0},
         {-3.0, 2.0},
@@ -222,7 +222,7 @@ TEST(TestMatrix, calculate_determinant_2x2) {
 }
 
 // A submatrix of a 3x3 matrix is a 2x2 matrix
-TEST(TestMatrix, submatrix_of_3x3) {
+TEST(TestMatrices, submatrix_of_3x3) {
     auto A = matrix3x3({
         {  1.0,  5.0,  0.0},
         { -3.0,  2.0,  7.0},
@@ -236,7 +236,7 @@ TEST(TestMatrix, submatrix_of_3x3) {
 }
 
 // A submatrix of a 4x4 matrix is a 3x3 matrix
-TEST(TestMatrix, submatrix_of_4x4) {
+TEST(TestMatrices, submatrix_of_4x4) {
     auto A = matrix4x4({
         {-6.0,  1.0,  1.0,  6.0},
         {-8.0,  5.0,  8.0,  6.0},
@@ -252,7 +252,7 @@ TEST(TestMatrix, submatrix_of_4x4) {
 }
 
 // Calculating a minor of a 3x3 matrix
-TEST(TestMatrix, calculate_minor_of_3x3) {
+TEST(TestMatrices, calculate_minor_of_3x3) {
     auto A = matrix3x3({
         {  3.0,  5.0,  0.0},
         {  2.0, -1.0, -7.0},
@@ -264,7 +264,7 @@ TEST(TestMatrix, calculate_minor_of_3x3) {
 }
 
 // Calculating a cofactor of a 3x3 matrix
-TEST(TestMatrix, calculate_cofactor_of_3x3) {
+TEST(TestMatrices, calculate_cofactor_of_3x3) {
     auto A = matrix3x3({
         {  3.0,  5.0,  0.0},
         {  2.0, -1.0, -7.0},
@@ -277,7 +277,7 @@ TEST(TestMatrix, calculate_cofactor_of_3x3) {
 }
 
 // Calculating the determinant of a 3x3 matrix
-TEST(TestMatrix, calculate_determinant_of_3x3) {
+TEST(TestMatrices, calculate_determinant_of_3x3) {
     auto A = matrix3x3({
         {  1.0,  2.0,  6.0},
         { -5.0,  8.0, -4.0},
@@ -290,7 +290,7 @@ TEST(TestMatrix, calculate_determinant_of_3x3) {
 }
 
 // Calculating the determinant of a 4x4 matrix
-TEST(TestMatrix, calculate_determinant_of_4x4) {
+TEST(TestMatrices, calculate_determinant_of_4x4) {
     auto A = matrix4x4({
         {-2.0, -8.0,  3.0,  5.0},
         {-3.0,  1.0,  7.0,  3.0},
@@ -305,7 +305,7 @@ TEST(TestMatrix, calculate_determinant_of_4x4) {
 }
 
 // Testing an invertible matrix for invertibility
-TEST(TestMatrix, invertible_matrix_is_invertible) {
+TEST(TestMatrices, invertible_matrix_is_invertible) {
     auto A = matrix4x4({
         { 6.0,  4.0,  4.0,  4.0},
         { 5.0,  5.0,  7.0,  6.0},
@@ -317,7 +317,7 @@ TEST(TestMatrix, invertible_matrix_is_invertible) {
 }
 
 // Testing a noninvertible matrix for invertibility
-TEST(TestMatrix, noninvertible_matrix_is_not_invertible) {
+TEST(TestMatrices, noninvertible_matrix_is_not_invertible) {
     auto A = matrix4x4({
         {-4.0,  2.0, -2.0, -3.0},
         { 9.0,  6.0,  2.0,  6.0},
@@ -329,7 +329,7 @@ TEST(TestMatrix, noninvertible_matrix_is_not_invertible) {
 }
 
 // Calculating the inverse of a matrix
-TEST(TestMatrix, calculate_inverse_of_matrix) {
+TEST(TestMatrices, calculate_inverse_of_matrix) {
     auto A = matrix4x4({
         {-5.0,  2.0,  6.0, -8.0},
         { 1.0, -5.0,  1.0,  8.0},
@@ -351,7 +351,7 @@ TEST(TestMatrix, calculate_inverse_of_matrix) {
 }
 
 // Calculating the inverse of another matrix
-TEST(TestMatrix, calculate_inverse_of_another_matrix) {
+TEST(TestMatrices, calculate_inverse_of_another_matrix) {
     auto A = matrix4x4({
         { 8.0, -5.0,  9.0,  2.0},
         { 7.0,  5.0,  6.0,  1.0},
@@ -367,7 +367,7 @@ TEST(TestMatrix, calculate_inverse_of_another_matrix) {
 }
 
 // Calculating the inverse of a third matrix
-TEST(TestMatrix, calculate_inverse_of_a_third_matrix) {
+TEST(TestMatrices, calculate_inverse_of_a_third_matrix) {
     auto A = matrix4x4({
         { 9.0,  3.0,  0.0,  9.0},
         {-5.0, -2.0, -6.0, -3.0},
@@ -383,7 +383,7 @@ TEST(TestMatrix, calculate_inverse_of_a_third_matrix) {
 }
 
 // Multiplying a product by its inverse}
-TEST(TestMatrix, multiply_product_by_inverse) {
+TEST(TestMatrices, multiply_product_by_inverse) {
     auto A = matrix4x4({
         { 3.0,  -9.0,   7.0,   3.0},
         { 3.0,  -8.0,   2.0,  -9.0},
