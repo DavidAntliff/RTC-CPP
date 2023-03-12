@@ -40,9 +40,9 @@ TEST(TestCanvas, construct_ppm_header) {
 // Constructing the PPM pixel data
 TEST(TestCanvas, construct_ppm_pixel_data) {
     auto c = canvas(5, 3);
-    auto c1 = color(1.5, 0, 0);
-    auto c2 = color(0., 0.5, 0.);
-    auto c3 = color(-0.5, 0, 1);
+    auto c1 = color(1.5, 0.0, 0.0);
+    auto c2 = color(0.0, 0.5, 0.0);
+    auto c3 = color(-0.5, 0.0, 1.0);
     write_pixel(c, 0, 0, c1);
     write_pixel(c, 2, 1, c2);
     write_pixel(c, 4, 2, c3);

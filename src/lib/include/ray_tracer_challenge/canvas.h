@@ -89,17 +89,17 @@ auto canvas(unsigned int width, unsigned int height) {
 }
 
 template <typename PixelType=Color<>>
-auto pixel_at(const Canvas<PixelType> & canvas, unsigned int x, unsigned int y) {
+auto pixel_at(Canvas<PixelType> const & canvas, unsigned int x, unsigned int y) {
     return canvas.pixel_at(x, y);
 }
 
 template <typename Canvas>
-auto write_pixel(Canvas & canvas, unsigned int x, unsigned int y, const typename Canvas::pixel_t & color) {
+auto write_pixel(Canvas & canvas, unsigned int x, unsigned int y, typename Canvas::pixel_t const & color) {
     canvas.write_pixel(x, y, color);
 }
 
 template <typename Canvas>
-auto ppm_from_canvas(Canvas & canvas) {
+auto ppm_from_canvas(Canvas const & canvas) {
     const auto header = (boost::format("P3\n%1% %2%\n255\n") % canvas.width() % canvas.height()).str();
 
     std::string data;

@@ -38,8 +38,8 @@ TEST(TestColor, multiplying_color_by_scalar) {
 
 // Multiplying colors
 TEST(TestColor, multiplying_colors) {
-    auto c1 = color(1., 0.2, 0.4);
-    auto c2 = color(0.9, 1, 0.1);
+    auto c1 = color(1.0, 0.2, 0.4);
+    auto c2 = color(0.9, 1.0, 0.1);
     EXPECT_TRUE(almost_equal(c1 * c2, color(0.9, 0.2, 0.04)));
     EXPECT_TRUE(almost_equal(hadamard(c1, c2), color(0.9, 0.2, 0.04)));
 }

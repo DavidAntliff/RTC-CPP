@@ -11,10 +11,13 @@ namespace rtc {
 template <typename T=fp_t>
 class Sphere {
 public:
+    using value_t = T;
     using matrix_t = Matrix<T, 4>;
 
     Sphere() = default;
     Sphere(int id) : id_{id} {}
+
+    auto operator<=>(Sphere const &) const = default;
 
     matrix_t const & transform() const { return transform_; }
 
