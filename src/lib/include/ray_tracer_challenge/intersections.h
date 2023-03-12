@@ -7,6 +7,8 @@ namespace rtc {
 
 template <typename T=fp_t>
 struct Intersection {
+    using value_t = T;
+
     Intersection() = default;
     Intersection(fp_t t, Sphere<T> const * object) :
             t_{t}, object_{object} {}
@@ -14,7 +16,8 @@ struct Intersection {
     auto t() const { return t_; }
     auto object() const { return object_; }
 
-    bool operator==(const Intersection &) const = default;
+    auto operator<=>(Intersection const &) const = default;
+
     friend bool operator<(Intersection const& l, Intersection const& r) {
         return l.t_ < r.t_;
     }
@@ -66,9 +69,9 @@ auto intersections(Head&& head, Tail&&... tail) {
 // See also:
 // https://www.scs.stanford.edu/~dm/blog/param-pack.html#homogeneous-intro
 
-template <typename T, typename Ray>
-inline Intersections<Intersection<T>> intersect(Sphere<T> const & sphere,
-                                                Ray const & ray) {
+template <typename Sphere, typename Ray>
+inline Intersections<Intersection<fp_t>> intersect(Sphere const & sphere,
+                                                   Ray const & ray) {
     // Apply the inverse of the Sphere's transformation
     auto ray2 = transform(ray, inverse(sphere.transform()));
 
@@ -77,7 +80,7 @@ inline Intersections<Intersection<T>> intersect(Sphere<T> const & sphere,
 
     // The vector from the sphere's centre, to the ray origin
     // Remember, the sphere is centred at the world origin
-    auto sphere_to_ray = ray2.origin() - point<typename Ray::Point::value_t>(0.0, 0.0, 0.0);
+    auto sphere_to_ray = ray2.origin() - point(0.0, 0.0, 0.0);
 
     auto a = dot(ray2.direction(), ray2.direction());
     auto b = 2.0 * dot(ray2.direction(), sphere_to_ray);

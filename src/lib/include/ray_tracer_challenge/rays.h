@@ -10,37 +10,35 @@
 
 namespace rtc {
 
-template <typename TupleType>
+template <typename T=fp_t>
 class Ray {
 public:
-    using Point = TupleType;
-    using Vector = TupleType;
+    using value_t = T;
 
     Ray() = default;
-    Ray(const Point & origin, const Vector & direction) :
+    Ray(Point<T> const & origin, Vector<T> const & direction) :
         origin_{origin}, direction_{direction} {}
 
-    Point origin() const { return origin_; }
-    Vector direction() const { return direction_; }
+    auto operator<=>(Ray const &) const = default;
+
+    Point<T> origin() const { return origin_; }
+    Vector<T> direction() const { return direction_; }
 
 private:
-    Point origin_ {};
-    Vector direction_ {};
+    Point<T> origin_ {};
+    Vector<T> direction_ {};
 };
 
-template<typename T>
-inline auto ray(T const &origin,
-                T const &direction) {
+template <typename T>
+inline auto ray(Point<T> const & origin,
+                Vector<T> const & direction) {
     return Ray<T>{origin, direction};
 }
 
-template<typename Ray>
-inline auto position(Ray const & ray,
-                     typename Ray::Point::value_t t) {
+template <typename T>
+inline auto position(Ray<T> const & ray, T t) {
     return ray.origin() + ray.direction() * t;
 }
-
-
 
 template <typename Ray, typename Matrix>
 inline Ray transform(Ray const & r, Matrix const & m) {

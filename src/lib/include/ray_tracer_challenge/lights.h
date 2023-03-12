@@ -10,19 +10,21 @@ template <typename T=fp_t>
 class PointLight {
 public:
     PointLight() = default;
-    PointLight(Point<T> const & position, Color<Tuple<T>> const & intensity) :
+    PointLight(Point<T> const & position, Color<T> const & intensity) :
         position_{position}, intensity_{intensity} {}
+
+    auto operator<=>(PointLight const &) const = default;
 
     auto position() const { return position_; }
     auto intensity() const { return intensity_; }
 
 private:
     Point<T> position_;
-    Color<Tuple<T>> intensity_;
+    Color<T> intensity_;
 };
 
 template <typename T=fp_t>
-inline auto point_light(Point<T> const & position, Color<Tuple<T>> const & intensity) {
+inline auto point_light(Point<T> const & position, Color<T> const & intensity) {
     return PointLight<T> {position, intensity};
 }
 

@@ -5,26 +5,20 @@
 
 namespace rtc {
 
-template <typename Base=Tuple<fp_t>>
-struct Color : Base {
-    using value_t = Base::value_t;
+template <typename T=fp_t>
+struct Color : Tuple<T> {
+    using Base = Tuple<T>;
+    using value_t = T;
 
     Color() = default;
     Color(value_t red, value_t green, value_t blue) :
         Base(red, green, blue, 0) {}
 
-    // Rule of 5
-    virtual ~Color() = default;
-    Color(Color &&) = default;
-    Color& operator=(Color &&) = default;
-    Color(const Color&) = default;
-    Color& operator=(const Color&) = default;
-
     value_t red() const { return Base::x_; }
     value_t green() const { return Base::y_; }
     value_t blue() const { return Base::z_; }
 
-    Color & operator*=(const Color & rhs) {
+    Color & operator*=(Color const & rhs) {
         Base::x_ *= rhs.red();
         Base::y_ *= rhs.green();
         Base::z_ *= rhs.blue();
@@ -37,7 +31,7 @@ struct Color : Base {
 };
 
 template <typename T>
-inline bool almost_equal(const Color<T> & lhs, const Color<T> & rhs) {
+inline bool almost_equal(Color<T> const & lhs, Color<T> const & rhs) {
     return almost_equal(lhs.red(), rhs.red())
            && almost_equal(lhs.green(), rhs.green())
            && almost_equal(lhs.blue(), rhs.blue());
@@ -45,7 +39,7 @@ inline bool almost_equal(const Color<T> & lhs, const Color<T> & rhs) {
 
 // Hadamard or Shur Product
 template <typename T>
-inline Color<T> operator*(Color<T> lhs, const Color<T> & rhs)
+inline Color<T> operator*(Color<T> lhs, Color<T> const & rhs)
 {
     lhs *= rhs;
     return lhs;
@@ -57,15 +51,12 @@ inline Color<T> operator*(Color<T> lhs, const Color<T> & rhs)
 
 // Instead, use a wrapper function:
 template <typename T>
-T hadamard(const Color<T> & lhs, const Color<T> & rhs) {
+Color<T> hadamard(Color<T> const & lhs, Color<T> const & rhs) {
     return lhs * rhs;
 }
 
-template <typename T=Tuple<>>
-inline auto color(
-        typename Color<T>::value_t r,
-        typename Color<T>::value_t g,
-        typename Color<T>::value_t b) {
+template <typename T>
+inline auto color(T r, T g, T b) {
     return Color<T> {r, g, b};
 }
 

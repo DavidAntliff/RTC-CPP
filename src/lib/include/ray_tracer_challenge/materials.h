@@ -10,9 +10,17 @@ namespace rtc {
 template <typename T>
 class Material {
 public:
-    Material() = default;
+    using value_t = T;
 
-    bool operator==(Material const &) const = default;
+    Material() = default;
+    Material(Color<T> color,
+             T ambient,
+             T diffuse,
+             T specular,
+             T shininess) :
+             color_{color}, ambient_{ambient}, diffuse_{diffuse}, specular_{specular}, shininess_{shininess} {}
+
+    auto operator<=>(Material const &) const = default;
 
     auto color() const { return color_; }
     auto ambient() const { return ambient_; }
@@ -20,7 +28,7 @@ public:
     auto specular() const { return specular_; }
     auto shininess() const { return shininess_; }
 
-    void set_color(Color<Tuple<T>> const & color) { color_ = color; }
+    void set_color(Color<T> const & color) { color_ = color; }
     void set_ambient(T value) { ambient_ = value; }
     void set_diffuse(T value) { diffuse_ = value; }
     void set_specular(T value) { specular_ = value; }
@@ -28,7 +36,7 @@ public:
 
 
 private:
-    Color<Tuple<T>> color_ {1.0, 1.0, 1.0};
+    Color<T> color_ {1.0, 1.0, 1.0};
     T ambient_ {0.1};
     T diffuse_ {0.9};
     T specular_ {0.9};
@@ -38,6 +46,15 @@ private:
 template <typename T=fp_t>
 inline auto material() {
     return Material<T> {};
+}
+
+template <typename T=fp_t>
+inline auto material(Color<T> const & color,
+                     T ambient,
+                     T diffuse,
+                     T specular,
+                     T shininess) {
+    return Material<T> {color, ambient, diffuse, specular, shininess};
 }
 
 template <typename T=fp_t>
@@ -56,8 +73,8 @@ inline auto lighting(Material<T> const & material,
     // Compute the ambient contribution
     auto ambient = effective_color * material.ambient();
 
-    Color<Tuple<T>> diffuse {};
-    Color<Tuple<T>> specular {};
+    Color<T> diffuse {};
+    Color<T> specular {};
 
     // light_dot_normal represents the cosine of the angle between the
     // light vector and the normal vector. A negative number means the

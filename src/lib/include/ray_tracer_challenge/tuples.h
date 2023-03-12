@@ -23,29 +23,22 @@
 
 namespace rtc {
 
-// Abstract base class, with special methods re-enabled, after
-// providing the recommended virtual destructor.
-struct TupleBase {
-    TupleBase() = default;
-    virtual ~TupleBase() = default;
-    TupleBase(TupleBase &&) = default;
-    TupleBase& operator=(TupleBase &&) = default;
-    TupleBase(const TupleBase&) = default;
-    TupleBase& operator=(const TupleBase&) = default;
-
-    bool operator==(TupleBase const &) const = default;
-};
-
 template <typename T=fp_t, unsigned int N=4>
-struct Tuple : public TupleBase {
+struct Tuple {
     using value_t = T;
 
     Tuple() = default;
     Tuple(T x, T y, T z, T w) :
-        TupleBase{},
         x_ {x}, y_ {y}, z_{z}, w_{w} {}
 
     virtual ~Tuple() = default;
+
+    Tuple(Tuple &&) = default;
+    Tuple& operator=(Tuple &&) = default;
+    Tuple(Tuple const &) = default;
+    Tuple& operator=(Tuple const &) = default;
+
+    auto operator<=>(Tuple const &) const = default;
 
     T x() const { return x_; }
     T y() const { return y_; }
@@ -87,9 +80,7 @@ struct Tuple : public TupleBase {
         return w_ == 0.0;
     }
 
-    bool operator==(Tuple const &) const = default;
-
-    Tuple & operator+=(const Tuple & rhs) {
+    Tuple & operator+=(Tuple const & rhs) {
         x_ += rhs.x_;
         y_ += rhs.y_;
         z_ += rhs.z_;
@@ -97,7 +88,7 @@ struct Tuple : public TupleBase {
         return *this;
     }
 
-    Tuple & operator-=(const Tuple & rhs) {
+    Tuple & operator-=(Tuple const  & rhs) {
         x_ -= rhs.x_;
         y_ -= rhs.y_;
         z_ -= rhs.z_;
@@ -110,7 +101,7 @@ struct Tuple : public TupleBase {
     }
 
     template <typename Scalar>
-    Tuple & operator*=(const Scalar & rhs) {
+    Tuple & operator*=(Scalar const & rhs) {
         x_ *= rhs;
         y_ *= rhs;
         z_ *= rhs;
@@ -119,7 +110,7 @@ struct Tuple : public TupleBase {
     }
 
     template <typename Scalar>
-    Tuple & operator/=(const Scalar & rhs) {
+    Tuple & operator/=(Scalar const & rhs) {
         x_ /= rhs;
         y_ /= rhs;
         z_ /= rhs;
@@ -127,7 +118,7 @@ struct Tuple : public TupleBase {
         return *this;
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Tuple & t) {
+    friend std::ostream& operator<<(std::ostream & os, Tuple const  & t) {
         return os << "tuple(" << t.x_
                   << ", " << t.y_
                   << ", " << t.z_
@@ -135,7 +126,7 @@ struct Tuple : public TupleBase {
     }
 
 //    // Converting constructor
-//    Tuple(const Color<T> & color) :
+//    Tuple(Color<T> const & color) :
 //        x_{color.red()},
 //        y_{color.green()},
 //        z_{color.blue()},
@@ -162,7 +153,7 @@ using Vector = Tuple<T>;
 // Free functions:
 
 template <typename T>
-inline bool almost_equal(const Tuple<T> & lhs, const Tuple<T> & rhs, T epsilon=1e-5) {
+inline bool almost_equal(Tuple<T> const & lhs, Tuple<T> const & rhs, T epsilon=1e-5) {
     using rtc::almost_equal;
     return almost_equal(lhs.x(), rhs.x(), epsilon)
            && almost_equal(lhs.y(), rhs.y(), epsilon)
@@ -171,40 +162,40 @@ inline bool almost_equal(const Tuple<T> & lhs, const Tuple<T> & rhs, T epsilon=1
 }
 
 template <typename T>
-inline Tuple<T> operator+(Tuple<T> lhs, const Tuple<T> & rhs)
+inline Tuple<T> operator+(Tuple<T> lhs, Tuple<T> const & rhs)
 {
     lhs += rhs;
     return lhs;
 }
 
 template <typename T>
-inline Tuple<T> operator-(Tuple<T> lhs, const Tuple<T> & rhs)
+inline Tuple<T> operator-(Tuple<T> lhs, Tuple<T> const & rhs)
 {
     lhs -= rhs;
     return lhs;
 }
 
 template <typename T>
-inline Tuple<T> operator*(Tuple<T> lhs, const T & rhs)
+inline Tuple<T> operator*(Tuple<T> lhs, T const & rhs)
 {
     lhs *= rhs;
     return lhs;
 }
 
 template <typename T>
-inline Tuple<T> operator*(const T & lhs, Tuple<T> rhs)
+inline Tuple<T> operator*(T const & lhs, Tuple<T> rhs)
 {
     return rhs * lhs;
 }
 
 template <typename T>
-inline Tuple<T> operator/(Tuple<T> lhs, const T & rhs)
+inline Tuple<T> operator/(Tuple<T> lhs, T const & rhs)
 {
     return lhs /= rhs;
 }
 
 template <typename T>
-inline T magnitude(const Tuple<T> & t)
+inline T magnitude(Tuple<T> const & t)
 {
     return std::sqrt(t.x() * t.x()
         + t.y() * t.y()
@@ -213,13 +204,13 @@ inline T magnitude(const Tuple<T> & t)
 }
 
 template <typename T>
-inline Tuple<T> normalize(const Tuple<T> & t)
+inline Tuple<T> normalize(Tuple<T> const & t)
 {
     return t / magnitude(t);
 }
 
 template <typename T>
-inline T dot(const Tuple<T> & a, const Tuple<T> & b) {
+inline T dot(Tuple<T> const & a, Tuple<T> const & b) {
     return a.x() * b.x()
          + a.y() * b.y()
          + a.z() * b.z()
@@ -228,7 +219,7 @@ inline T dot(const Tuple<T> & a, const Tuple<T> & b) {
 
 // 3D cross-product, ignore .w
 template <typename T>
-inline Tuple<T> cross(const Tuple<T> & a, const Tuple<T> & b) {
+inline Tuple<T> cross(Tuple<T> const & a, Tuple<T> const & b) {
     return {a.y() * b.z() - a.z() * b.y(),
             a.z() * b.x() - a.x() * b.z(),
             a.x() * b.y() - a.y() * b.x(),
