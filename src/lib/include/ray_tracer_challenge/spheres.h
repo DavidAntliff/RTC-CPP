@@ -25,7 +25,9 @@ public:
         transform_ = m;
     }
 
-    auto material() const { return material_; }
+    auto const & material() const { return material_; }
+    auto & material() { return material_; }
+
     void set_material(Material<T> const & material) {
         material_ = material;
     }

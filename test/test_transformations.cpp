@@ -184,3 +184,44 @@ TEST(TestTransformations, fluent_api) {
 
     EXPECT_EQ(M2 * p, point(13.0, 2.0, 7.0));
 }
+
+// The transformation matrix for the default orientation
+TEST(TestTransformations, transformation_matrix_for_default_orientation) {
+    auto from = point(0.0, 0.0, 0.0);
+    auto to = point(0.0, 0.0, -1.0);
+    auto up = vector(0.0, 1.0, 0.0);
+    auto t = view_transform(from, to, up);
+    EXPECT_EQ(t, identity4x4());
+}
+
+// A view transformation matrix looking in positive Z direction
+TEST(TestTransformations, view_transformation_matrix_looking_in_positive_z_direction) {
+    auto from = point(0.0, 0.0, 0.0);
+    auto to = point(0.0, 0.0, 1.0);
+    auto up = vector(0.0, 1.0, 0.0);
+    auto t = view_transform(from, to, up);
+    EXPECT_EQ(t, scaling(-1.0, 1.0, -1.0));
+}
+
+// The view transformation moves the world
+TEST(TestTransformations, view_transformation_moves_the_world) {
+    auto from = point(0.0, 0.0, 8.0);
+    auto to = point(0.0, 0.0, 0.0);
+    auto up = vector(0.0, 1.0, 0.0);
+    auto t = view_transform(from, to, up);
+    EXPECT_EQ(t, translation(0.0, 0.0, -8.0));
+}
+
+// An arbitrary view transformation
+TEST(TestTransformations, arbitrary_view_transformation) {
+    auto from = point(1.0, 3.0, 2.0);
+    auto to = point(4.0, -2.0, 8.0);
+    auto up = vector(1.0, 1.0, 0.0);
+    auto t = view_transform(from, to, up);
+    EXPECT_TRUE(almost_equal(t, matrix4x4({
+            { -0.50709, 0.50709,  0.67612, -2.36643},
+            {  0.76772, 0.60609,  0.12122, -2.82843},
+            { -0.35857, 0.59761, -0.71714,  0.00000},
+            {  0.00000, 0.00000,  0.00000,  1.00000},
+    })));
+}

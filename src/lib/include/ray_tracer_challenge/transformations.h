@@ -73,6 +73,25 @@ inline auto shearing(T xy, T xz, T yx, T yz, T zx, T zy) {
     };
 }
 
+template <typename T>
+inline auto view_transform(Point<T> const & from,
+                           Point<T> const & to,
+                           Vector<T> const & up) {
+    auto const forward = normalize(to - from);
+    auto const upn = normalize(up);
+    auto const left = cross(forward, upn);
+    auto const true_up = cross(left, forward);
+
+    Matrix<T, 4> const orientation {
+        {    left.x(),     left.y(),     left.z(), T(0)},
+        { true_up.x(),  true_up.y(),  true_up.z(), T(0)},
+        {-forward.x(), -forward.y(), -forward.z(), T(0)},
+        {        T(0),         T(0),         T(0), T(1)},
+    };
+
+    return orientation * translation(-from.x(), -from.y(), -from.z());
+}
+
 } // namespace rtc
 
 #endif // RTC_LIB_TRANSFORMATIONS_H

@@ -2,6 +2,7 @@
 #define RTC_LIB_INTERSECTIONS_H
 
 #include "./math.h"
+#include "rays.h"
 
 namespace rtc {
 
@@ -110,6 +111,36 @@ inline std::optional<Intersection<T>> hit(Intersections<Intersection<T>> & inter
     } else {
         return {};
     }
+}
+
+template <typename T>
+struct IntersectionComputation {
+    T t {};
+    Sphere<T> const * object {};
+    Point<T> point {};
+    Vector<T> eyev {};
+    Vector<T> normalv {};
+    bool inside {false};
+};
+
+template <typename T>
+inline auto prepare_computations(Intersection<T> const & intersection,
+                                 Ray<T> const & ray) {
+    IntersectionComputation<T> comps {};
+
+    comps.t = intersection.t();
+    comps.object = intersection.object();
+
+    comps.point = position(ray, comps.t);
+    comps.eyev = -ray.direction();
+    comps.normalv = normal_at(*comps.object, comps.point);
+
+    if (dot(comps.normalv, comps.eyev) < 0) {
+        comps.inside = true;
+        comps.normalv = -comps.normalv;
+    }
+
+    return comps;
 }
 
 } // namespace rtc

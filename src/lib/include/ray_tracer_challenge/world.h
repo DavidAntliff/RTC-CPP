@@ -16,7 +16,7 @@ public:
 
     World() = default;
 
-    auto const & light() const {
+    auto & light() const {
         return light_;
     }
 
@@ -25,6 +25,10 @@ public:
     }
 
     auto const & objects() const {
+        return objects_;
+    }
+
+    auto & objects() {
         return objects_;
     }
 
@@ -66,7 +70,7 @@ inline auto default_world() {
 
 template <typename T, typename Ray>
 inline Intersections<Intersection<T>> intersect_world(World<T> const & world,
-                     Ray const & ray) {
+                                                      Ray const & ray) {
 
     Intersections<Intersection<T>> result {};
 
@@ -83,6 +87,25 @@ inline Intersections<Intersection<T>> intersect_world(World<T> const & world,
     return result;
 }
 
+// Returns the color at the intersection encapsulated by comps, in the given world.
+template <typename T>
+inline auto shade_hit(World<T> const & world, IntersectionComputation<T> const & comps) {
+    return lighting(comps.object->material(),
+                    *world.light(),
+                    comps.point, comps.eyev, comps.normalv);
+}
+
+template <typename T>
+inline Color<T> color_at(World<T> const & world, Ray<T> const & ray) {
+    auto xs = intersect_world(world, ray);
+    auto const i = hit(xs);
+    if (i) {
+        auto const comps = prepare_computations(*i, ray);
+        return shade_hit(world, comps);
+    } else {
+        return Color(0.0, 0.0, 0.0);
+    }
+}
 
 } // namespace rtc
 
