@@ -70,3 +70,38 @@ TEST(TestIntersections, the_hit_is_always_the_lowest_non_negative) {
     auto i = hit(xs);
     EXPECT_THAT(i, Optional(i4));
 }
+
+// Precomputing the state of an intersection
+TEST(TestIntersections, precomputing_the_state_of_an_intersection) {
+    auto r = ray(point(0.0, 0.0, -5.0), vector(0.0, 0.0, 1.0));
+    auto shape = sphere(1);
+    auto i = intersection(4.0, shape);
+    auto comps = prepare_computations(i, r);
+    EXPECT_EQ(comps.t, i.t());
+    EXPECT_EQ(comps.object, i.object());
+    EXPECT_EQ(comps.point, point(0.0, 0.0, -1.0));
+    EXPECT_EQ(comps.eyev, vector(0.0, 0.0, -1.0));
+    EXPECT_EQ(comps.normalv, vector(0.0, 0.0, -1.0));
+}
+
+// The hit, when an intersection occurs on the outside
+TEST(TestIntersections, the_hit_when_intersection_occurs_on_outside) {
+    auto r = ray(point(0.0, 0.0, -5.0), vector(0.0, 0.0, 1.0));
+    auto shape = sphere(1);
+    auto i = intersection(4.0, shape);
+    auto comps = prepare_computations(i, r);
+    EXPECT_FALSE(comps.inside);
+}
+
+// The hit, when an intersection occurs on the inside
+TEST(TestIntersections, the_hit_when_intersection_occurs_on_inside) {
+    auto r = ray(point(0.0, 0.0, 0.0), vector(0.0, 0.0, 1.0));
+    auto shape = sphere(1);
+    auto i = intersection(1.0, shape);
+    auto comps = prepare_computations(i, r);
+    EXPECT_EQ(comps.point, point(0.0, 0.0, 1.0));
+    EXPECT_EQ(comps.eyev, vector(0.0, 0.0, -1.0));
+    EXPECT_TRUE(comps.inside);
+    // normal would have been (0, 0, 1), but is inverted:
+    EXPECT_EQ(comps.normalv, vector(0.0, 0.0, -1.0));
+}

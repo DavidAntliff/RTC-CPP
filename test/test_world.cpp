@@ -52,3 +52,54 @@ TEST(TestWorld, intersect_world_with_ray) {
     EXPECT_EQ(xs[2].t(), 5.5);
     EXPECT_EQ(xs[3].t(), 6.0);
 }
+
+// Shading an intersection
+TEST(TestWorld, shading_an_intersection) {
+    auto w = default_world();
+    auto r = ray(point(0.0, 0.0, -5.0), vector(0.0, 0.0, 1.0));
+    auto shape = w.objects()[0];
+    auto i = intersection(4.0, shape);
+    auto comps = prepare_computations(i, r);
+    auto c = shade_hit(w, comps);
+    EXPECT_TRUE(almost_equal(c, color(0.38066, 0.47583, 0.2855)));
+}
+
+// Shading an intersection from the inside
+TEST(TestWorld, shading_an_intersection_from_inside) {
+    auto w = default_world();
+    w.add_light(point_light(point(0.0, 0.25, 0.0), color(1.0, 1.0, 1.0)));
+    auto r = ray(point(0.0, 0.0, 0.0), vector(0.0, 0.0, 1.0));
+    auto shape = w.objects()[1];
+    auto i = intersection(0.5, shape);
+    auto comps = prepare_computations(i, r);
+    auto c = shade_hit(w, comps);
+    EXPECT_TRUE(almost_equal(c, color(0.90498, 0.90498, 0.90498)));
+}
+
+// The color when a ray misses
+TEST(TestWorld, color_when_ray_misses) {
+    auto w = default_world();
+    auto r = ray(point(0.0, 0.0, -5.0), vector(0.0, 1.0, 0.0));
+    auto c = color_at(w, r);
+    EXPECT_EQ(c, color(0.0, 0.0, 0.0));
+}
+
+// The color when a ray hits
+TEST(TestWorld, color_when_ray_hits) {
+    auto w = default_world();
+    auto r = ray(point(0.0, 0.0, -5.0), vector(0.0, 0.0, 1.0));
+    auto c = color_at(w, r);
+    EXPECT_TRUE(almost_equal(c, color(0.38066, 0.47583, 0.2855)));
+}
+
+// The color with an intersection behind the ray
+TEST(TestWorld, color_with_intersection_behind_ray) {
+    auto w = default_world();
+    auto outer = w.objects()[0];
+    outer.material().set_ambient(1.0);
+    auto & inner = w.objects()[1];
+    inner.material().set_ambient(1.0);
+    auto r = ray(point(0.0, 0.0, 0.75), vector(0.0, 0.0, -1.0));
+    auto c = color_at(w, r);
+    EXPECT_EQ(c, inner.material().color());
+}

@@ -23,7 +23,7 @@ void add_value(std::string & row, T value) {
     row += std::to_string(ivalue);
 }
 
-void split_line_by(std::vector<std::string> & lines,
+inline void split_line_by(std::vector<std::string> & lines,
                    std::string_view line, int limit) {
     if (line.length() > 70) {
         const auto idx = line.rfind(' ', 70 - 1);
