@@ -103,3 +103,47 @@ TEST(TestWorld, color_with_intersection_behind_ray) {
     auto c = color_at(w, r);
     EXPECT_EQ(c, inner.material().color());
 }
+
+// There is no shadow when nothing is collinear with point and light
+TEST(TestWorld, no_shadow_when_nothing_between_point_and_light) {
+    auto w = default_world();
+    auto p = point(0.0, 10.0, 0.0);
+    EXPECT_FALSE(is_shadowed(w, p));
+}
+
+// The shadow when an object is between the point and the light
+TEST(TestWorld, shadow_when_object_between_point_and_light) {
+    auto w = default_world();
+    auto p = point(10.0, -10.0, 10.0);
+    EXPECT_TRUE(is_shadowed(w, p));
+}
+
+// There is no shadow when an object is behind the light
+TEST(TestWorld, no_shadow_when_object_is_behind_light) {
+    auto w = default_world();
+    auto p = point(-20.0, 20.0, -20.0);
+    EXPECT_FALSE(is_shadowed(w, p));
+}
+
+// There is no shadow when an object is behind the point
+TEST(TestWorld, no_shadow_when_object_is_behind_point) {
+    auto w = default_world();
+    auto p = point(-2.0, 2.0, -2.0);
+    EXPECT_FALSE(is_shadowed(w, p));
+}
+
+// shade_hit() is given an intersection in shadow
+TEST(TestWorld, shade_hit_given_intersection_in_shadow) {
+    auto w = world();
+    w.add_light(point_light(point(0.0, 0.0, -10.0), color(1.0, 1.0, 1.0)));
+    auto s1 = sphere(1);
+    w.add_object(s1);
+    auto s2 = sphere(2);
+    s2.set_transform(translation(0.0, 0.0, 10.0));
+    w.add_object(s2);
+    auto r = ray(point(0.0, 0.0, 5.0), vector(0.0, 0.0, 1.0));
+    auto i = intersection(4.0, s2);
+    auto comps = prepare_computations(i, r);
+    auto c = shade_hit(w, comps);
+    EXPECT_EQ(c, color(0.1, 0.1, 0.1));
+}

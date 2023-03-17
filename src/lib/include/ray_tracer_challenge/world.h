@@ -90,9 +90,13 @@ inline Intersections<Intersection<T>> intersect_world(World<T> const & world,
 // Returns the color at the intersection encapsulated by comps, in the given world.
 template <typename T>
 inline auto shade_hit(World<T> const & world, IntersectionComputation<T> const & comps) {
+    auto const shadowed {is_shadowed(world, comps.over_point)};
     return lighting(comps.object->material(),
                     *world.light(),
-                    comps.point, comps.eyev, comps.normalv);
+                    comps.point,
+                    comps.eyev,
+                    comps.normalv,
+                    shadowed);
 }
 
 template <typename T>
@@ -105,6 +109,21 @@ inline Color<T> color_at(World<T> const & world, Ray<T> const & ray) {
     } else {
         return Color(0.0, 0.0, 0.0);
     }
+}
+
+template <typename T>
+inline bool is_shadowed(World<T> const & world, Point<T> const & point) {
+    if (!world.light()) return true;  // everything is in shadow
+
+    auto const v = (*world.light()).position() - point;
+    auto const distance = magnitude(v);
+    auto const direction = normalize(v);
+
+    auto const ray = Ray<T>(point, direction);
+    auto intersections = intersect_world(world, ray);
+
+    auto const h = hit(intersections);
+    return (h && (*h).t() < distance);
 }
 
 } // namespace rtc

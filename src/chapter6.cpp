@@ -91,7 +91,8 @@ int main(int argc, char * argv[]) {
                                       light,
                                       point,
                                       eye,
-                                      normal);
+                                      normal,
+                                      false);
 
                 write_pixel(c, x, y, color);
             }

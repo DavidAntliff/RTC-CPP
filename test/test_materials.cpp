@@ -29,7 +29,7 @@ TEST_F(TestMaterialsFixture, lighting_with_eye_between_light_and_surface) {
     auto eyev = vector(0.0, 0.0, -1.0);
     auto normalv = vector(0.0, 0.0, -1.0);
     auto light = point_light(point(0.0, 0.0, -10.0), color(1.0, 1.0, 1.0));
-    auto result = lighting(m, light, position, eyev, normalv);
+    auto result = lighting(m, light, position, eyev, normalv, false);
 
     // intensity = full ambient + full diffuse + full specular
     EXPECT_EQ(result, color(1.9, 1.9, 1.9));
@@ -41,7 +41,7 @@ TEST_F(TestMaterialsFixture, lighting_with_eye_between_light_and_surface_eye_off
     auto eyev = vector(0.0, k, -k);
     auto normalv = vector(0.0, 0.0, -1.0);
     auto light = point_light(point(0.0, 0.0, -10.0), color(1.0, 1.0, 1.0));
-    auto result = lighting(m, light, position, eyev, normalv);
+    auto result = lighting(m, light, position, eyev, normalv, false);
 
     // intensity = full ambient + full diffuse + zero specular
     EXPECT_EQ(result, color(1.0, 1.0, 1.0));
@@ -52,7 +52,7 @@ TEST_F(TestMaterialsFixture, lighting_with_eye_opposite_surface_light_offset_45_
     auto eyev = vector(0.0, 0.0, -1.0);
     auto normalv = vector(0.0, 0.0, -1.0);
     auto light = point_light(point(0.0, 10.0, -10.0), color(1.0, 1.0, 1.0));
-    auto result = lighting(m, light, position, eyev, normalv);
+    auto result = lighting(m, light, position, eyev, normalv, false);
 
     // intensity = full ambient + partial diffuse + zero specular
     EXPECT_TRUE(almost_equal(result, color(0.7364, 0.7364, 0.7364)));
@@ -64,7 +64,7 @@ TEST_F(TestMaterialsFixture, lighting_with_eye_in_path_of_reflection_vector) {
     auto eyev = vector(0.0, -k, -k);
     auto normalv = vector(0.0, 0.0, -1.0);
     auto light = point_light(point(0.0, 10.0, -10.0), color(1.0, 1.0, 1.0));
-    auto result = lighting(m, light, position, eyev, normalv);
+    auto result = lighting(m, light, position, eyev, normalv, false);
 
     // intensity = full ambient + partial diffuse + full specular
     EXPECT_TRUE(almost_equal(result, color(1.6364, 1.6364, 1.6364)));
@@ -75,9 +75,20 @@ TEST_F(TestMaterialsFixture, lighting_with_light_behind_surface) {
     auto eyev = vector(0.0, 0.0, -1.0);
     auto normalv = vector(0.0, 0.0, -1.0);
     auto light = point_light(point(0.0, 0.0, 10.0), color(1.0, 1.0, 1.0));
-    auto result = lighting(m, light, position, eyev, normalv);
+    auto result = lighting(m, light, position, eyev, normalv, false);
 
     // intensity = full ambient + zero diffuse + zero specular
     EXPECT_EQ(result, color(0.1, 0.1, 0.1));
 }
 
+// Chapter 8: Shadows
+
+// Lighting with the surface in shadow
+TEST_F(TestMaterialsFixture, lighting_with_surface_in_shadow) {
+    auto eyev = vector(0.0, 0.0, -1.0);
+    auto normalv = vector(0.0, 0.0, -1.0);
+    auto light = point_light(point(0.0, 0.0, -10.0), color(1.0, 1.0, 1.0));
+    auto in_shadow = true;
+    auto result = lighting(m, light, position, eyev, normalv, in_shadow);
+    EXPECT_EQ(result, color(0.1, 0.1, 0.1));
+}

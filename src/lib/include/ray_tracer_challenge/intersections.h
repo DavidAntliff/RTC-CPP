@@ -118,6 +118,7 @@ struct IntersectionComputation {
     T t {};
     Sphere<T> const * object {};
     Point<T> point {};
+    Point<T> over_point {};
     Vector<T> eyev {};
     Vector<T> normalv {};
     bool inside {false};
@@ -139,6 +140,8 @@ inline auto prepare_computations(Intersection<T> const & intersection,
         comps.inside = true;
         comps.normalv = -comps.normalv;
     }
+
+    comps.over_point = comps.point + comps.normalv * 0.00001;//std::numeric_limits<T>::epsilon();
 
     return comps;
 }
