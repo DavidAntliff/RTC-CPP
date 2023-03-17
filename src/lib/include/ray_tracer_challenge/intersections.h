@@ -141,7 +141,7 @@ inline auto prepare_computations(Intersection<T> const & intersection,
         comps.normalv = -comps.normalv;
     }
 
-    comps.over_point = comps.point + comps.normalv * 0.00001;//std::numeric_limits<T>::epsilon();
+    comps.over_point = comps.point + comps.normalv * EPSILON;
 
     return comps;
 }
