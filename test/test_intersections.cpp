@@ -1,7 +1,5 @@
 // Chapter 5: Ray-Sphere Intersections
 
-#include <limits>
-
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -11,8 +9,6 @@
 
 using namespace rtc;
 using ::testing::Optional;
-
-constexpr auto EPSILON = std::numeric_limits<double>::epsilon();
 
 // An intersection encapsulates t and object
 TEST(TestIntersections, intersection_encapsulates_t_and_object) {
