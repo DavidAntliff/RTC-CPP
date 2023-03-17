@@ -62,7 +62,8 @@ inline auto lighting(Material<T> const & material,
                      PointLight<T> const & light,
                      Point<T> const & point,
                      Vector<T> const & eyev,
-                     Vector<T> const & normalv) {
+                     Vector<T> const & normalv,
+                     bool in_shadow) {
 
     // Combine the surface color with the light's color/intensity
     auto effective_color = material.color() * light.intensity();
@@ -72,6 +73,10 @@ inline auto lighting(Material<T> const & material,
 
     // Compute the ambient contribution
     auto ambient = effective_color * material.ambient();
+
+    if (in_shadow) {
+        return ambient;
+    }
 
     Color<T> diffuse {};
     Color<T> specular {};

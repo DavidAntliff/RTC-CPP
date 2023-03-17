@@ -59,12 +59,16 @@ public:
         return elements_[row][column];
     }
 
+    void unsafe_set(unsigned int row, unsigned int column, T value) {
+        elements_[row][column] = value;
+    }
+
     void set(unsigned int row, unsigned int column, T value) {
         if (row >= N)
             return;
         if (column >= N)
             return;
-        elements_[row][column] = value;
+        unsafe_set(row, column, value);
     }
 
     // Strict equality for floating point types
@@ -202,20 +206,39 @@ inline T determinant(Matrix<T, 2> const & m) {
     return m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0);
 }
 
+// ~20 seconds for chapter8.cpp, release build, 1024x768
 template <typename T, unsigned int N>
-inline auto submatrix(Matrix<T, N> const & m, unsigned int row, unsigned int column) {
+inline auto submatrix_slow(Matrix<T, N> const & m, unsigned int row, unsigned int column) {
     std::vector<T> el;
     el.reserve((N - 1) * (N - 1));
     for (auto r = 0U; r < N; ++r) {
         if (r != row) {
             for (auto c = 0U; c < N; ++c) {
                 if (c != column) {
-                    el.push_back(m(r, c));
+                    el.emplace_back(m(r, c));
                 }
             }
         }
     }
     return Matrix<T, N - 1> {el};
+}
+
+// ~2 seconds for chapter8.cpp, release build, 1024x768
+template <typename T, unsigned int N>
+inline auto submatrix(Matrix<T, N> const & m, unsigned int row, unsigned int column) {
+    Matrix<T, N - 1> s{};
+    for (auto r = 0U, sr = 0U; r < N; ++r) {
+        if (r != row) {
+            for (auto c = 0U, sc = 0U; c < N; ++c) {
+                if (c != column) {
+                    s.unsafe_set(sr, sc, m(r, c));
+                    ++sc;
+                }
+            }
+            ++sr;
+        }
+    }
+    return s;
 }
 
 template <typename T, unsigned int N>

@@ -1,5 +1,7 @@
 // Chapter 5: Ray-Sphere Intersections
 
+#include <limits>
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -9,6 +11,8 @@
 
 using namespace rtc;
 using ::testing::Optional;
+
+constexpr auto EPSILON = std::numeric_limits<double>::epsilon();
 
 // An intersection encapsulates t and object
 TEST(TestIntersections, intersection_encapsulates_t_and_object) {
@@ -104,4 +108,15 @@ TEST(TestIntersections, the_hit_when_intersection_occurs_on_inside) {
     EXPECT_TRUE(comps.inside);
     // normal would have been (0, 0, 1), but is inverted:
     EXPECT_EQ(comps.normalv, vector(0.0, 0.0, -1.0));
+}
+
+// The hit should offset the point
+TEST(TestIntersections, hit_should_offset_point) {
+    auto r = ray(point(0.0, 0.0, -5.0), vector(0.0, 0.0, 1.0));
+    auto shape = sphere(1);
+    shape.set_transform(translation(0.0, 0.0, 1.0));
+    auto i = intersection(5.0, shape);
+    auto comps = prepare_computations(i, r);
+    EXPECT_LT(comps.over_point.z(), -EPSILON / 2.0);
+    EXPECT_GT(comps.point.z(), comps.over_point.z());
 }
