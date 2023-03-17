@@ -73,11 +73,12 @@ inline Intersections<Intersection<T>> intersect_world(World<T> const & world,
                                                       Ray const & ray) {
 
     Intersections<Intersection<T>> result {};
+    result.reserve(2); // ~5% faster than no reserve
 
     // Intersections must be in sorted order
-    for (auto & obj: world.objects()) {
-        auto xs = intersect(obj, ray);
-        for (auto & i: xs) {
+    for (auto const & obj: world.objects()) {
+        auto const xs = intersect(obj, ray);
+        for (auto const & i: xs) {
             result.insert(
                     std::upper_bound(result.begin(), result.end(), i),
                     i);
