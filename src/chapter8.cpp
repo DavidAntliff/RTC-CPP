@@ -80,7 +80,8 @@ int main(int argc, char * argv[]) {
 
     //auto cam = camera(100, 50, pi / 3.0);
     //auto cam = camera(400, 200, pi / 3.0);
-    auto cam = camera(1024, 768, pi / 3.0);
+    //auto cam = camera(1024, 768, pi / 3.0);
+    auto cam = camera(2048, 1536, pi / 3.0);
     cam.set_transform(view_transform(point(0.0, 1.5, -5.0),
                                      point(0.0, 1.0, 0.0),
                                      vector(0.0, 1.0, 0.0)));

@@ -74,27 +74,27 @@ template <typename Sphere, typename Ray>
 inline Intersections<Intersection<fp_t>> intersect(Sphere const & sphere,
                                                    Ray const & ray) {
     // Apply the inverse of the Sphere's transformation
-    auto ray2 = transform(ray, inverse(sphere.transform()));
+    auto const ray2 = transform(ray, inverse(sphere.transform()));
 
     // TODO: A more stable algorithm at:
     // https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
 
     // The vector from the sphere's centre, to the ray origin
     // Remember, the sphere is centred at the world origin
-    auto sphere_to_ray = ray2.origin() - point(0.0, 0.0, 0.0);
+    auto const sphere_to_ray = ray2.origin() - point(0.0, 0.0, 0.0);
 
-    auto a = dot(ray2.direction(), ray2.direction());
-    auto b = 2.0 * dot(ray2.direction(), sphere_to_ray);
-    auto c = dot(sphere_to_ray, sphere_to_ray) - 1.0;
+    auto const a = dot(ray2.direction(), ray2.direction());
+    auto const b = 2.0 * dot(ray2.direction(), sphere_to_ray);
+    auto const c = dot(sphere_to_ray, sphere_to_ray) - 1.0;
 
-    auto discriminant = b * b - 4.0 * a * c;
+    auto const discriminant = b * b - 4.0 * a * c;
     if (discriminant < 0) {
         // miss
         return {};
     }
 
-    auto t1 = (-b - std::sqrt(discriminant)) / (2.0 * a);
-    auto t2 = (-b + std::sqrt(discriminant)) / (2.0 * a);
+    auto const t1 = (-b - std::sqrt(discriminant)) / (2.0 * a);
+    auto const t2 = (-b + std::sqrt(discriminant)) / (2.0 * a);
 
     return {{t1, &sphere}, {t2, &sphere}};
 }
@@ -103,8 +103,8 @@ template <typename T>
 inline std::optional<Intersection<T>> hit(Intersections<Intersection<T>> & intersections) {
     std::sort(intersections.begin(), intersections.end());
 
-    auto is_positive = [](Intersection<T> x){ return x.t() >= 0; };
-    auto iterator = std::ranges::find_if(intersections, is_positive);
+    auto const is_positive = [](Intersection<T> x){ return x.t() >= 0; };
+    auto const iterator = std::ranges::find_if(intersections, is_positive);
 
     if (iterator != intersections.end()) {
         return *iterator;

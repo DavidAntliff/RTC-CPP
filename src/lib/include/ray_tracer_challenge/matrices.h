@@ -243,19 +243,19 @@ inline auto submatrix(Matrix<T, N> const & m, unsigned int row, unsigned int col
 
 template <typename T, unsigned int N>
 inline auto minor(Matrix<T, N> const & m, unsigned int row, unsigned int column) {
-    const auto b = submatrix(m, row, column);
+    auto const b = submatrix(m, row, column);
     return determinant(b);
 }
 
 template <typename T, unsigned int N>
 inline auto cofactor(Matrix<T, N> const & m, unsigned int row, unsigned int column) {
-    auto factor = -2 * ((static_cast<int>(row + column)) % 2) + 1;
+    auto const factor = -2 * ((static_cast<int>(row + column)) % 2) + 1;
     return minor(m, row, column) * factor;
 }
 
 template <typename T, unsigned int N>
 inline T determinant(Matrix<T, N> const & m) {
-    auto det = T(0);
+    T det {0};
     for (auto c = 0U; c < N; ++c) {
         det += m(0, c) * cofactor(m, 0, c);
     }
@@ -269,14 +269,14 @@ inline bool is_invertible(Matrix<T, N> const & m) {
 
 template <typename T, unsigned int N>
 inline Matrix<T, N> inverse(Matrix<T, N> const & m) {
-    auto det = determinant(m);
+    auto const det = determinant(m);
 
     Matrix<T, N> m2;
     for (auto row = 0U; row < N; ++row) {
         for (auto col = 0U; col < N; ++col) {
-            auto c = cofactor(m, row, col);
+            auto const c = cofactor(m, row, col);
             // do transpose by swapping r, c here:
-            m2.set(col, row, c / det);
+            m2.unsafe_set(col, row, c / det);
         }
     }
     return m2;
