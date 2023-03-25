@@ -2,6 +2,7 @@
 #define RTC_LIB_WORLD_H
 
 #include "lights.h"
+#include "shapes.h"
 #include "spheres.h"
 #include "lights.h"
 #include "transformations.h"
@@ -32,13 +33,13 @@ public:
         return objects_;
     }
 
-    void add_object(Sphere<T> object) {
-        objects_.push_back(object);
+    void add_object(Shape<T> & object) {
+        objects_.push_back(&object);
     }
 
 private:
     std::optional<PointLight<T>> light_;
-    std::vector<Sphere<T>> objects_;
+    std::vector<Shape<T> *> objects_;  // non-owning
 };
 
 
@@ -76,8 +77,8 @@ inline Intersections<Intersection<T>> intersect_world(World<T> const & world,
     result.reserve(2); // ~5% faster than no reserve
 
     // Intersections must be in sorted order
-    for (auto const & obj: world.objects()) {
-        auto const xs = intersect(obj, ray);
+    for (auto const obj: world.objects()) {
+        auto const xs = intersect(*obj, ray);
         for (auto const & i: xs) {
             result.insert(
                     std::upper_bound(result.begin(), result.end(), i),

@@ -29,8 +29,8 @@ public:
         return rtc::local_intersect(*this, local_ray);
     }
 
-    Vector<T> local_normal_at(Point<T> const & world_point) const override {
-        return rtc::local_normal_at(*this, world_point);
+    Vector<T> local_normal_at(Point<T> const & local_point) const override {
+        return rtc::local_normal_at(*this, local_point);
     }
 
 private:
