@@ -3,6 +3,7 @@
 
 #include <cmath>
 
+#include "tuples.h"
 #include "matrices.h"
 
 namespace rtc {

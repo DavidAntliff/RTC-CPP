@@ -4,38 +4,37 @@
 #include "math.h" // NOLINT(modernize-deprecated-headers)
 #include "tuples.h"
 #include "matrices.h"
-#include "materials.h"
+#include "intersections.h"
+#include "shapes.h"
 
 namespace rtc {
 
 template <typename T=fp_t>
-class Sphere {
-public:
-    using value_t = T;
-    using matrix_t = Matrix<T, 4>;
+class Sphere;
 
+template <typename T>
+Vector<T> local_normal_at(Sphere<T> const & sphere, Point<T> const & local_point);
+
+template <typename T>
+Intersections<Intersection<fp_t>> local_intersect(Sphere<T> const & sphere,
+                                                  Ray<T> const & local_ray);
+
+template <typename T>
+class Sphere : public Shape<T> {
+public:
     Sphere() = default;
     Sphere(int id) : id_{id} {}
 
-    auto operator<=>(Sphere const &) const = default;
-
-    matrix_t const & transform() const { return transform_; }
-
-    void set_transform(matrix_t const & m) {
-        transform_ = m;
+    Intersections<Intersection<fp_t>> local_intersect(Ray<T> const & local_ray) const override {
+        return rtc::local_intersect(*this, local_ray);
     }
 
-    auto const & material() const { return material_; }
-    auto & material() { return material_; }
-
-    void set_material(Material<T> const & material) {
-        material_ = material;
+    Vector<T> local_normal_at(Point<T> const & world_point) const override {
+        return rtc::local_normal_at(*this, world_point);
     }
 
 private:
     int id_ {};
-    matrix_t transform_ {identity4x4()};
-    Material<T> material_ {};
 };
 
 template <typename T=fp_t>
@@ -44,18 +43,38 @@ inline auto sphere(int id) {
 }
 
 template <typename T>
-inline auto normal_at(Sphere<T> const & sphere, Point<T> const & world_point) {
-    // TODO: move to member function
-
+inline Vector<T> local_normal_at(Sphere<T> const & sphere, Point<T> const & local_point) {
+    (void)sphere;
     // Assume the point is always on the surface of the sphere
+    auto object_normal = local_point - point(0.0, 0.0, 0.0);
+    object_normal.set_w(0);
+    return normalize(object_normal);
+}
 
-    // Why multiply by the inverse transpose?
-    // https://stackoverflow.com/questions/13654401/why-transform-normals-with-the-transpose-of-the-inverse-of-the-modelview-matrix
-    auto const object_point = inverse(sphere.transform()) * world_point;
-    auto const object_normal = object_point - point(0.0, 0.0, 0.0);
-    auto world_normal = transpose(inverse(sphere.transform())) * object_normal;
-    world_normal.set(3, 0.0);
-    return normalize(world_normal);
+template <typename T>
+inline Intersections<Intersection<fp_t>> local_intersect(Sphere<T> const & sphere,
+                                                         Ray<T> const & local_ray) {
+    // TODO: A more stable algorithm at:
+    // https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
+
+    // The vector from the sphere's centre, to the ray origin
+    // Remember, the sphere is centred at the world origin
+    auto const sphere_to_ray = local_ray.origin() - point(0.0, 0.0, 0.0);
+
+    auto const a = dot(local_ray.direction(), local_ray.direction());
+    auto const b = 2.0 * dot(local_ray.direction(), sphere_to_ray);
+    auto const c = dot(sphere_to_ray, sphere_to_ray) - 1.0;
+
+    auto const discriminant = b * b - 4.0 * a * c;
+    if (discriminant < 0) {
+        // miss
+        return {};
+    }
+
+    auto const t1 = (-b - std::sqrt(discriminant)) / (2.0 * a);
+    auto const t2 = (-b + std::sqrt(discriminant)) / (2.0 * a);
+
+    return {{t1, &sphere}, {t2, &sphere}};
 }
 
 } // namespace rtc

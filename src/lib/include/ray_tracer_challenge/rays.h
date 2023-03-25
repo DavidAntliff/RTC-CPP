@@ -45,11 +45,6 @@ inline Ray transform(Ray const & r, Matrix const & m) {
     return { m * r.origin(), m * r.direction() };
 }
 
-template <typename Shape, typename Matrix>
-inline void set_transform(Shape & shape, Matrix const & m) {
-    shape.set_transform(m);
-}
-
 } // namespace rtc
 
 #endif // RTC_LIB_RAYS_H

@@ -4,7 +4,6 @@
 
 #include <ray_tracer_challenge/spheres.h>
 #include <ray_tracer_challenge/rays.h>
-#include <ray_tracer_challenge/intersections.h>
 
 using namespace rtc;
 
@@ -12,7 +11,7 @@ using namespace rtc;
 TEST(TestSpheres, ray_intersects_sphere_at_two_points) {
     auto r = ray(point(0.0, 0.0, -5.0), vector(0.0, 0.0, 1.0));
     auto s = sphere(1);
-    auto xs = intersect(s, r);
+    auto xs = local_intersect(s, r);
     EXPECT_EQ(xs.size(), 2);
     EXPECT_EQ(xs[0].t(), 4.0);
     EXPECT_EQ(xs[1].t(), 6.0);
@@ -22,7 +21,7 @@ TEST(TestSpheres, ray_intersects_sphere_at_two_points) {
 TEST(TestSpheres, ray_intersects_a_sphere_at_a_tangent) {
     auto r = ray(point(0.0, 1.0, -5.0), vector(0.0, 0.0, 1.0));
     auto s = sphere(1);
-    auto xs = intersect(s, r);
+    auto xs = local_intersect(s, r);
     EXPECT_EQ(xs.size(), 2);
     EXPECT_EQ(xs[0].t(), 5.0);
     EXPECT_EQ(xs[1].t(), 5.0);
@@ -32,7 +31,7 @@ TEST(TestSpheres, ray_intersects_a_sphere_at_a_tangent) {
 TEST(TestSpheres, ray_misses_sphere) {
     auto r = ray(point(0.0, 2.0, -5.0), vector(0.0, 0.0, 1.0));
     auto s = sphere(1);
-    auto xs = intersect(s, r);
+    auto xs = local_intersect(s, r);
     EXPECT_EQ(xs.size(), 0);
 }
 
@@ -40,7 +39,7 @@ TEST(TestSpheres, ray_misses_sphere) {
 TEST(TestSpheres, ray_originates_inside_sphere) {
     auto r = ray(point(0.0, 0.0, 0.0), vector(0.0, 0.0, 1.0));
     auto s = sphere(1);
-    auto xs = intersect(s, r);
+    auto xs = local_intersect(s, r);
     EXPECT_EQ(xs.size(), 2);
     EXPECT_EQ(xs[0].t(), -1.0);
     EXPECT_EQ(xs[1].t(), 1.0);
@@ -50,7 +49,7 @@ TEST(TestSpheres, ray_originates_inside_sphere) {
 TEST(TestSpheres, sphere_is_behind_ray) {
     auto r = ray(point(0.0, 0.0, 5.0), vector(0.0, 0.0, 1.0));
     auto s = sphere(1);
-    auto xs = intersect(s, r);
+    auto xs = local_intersect(s, r);
     EXPECT_EQ(xs.size(), 2);
     EXPECT_EQ(xs[0].t(), -6.0);
     EXPECT_EQ(xs[1].t(), -4.0);
@@ -60,7 +59,7 @@ TEST(TestSpheres, sphere_is_behind_ray) {
 TEST(TestSpheres, intersect_sets_the_object) {
     auto r = ray(point(0.0, 0.0, -5.0), vector(0.0, 0.0, 1.0));
     auto s = sphere(1);
-    auto xs = intersect(s, r);
+    auto xs = local_intersect(s, r);
     EXPECT_EQ(xs.size(), 2);
     EXPECT_EQ(xs[0].object(), &s);
     EXPECT_EQ(xs[1].object(), &s);
@@ -105,21 +104,21 @@ TEST(TestSpheres, intersecting_translated_sphere_with_ray) {
 // The normal on a sphere at a point on the x axis
 TEST(TestSpheres, normal_on_sphere_at_point_on_x_axis) {
     auto s = sphere(1);
-    auto n = normal_at(s, point(1.0, 0.0, 0.0));
+    auto n = local_normal_at(s, point(1.0, 0.0, 0.0));
     EXPECT_EQ(n, vector(1.0, 0.0, 0.0));
 }
 
 // The normal on a sphere at a point on the y axis
 TEST(TestSpheres, normal_on_sphere_at_point_on_y_axis) {
     auto s = sphere(1);
-    auto n = normal_at(s, point(0.0, 1.0, 0.0));
+    auto n = local_normal_at(s, point(0.0, 1.0, 0.0));
     EXPECT_EQ(n, vector(0.0, 1.0, 0.0));
 }
 
 // The normal on a sphere at a point on the z axis
 TEST(TestSpheres, normal_on_sphere_at_point_on_z_axis) {
     auto s = sphere(1);
-    auto n = normal_at(s, point(0.0, 0.0, 1.0));
+    auto n = local_normal_at(s, point(0.0, 0.0, 1.0));
     EXPECT_EQ(n, vector(0.0, 0.0, 1.0));
 }
 
@@ -127,7 +126,7 @@ TEST(TestSpheres, normal_on_sphere_at_point_on_z_axis) {
 TEST(TestSpheres, normal_on_sphere_at_non_axial_point) {
     auto s = sphere(1);
     auto k = sqrt(3.0) / 3.0;
-    auto n = normal_at(s, point(k, k, k));
+    auto n = local_normal_at(s, point(k, k, k));
     EXPECT_EQ(n, vector(k, k, k));
 }
 
@@ -135,7 +134,7 @@ TEST(TestSpheres, normal_on_sphere_at_non_axial_point) {
 TEST(TestSphere, normal_is_normalized_vector) {
     auto s = sphere(1);
     auto k = sqrt(3.0) / 3.0;
-    auto n = normal_at(s, point(k, k, k));
+    auto n = local_normal_at(s, point(k, k, k));
     EXPECT_EQ(n, normalize(n));
 }
 

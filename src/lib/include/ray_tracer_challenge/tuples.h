@@ -72,6 +72,11 @@ struct Tuple {
         }
     }
 
+    void set_x(T value) { x_ = value; }
+    void set_y(T value) { y_ = value; }
+    void set_z(T value) { z_ = value; }
+    void set_w(T value) { w_ = value; }
+
     bool is_point() const {
         return w_ == 1.0;
     }
