@@ -6,12 +6,15 @@
 
 namespace rtc {
 
+template <typename T>
+class Shape;
+
 template <typename T=fp_t>
 struct Intersection {
     using value_t = T;
 
     Intersection() = default;
-    Intersection(fp_t t, Sphere<T> const * object) :
+    Intersection(fp_t t, Shape<T> const * object) :
             t_{t}, object_{object} {}
 
     auto t() const { return t_; }
@@ -25,11 +28,11 @@ struct Intersection {
 
 private:
     fp_t t_ {};
-    Sphere<T> const * object_ {};
+    Shape<T> const * object_ {};
 };
 
 template <typename T=fp_t>
-inline auto intersection(fp_t t, Sphere<T> const & object) {
+inline auto intersection(fp_t t, Shape<T> const & object) {
     return Intersection {t, &object};
 }
 
@@ -70,33 +73,14 @@ auto intersections(Head&& head, Tail&&... tail) {
 // See also:
 // https://www.scs.stanford.edu/~dm/blog/param-pack.html#homogeneous-intro
 
-template <typename Sphere, typename Ray>
-inline Intersections<Intersection<fp_t>> intersect(Sphere const & sphere,
-                                                   Ray const & ray) {
-    // Apply the inverse of the Sphere's transformation
-    auto const ray2 = transform(ray, inverse(sphere.transform()));
+template <typename T>
+inline Intersections<Intersection<fp_t>> intersect(Shape<T> const & shape,
+                                                   Ray<T> const & ray) {
+    // Apply the inverse of the shape's transformation
+    auto const local_ray = transform(ray, inverse(shape.transform()));
 
-    // TODO: A more stable algorithm at:
-    // https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
-
-    // The vector from the sphere's centre, to the ray origin
-    // Remember, the sphere is centred at the world origin
-    auto const sphere_to_ray = ray2.origin() - point(0.0, 0.0, 0.0);
-
-    auto const a = dot(ray2.direction(), ray2.direction());
-    auto const b = 2.0 * dot(ray2.direction(), sphere_to_ray);
-    auto const c = dot(sphere_to_ray, sphere_to_ray) - 1.0;
-
-    auto const discriminant = b * b - 4.0 * a * c;
-    if (discriminant < 0) {
-        // miss
-        return {};
-    }
-
-    auto const t1 = (-b - std::sqrt(discriminant)) / (2.0 * a);
-    auto const t2 = (-b + std::sqrt(discriminant)) / (2.0 * a);
-
-    return {{t1, &sphere}, {t2, &sphere}};
+    // virtual function call
+    return shape.local_intersect(local_ray);
 }
 
 template <typename T>
@@ -116,7 +100,7 @@ inline std::optional<Intersection<T>> hit(Intersections<Intersection<T>> & inter
 template <typename T>
 struct IntersectionComputation {
     T t {};
-    Sphere<T> const * object {};
+    Shape<T> const * object {};
     Point<T> point {};
     Point<T> over_point {};
     Vector<T> eyev {};
