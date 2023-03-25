@@ -27,6 +27,14 @@ int main(int argc, char * argv[]) {
     floor.material().set_color(color(1.0, 0.9, 0.9));
     floor.material().set_specular(0.0);
 
+    auto wall = plane();
+    wall.set_transform(rotation_x(pi / 2.0)
+                        .then(rotation_y(0.3))
+                        .then(translation(0.0, 0.0, 7.0)));
+    wall.set_material(material());
+    wall.material().set_color(Color(1.0, 0.8, 0.8));
+    wall.material().set_specular(0.0);
+
     auto middle = sphere(4);
     middle.set_transform(translation(-0.5, 1.0, 0.5));
     middle.material() = material();
@@ -56,6 +64,7 @@ int main(int argc, char * argv[]) {
 //    left_up.material().set_specular(0.6);
 
     w.add_object(floor);
+    w.add_object(wall);
     w.add_object(middle);
     w.add_object(right);
     w.add_object(left);
