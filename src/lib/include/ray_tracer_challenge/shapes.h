@@ -21,6 +21,10 @@ public:
     Shape(Shape const &) = default;
     Shape& operator=(Shape const &) = default;
 
+    // https://www.fluentcpp.com/2017/09/08/make-polymorphic-copy-modern-cpp/
+    // Just using 'clone' fails for multiple-inheritance, but deal with that another time
+    virtual std::unique_ptr<Shape> clone() const = 0;
+
     virtual Intersections<Intersection<fp_t>> local_intersect(Ray<T> const & local_ray) const = 0;
 
     virtual Vector<T> local_normal_at(Point<T> const & world_point) const = 0;

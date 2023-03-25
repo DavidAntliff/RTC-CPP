@@ -15,6 +15,10 @@ class TestShape : public Shape<double> {
 public:
     TestShape() = default;
 
+    std::unique_ptr<Shape<double>> clone() const override {
+        return std::make_unique<TestShape>(*this);
+    }
+
     Intersections<Intersection<fp_t>> local_intersect(Ray<double> const & local_ray) const override {
         saved_ray = local_ray;
         return {};

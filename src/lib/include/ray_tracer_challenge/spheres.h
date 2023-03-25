@@ -25,6 +25,10 @@ public:
     Sphere() = default;
     Sphere(int id) : id_{id} {}
 
+    std::unique_ptr<Shape<T>> clone() const override {
+        return std::make_unique<Sphere>(*this);
+    }
+
     Intersections<Intersection<fp_t>> local_intersect(Ray<T> const & local_ray) const override {
         return rtc::local_intersect(*this, local_ray);
     }

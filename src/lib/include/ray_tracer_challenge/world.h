@@ -44,9 +44,8 @@ public:
         return nullptr;
     }
 
-    template <typename S>
-    void add_object(S const & object) {
-        objects_.push_back(std::make_unique<S>(object));
+    void add_object(Shape<T> const & shape) {
+        objects_.push_back(shape.clone());
     }
 
 private:

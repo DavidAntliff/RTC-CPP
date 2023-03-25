@@ -23,6 +23,10 @@ class Plane : public Shape<T> {
 public:
     Plane() = default;
 
+    std::unique_ptr<Shape<T>> clone() const override {
+        return std::make_unique<Plane>(*this);
+    }
+
     Intersections<Intersection<fp_t>> local_intersect(Ray<T> const & local_ray) const override {
         return rtc::local_intersect(*this, local_ray);
     }
