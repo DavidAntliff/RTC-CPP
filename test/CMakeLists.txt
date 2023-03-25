@@ -26,6 +26,7 @@ set(SRCS
         test_world.cpp
         test_camera.cpp
         test_shapes.cpp
+        test_planes.cpp
         )
 
 add_executable(RayTracerChallengeTests ${SRCS})

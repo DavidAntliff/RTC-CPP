@@ -49,3 +49,25 @@ $ cmake .. \
     -DBUILD_TESTS=1
     -DUSE_STATIC_BOOST=1
 ```
+
+## Development Notes
+
+### Genericity
+
+Started the project with a type `T` for most classes, to allow switching between `float` and `double`.
+However it became apparent that `float` does not provide enough precision for quality images, therefore only the use of
+`double` makes practical sense.
+
+At some point, refactor the code to remove the `T` type parameters. This should simplify the code considerably.
+
+### Polymorphism
+
+For Chapter 9, introduced dynamic polymorphism via virtual member functions.
+This increased `chapter8`'s execution time (Release build, for 2048x1536) from around 7.0 seconds to about 8.0 seconds.
+There's +/-1 second variation between runs, so probably need a more complex image to get a more precise measurement.
+
+Consider removing virtual member functions and replace the world collection with a tuple of vectors for each supported
+shape:
+
+`std::tuple<std::vector<Sphere>, std::vector<Plane>, ...>`
+
