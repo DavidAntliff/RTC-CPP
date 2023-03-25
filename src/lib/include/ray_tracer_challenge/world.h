@@ -1,6 +1,8 @@
 #ifndef RTC_LIB_WORLD_H
 #define RTC_LIB_WORLD_H
 
+#include <memory>
+
 #include "lights.h"
 #include "shapes.h"
 #include "spheres.h"
@@ -21,10 +23,12 @@ public:
         return light_;
     }
 
+    // TODO: add multiple lights
     void add_light(PointLight<T> const & light) {
         light_ = light;
     }
 
+    // TODO: encapsulate collection of objects (i.e. hide that it's a vector of unique_ptrs)
     auto const & objects() const {
         return objects_;
     }
@@ -33,13 +37,21 @@ public:
         return objects_;
     }
 
-    void add_object(Shape<T> & object) {
-        objects_.push_back(&object);
+    Shape<T> * get_object(unsigned int i) {
+        if (i < objects_.size()) {
+            return objects_[i].get();
+        }
+        return nullptr;
+    }
+
+    template <typename S>
+    void add_object(S const & object) {
+        objects_.push_back(std::make_unique<S>(object));
     }
 
 private:
     std::optional<PointLight<T>> light_;
-    std::vector<Shape<T> *> objects_;  // non-owning
+    std::vector<std::unique_ptr<Shape<T>>> objects_;
 };
 
 
@@ -77,7 +89,7 @@ inline Intersections<Intersection<T>> intersect_world(World<T> const & world,
     result.reserve(2); // ~5% faster than no reserve
 
     // Intersections must be in sorted order
-    for (auto const obj: world.objects()) {
+    for (auto const & obj: world.objects()) {
         auto const xs = intersect(*obj, ray);
         for (auto const & i: xs) {
             result.insert(

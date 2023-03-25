@@ -37,8 +37,10 @@ TEST(TestWorld, default_world) {
     auto w = default_world();
     EXPECT_THAT(w.light(), Optional(light));
     // idiom for checking if item in vector is to test for != end iterator
-    EXPECT_NE(std::find(w.objects().begin(), w.objects().end(), s1), w.objects().end());
-    EXPECT_NE(std::find(w.objects().begin(), w.objects().end(), s2), w.objects().end());
+    EXPECT_NE(std::find_if(w.objects().begin(), w.objects().end(),
+                           [s1](auto & shape) { return *shape.get() == s1; }), w.objects().end());
+    EXPECT_NE(std::find_if(w.objects().begin(), w.objects().end(),
+                           [s2](auto & shape) { return *shape.get() == s2; }), w.objects().end());
 }
 
 // Intersect a world with a ray
@@ -57,8 +59,8 @@ TEST(TestWorld, intersect_world_with_ray) {
 TEST(TestWorld, shading_an_intersection) {
     auto w = default_world();
     auto r = ray(point(0.0, 0.0, -5.0), vector(0.0, 0.0, 1.0));
-    auto shape = w.objects()[0];
-    auto i = intersection(4.0, shape);
+    auto shape = w.get_object(0);
+    auto i = intersection(4.0, *shape);
     auto comps = prepare_computations(i, r);
     auto c = shade_hit(w, comps);
     EXPECT_TRUE(almost_equal(c, color(0.38066, 0.47583, 0.2855)));
@@ -69,8 +71,8 @@ TEST(TestWorld, shading_an_intersection_from_inside) {
     auto w = default_world();
     w.add_light(point_light(point(0.0, 0.25, 0.0), color(1.0, 1.0, 1.0)));
     auto r = ray(point(0.0, 0.0, 0.0), vector(0.0, 0.0, 1.0));
-    auto shape = w.objects()[1];
-    auto i = intersection(0.5, shape);
+    auto shape = w.get_object(1);
+    auto i = intersection(0.5, *shape);
     auto comps = prepare_computations(i, r);
     auto c = shade_hit(w, comps);
     EXPECT_TRUE(almost_equal(c, color(0.90498, 0.90498, 0.90498)));
@@ -95,13 +97,13 @@ TEST(TestWorld, color_when_ray_hits) {
 // The color with an intersection behind the ray
 TEST(TestWorld, color_with_intersection_behind_ray) {
     auto w = default_world();
-    auto outer = w.objects()[0];
-    outer.material().set_ambient(1.0);
-    auto & inner = w.objects()[1];
-    inner.material().set_ambient(1.0);
+    auto outer = w.get_object(0);
+    outer->material().set_ambient(1.0);
+    auto inner = w.get_object(1);
+    inner->material().set_ambient(1.0);
     auto r = ray(point(0.0, 0.0, 0.75), vector(0.0, 0.0, -1.0));
     auto c = color_at(w, r);
-    EXPECT_EQ(c, inner.material().color());
+    EXPECT_EQ(c, inner->material().color());
 }
 
 // There is no shadow when nothing is collinear with point and light
