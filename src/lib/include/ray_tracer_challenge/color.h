@@ -61,6 +61,12 @@ inline auto color(T r, T g, T b) {
 }
 
 const auto black {color(0.0, 0.0, 0.0)};
+const auto red {color(1.0, 0.0, 0.0)};
+const auto green {color(0.0, 1.0, 0.0)};
+const auto blue {color(0.0, 0.0, 1.0)};
+const auto yellow {color(1.0, 1.0, 0.0)};
+const auto cyan {color(0.0, 1.0, 1.0)};
+const auto magenta {color(1.0, 1.0, 0.0)};
 const auto white {color(1.0, 1.0, 1.0)};
 
 } // namespace rtc

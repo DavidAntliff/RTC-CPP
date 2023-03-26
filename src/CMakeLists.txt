@@ -31,65 +31,26 @@ add_subdirectory(lib)
 
 include(GNUInstallDirs)
 
-add_executable(ray_tracer_challenge ray_tracer_challenge.cpp)
-target_link_libraries(ray_tracer_challenge PRIVATE Threads::Threads ${Boost_LIBRARIES} RayTracerChallenge-Lib)
-target_compile_features(ray_tracer_challenge INTERFACE cxx_std_20)
-target_compile_options(ray_tracer_challenge PRIVATE -Wall -Wextra -Wpedantic)
-target_compile_options(ray_tracer_challenge PRIVATE "$<$<CONFIG:Debug>:-O0>")
-install(TARGETS ray_tracer_challenge EXPORT RayTracerChallengeTargets)
+set(PROGRAMS_SRC
+        ray_tracer_challenge.cpp
+        chapter2.cpp
+        chapter3.cpp
+        chapter4.cpp
+        chapter5.cpp
+        chapter6.cpp
+        chapter7.cpp
+        chapter8.cpp
+        chapter9.cpp
+        chapter10_stripes.cpp
+)
 
-add_executable(chapter2 chapter2.cpp)
-target_link_libraries(chapter2 PRIVATE Threads::Threads ${Boost_LIBRARIES} RayTracerChallenge-Lib)
-target_compile_features(chapter2 INTERFACE cxx_std_20)
-target_compile_options(chapter2 PRIVATE -Wall -Wextra -Wpedantic)
-target_compile_options(chapter2 PRIVATE "$<$<CONFIG:Debug>:-O0>")
-install(TARGETS chapter2 EXPORT RayTracerChallengeTargets)
+foreach (FILE ${PROGRAMS_SRC})
+    string(REPLACE ".cpp" "" TARGET_NAME "${FILE}")
 
-add_executable(chapter3 chapter3.cpp)
-target_link_libraries(chapter3 PRIVATE Threads::Threads ${Boost_LIBRARIES} RayTracerChallenge-Lib)
-target_compile_features(chapter3 INTERFACE cxx_std_20)
-target_compile_options(chapter3 PRIVATE -Wall -Wextra -Wpedantic)
-target_compile_options(chapter3 PRIVATE "$<$<CONFIG:Debug>:-O0>")
-install(TARGETS chapter3 EXPORT RayTracerChallengeTargets)
-
-add_executable(chapter4 chapter4.cpp)
-target_link_libraries(chapter4 PRIVATE Threads::Threads ${Boost_LIBRARIES} RayTracerChallenge-Lib)
-target_compile_features(chapter4 INTERFACE cxx_std_20)
-target_compile_options(chapter4 PRIVATE -Wall -Wextra -Wpedantic)
-target_compile_options(chapter4 PRIVATE "$<$<CONFIG:Debug>:-O0>")
-install(TARGETS chapter4 EXPORT RayTracerChallengeTargets)
-
-add_executable(chapter5 chapter5.cpp)
-target_link_libraries(chapter5 PRIVATE Threads::Threads ${Boost_LIBRARIES} RayTracerChallenge-Lib)
-target_compile_features(chapter5 INTERFACE cxx_std_20)
-target_compile_options(chapter5 PRIVATE -Wall -Wextra -Wpedantic)
-target_compile_options(chapter5 PRIVATE "$<$<CONFIG:Debug>:-O0>")
-install(TARGETS chapter5 EXPORT RayTracerChallengeTargets)
-
-add_executable(chapter6 chapter6.cpp)
-target_link_libraries(chapter6 PRIVATE Threads::Threads ${Boost_LIBRARIES} RayTracerChallenge-Lib)
-target_compile_features(chapter6 INTERFACE cxx_std_20)
-target_compile_options(chapter6 PRIVATE -Wall -Wextra -Wpedantic)
-target_compile_options(chapter6 PRIVATE "$<$<CONFIG:Debug>:-O0>")
-install(TARGETS chapter6 EXPORT RayTracerChallengeTargets)
-
-add_executable(chapter7 chapter7.cpp)
-target_link_libraries(chapter7 PRIVATE Threads::Threads ${Boost_LIBRARIES} RayTracerChallenge-Lib)
-target_compile_features(chapter7 INTERFACE cxx_std_20)
-target_compile_options(chapter7 PRIVATE -Wall -Wextra -Wpedantic)
-target_compile_options(chapter7 PRIVATE "$<$<CONFIG:Debug>:-O0>")
-install(TARGETS chapter7 EXPORT RayTracerChallengeTargets)
-
-add_executable(chapter8 chapter8.cpp)
-target_link_libraries(chapter8 PRIVATE Threads::Threads ${Boost_LIBRARIES} RayTracerChallenge-Lib)
-target_compile_features(chapter8 INTERFACE cxx_std_20)
-target_compile_options(chapter8 PRIVATE -Wall -Wextra -Wpedantic)
-target_compile_options(chapter8 PRIVATE "$<$<CONFIG:Debug>:-O0>")
-install(TARGETS chapter8 EXPORT RayTracerChallengeTargets)
-
-add_executable(chapter9 chapter9.cpp)
-target_link_libraries(chapter9 PRIVATE Threads::Threads ${Boost_LIBRARIES} RayTracerChallenge-Lib)
-target_compile_features(chapter9 INTERFACE cxx_std_20)
-target_compile_options(chapter9 PRIVATE -Wall -Wextra -Wpedantic)
-target_compile_options(chapter9 PRIVATE "$<$<CONFIG:Debug>:-O0>")
-install(TARGETS chapter9 EXPORT RayTracerChallengeTargets)
+    add_executable(${TARGET_NAME} ${FILE})
+    target_link_libraries(${TARGET_NAME} PRIVATE Threads::Threads ${Boost_LIBRARIES} RayTracerChallenge-Lib)
+    target_compile_features(${TARGET_NAME} INTERFACE cxx_std_20)
+    target_compile_options(${TARGET_NAME} PRIVATE -Wall -Wextra -Wpedantic)
+    target_compile_options(${TARGET_NAME} PRIVATE "$<$<CONFIG:Debug>:-O0>")
+    install(TARGETS ${TARGET_NAME} EXPORT RayTracerChallengeTargets)
+endforeach ()

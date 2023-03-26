@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include <ray_tracer_challenge/spheres.h>
 #include <ray_tracer_challenge/patterns.h>
 
 using namespace rtc;
@@ -38,5 +39,33 @@ TEST(TestPatterns, stripe_pattern_alternates_in_x) {
     EXPECT_EQ(stripe_at(pattern, point(-0.1, 0.0, 0.0)), black);
     EXPECT_EQ(stripe_at(pattern, point(-1.0, 0.0, 0.0)), black);
     EXPECT_EQ(stripe_at(pattern, point(-1.1, 0.0, 0.0)), white);
+}
+
+// Stripes with an object transformation
+TEST(TestPatterns, stripes_with_an_object_transformation) {
+    auto object = sphere(1);
+    set_transform(object, scaling(2.0, 2.0, 2.0));
+    auto pattern = stripe_pattern(white, black);
+    auto c = stripe_at_object(pattern, object, point(1.5, 0.0, 0.0));
+    EXPECT_EQ(c, white);
+}
+
+// Stripes with a pattern transformation
+TEST(TestPatterns, stripes_with_a_pattern_transformation) {
+    auto object = sphere(1);
+    auto pattern = stripe_pattern(white, black);
+    set_pattern_transform(pattern, scaling(2.0, 2.0, 2.0));
+    auto c = stripe_at_object(pattern, object, point(1.5, 0.0, 0.0));
+    EXPECT_EQ(c, white);
+}
+
+// Stripes with an object and a pattern transformation
+TEST(TestPatterns, stripes_with_an_object_and_a_pattern_transformation) {
+    auto object = sphere(1);
+    set_transform(object, scaling(2.0, 2.0, 2.0));
+    auto pattern = stripe_pattern(white, black);
+    set_pattern_transform(pattern, translation(0.5, 0.0, 0.0));
+    auto c = stripe_at_object(pattern, object, point(2.5, 0.0, 0.0));
+    EXPECT_EQ(c, white);
 }
 

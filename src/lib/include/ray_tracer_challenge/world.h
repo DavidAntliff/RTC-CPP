@@ -105,6 +105,7 @@ template <typename T>
 inline auto shade_hit(World<T> const & world, IntersectionComputation<T> const & comps) {
     auto const shadowed {is_shadowed(world, comps.over_point)};
     return lighting(comps.object->material(),
+                    *comps.object,
                     *world.light(),
                     comps.point,
                     comps.eyev,

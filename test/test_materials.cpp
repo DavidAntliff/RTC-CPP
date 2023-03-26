@@ -5,6 +5,7 @@
 #include <ray_tracer_challenge/materials.h>
 #include <ray_tracer_challenge/tuples.h>
 #include <ray_tracer_challenge/lights.h>
+#include <ray_tracer_challenge/spheres.h>
 
 using namespace rtc;
 
@@ -29,7 +30,7 @@ TEST_F(TestMaterialsFixture, lighting_with_eye_between_light_and_surface) {
     auto eyev = vector(0.0, 0.0, -1.0);
     auto normalv = vector(0.0, 0.0, -1.0);
     auto light = point_light(point(0.0, 0.0, -10.0), color(1.0, 1.0, 1.0));
-    auto result = lighting(m, light, position, eyev, normalv, false);
+    auto result = lighting(m, sphere(1), light, position, eyev, normalv, false);
 
     // intensity = full ambient + full diffuse + full specular
     EXPECT_EQ(result, color(1.9, 1.9, 1.9));
@@ -41,7 +42,7 @@ TEST_F(TestMaterialsFixture, lighting_with_eye_between_light_and_surface_eye_off
     auto eyev = vector(0.0, k, -k);
     auto normalv = vector(0.0, 0.0, -1.0);
     auto light = point_light(point(0.0, 0.0, -10.0), color(1.0, 1.0, 1.0));
-    auto result = lighting(m, light, position, eyev, normalv, false);
+    auto result = lighting(m, sphere(1), light, position, eyev, normalv, false);
 
     // intensity = full ambient + full diffuse + zero specular
     EXPECT_EQ(result, color(1.0, 1.0, 1.0));
@@ -52,7 +53,7 @@ TEST_F(TestMaterialsFixture, lighting_with_eye_opposite_surface_light_offset_45_
     auto eyev = vector(0.0, 0.0, -1.0);
     auto normalv = vector(0.0, 0.0, -1.0);
     auto light = point_light(point(0.0, 10.0, -10.0), color(1.0, 1.0, 1.0));
-    auto result = lighting(m, light, position, eyev, normalv, false);
+    auto result = lighting(m, sphere(1), light, position, eyev, normalv, false);
 
     // intensity = full ambient + partial diffuse + zero specular
     EXPECT_TRUE(almost_equal(result, color(0.7364, 0.7364, 0.7364)));
@@ -64,7 +65,7 @@ TEST_F(TestMaterialsFixture, lighting_with_eye_in_path_of_reflection_vector) {
     auto eyev = vector(0.0, -k, -k);
     auto normalv = vector(0.0, 0.0, -1.0);
     auto light = point_light(point(0.0, 10.0, -10.0), color(1.0, 1.0, 1.0));
-    auto result = lighting(m, light, position, eyev, normalv, false);
+    auto result = lighting(m, sphere(1), light, position, eyev, normalv, false);
 
     // intensity = full ambient + partial diffuse + full specular
     EXPECT_TRUE(almost_equal(result, color(1.6364, 1.6364, 1.6364)));
@@ -75,7 +76,7 @@ TEST_F(TestMaterialsFixture, lighting_with_light_behind_surface) {
     auto eyev = vector(0.0, 0.0, -1.0);
     auto normalv = vector(0.0, 0.0, -1.0);
     auto light = point_light(point(0.0, 0.0, 10.0), color(1.0, 1.0, 1.0));
-    auto result = lighting(m, light, position, eyev, normalv, false);
+    auto result = lighting(m, sphere(1), light, position, eyev, normalv, false);
 
     // intensity = full ambient + zero diffuse + zero specular
     EXPECT_EQ(result, color(0.1, 0.1, 0.1));
@@ -89,7 +90,7 @@ TEST_F(TestMaterialsFixture, lighting_with_surface_in_shadow) {
     auto normalv = vector(0.0, 0.0, -1.0);
     auto light = point_light(point(0.0, 0.0, -10.0), color(1.0, 1.0, 1.0));
     auto in_shadow = true;
-    auto result = lighting(m, light, position, eyev, normalv, in_shadow);
+    auto result = lighting(m, sphere(1), light, position, eyev, normalv, in_shadow);
     EXPECT_EQ(result, color(0.1, 0.1, 0.1));
 }
 
@@ -104,8 +105,8 @@ TEST_F(TestMaterialsFixture, lighting_with_pattern_applied) {
     auto eyev = vector(0.0, 0.0, -1.0);
     auto normalv = vector(0.0, 0.0, -1.0);
     auto light = point_light(point(0.0, 0.0, -10.0), color(1.0, 1.0, 1.0));
-    auto c1 = lighting(m, light, point(0.9, 0.0, 0.0), eyev, normalv, false);
-    auto c2 = lighting(m, light, point(1.1, 0.0, 0.0), eyev, normalv, false);
+    auto c1 = lighting(m, sphere(1), light, point(0.9, 0.0, 0.0), eyev, normalv, false);
+    auto c2 = lighting(m, sphere(1), light, point(1.1, 0.0, 0.0), eyev, normalv, false);
     EXPECT_EQ(c1, color(1.0, 1.0, 1.0));
     EXPECT_EQ(c2, color(0.0, 0.0, 0.0));
 }
