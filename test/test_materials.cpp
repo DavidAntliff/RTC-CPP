@@ -92,3 +92,20 @@ TEST_F(TestMaterialsFixture, lighting_with_surface_in_shadow) {
     auto result = lighting(m, light, position, eyev, normalv, in_shadow);
     EXPECT_EQ(result, color(0.1, 0.1, 0.1));
 }
+
+// Chapter 10: Patterns
+
+// Lighting with a pattern applied
+TEST_F(TestMaterialsFixture, lighting_with_pattern_applied) {
+    m.set_pattern(stripe_pattern(color(1.0, 1.0, 1.0), color(0.0, 0.0, 0.0)));
+    m.set_ambient(1.0);
+    m.set_diffuse(0.0);
+    m.set_specular(0.0);
+    auto eyev = vector(0.0, 0.0, -1.0);
+    auto normalv = vector(0.0, 0.0, -1.0);
+    auto light = point_light(point(0.0, 0.0, -10.0), color(1.0, 1.0, 1.0));
+    auto c1 = lighting(m, light, point(0.9, 0.0, 0.0), eyev, normalv, false);
+    auto c2 = lighting(m, light, point(1.1, 0.0, 0.0), eyev, normalv, false);
+    EXPECT_EQ(c1, color(1.0, 1.0, 1.0));
+    EXPECT_EQ(c2, color(0.0, 0.0, 0.0));
+}

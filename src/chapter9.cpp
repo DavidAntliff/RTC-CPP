@@ -26,6 +26,7 @@ int main(int argc, char * argv[]) {
     floor.set_material(material());
     floor.material().set_color(color(1.0, 0.9, 0.9));
     floor.material().set_specular(0.0);
+    floor.material().set_pattern(stripe_pattern(white, black));
 
     auto wall = plane();
     wall.set_transform(rotation_x(pi / 2.0)
@@ -34,6 +35,7 @@ int main(int argc, char * argv[]) {
     wall.set_material(material());
     wall.material().set_color(Color(1.0, 0.8, 0.8));
     wall.material().set_specular(0.0);
+    wall.material().set_pattern(stripe_pattern(white, black));
 
     auto middle = sphere(4);
     middle.set_transform(translation(-0.5, 1.0, 0.5));
@@ -41,6 +43,7 @@ int main(int argc, char * argv[]) {
     middle.material().set_color(color(0.1, 1.0, 0.5));
     middle.material().set_diffuse(0.7);
     middle.material().set_specular(0.3);
+    middle.material().set_pattern(stripe_pattern(white, black));
 
     auto right = sphere(5);
     right.set_transform(translation(1.5, 0.5, -0.5) * scaling(0.5, 0.5, 0.5));
@@ -48,6 +51,7 @@ int main(int argc, char * argv[]) {
     right.material().set_color(color(0.5, 1.0, 0.1));
     right.material().set_diffuse(0.7);
     right.material().set_specular(0.3);
+    right.material().set_pattern(stripe_pattern(white, black));
 
     auto left = sphere(6);
     left.set_transform(translation(-1.5, 0.33, -0.75) * scaling(0.33, 0.33, 0.33));
@@ -55,6 +59,7 @@ int main(int argc, char * argv[]) {
     left.material().set_color(color(1.0, 0.8, 0.1));
     left.material().set_diffuse(0.7);
     left.material().set_specular(0.3);
+    left.material().set_pattern(stripe_pattern(white, black));
 
 //    auto left_up = sphere(7);
 //    left_up.set_transform(translation(-2.0, 1.8, -1.0) * scaling(0.33, 0.33, 0.33));

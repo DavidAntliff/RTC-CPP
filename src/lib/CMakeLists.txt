@@ -18,6 +18,7 @@ set(HDRS
         include/ray_tracer_challenge/camera.h
         include/ray_tracer_challenge/shapes.h
         include/ray_tracer_challenge/planes.h
+        include/ray_tracer_challenge/patterns.h
         )
 
 add_library(RayTracerChallenge-Lib ${SRCS} ${HDRS})

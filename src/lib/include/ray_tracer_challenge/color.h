@@ -60,6 +60,9 @@ inline auto color(T r, T g, T b) {
     return Color<T> {r, g, b};
 }
 
+const auto black {color(0.0, 0.0, 0.0)};
+const auto white {color(1.0, 1.0, 1.0)};
+
 } // namespace rtc
 
 #endif // RTC_LIB_COLOR_H

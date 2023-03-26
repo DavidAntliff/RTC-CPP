@@ -4,6 +4,7 @@
 #include "tuples.h"
 #include "color.h"
 #include "lights.h"
+#include "patterns.h"
 
 namespace rtc {
 
@@ -34,6 +35,8 @@ public:
     void set_specular(T value) { specular_ = value; }
     void set_shininess(T value) { shininess_ = value; }
 
+    std::optional<StripePattern<T>> pattern() const { return pattern_; }
+    void set_pattern(StripePattern<T> const & pattern) { pattern_ = pattern; }
 
 private:
     Color<T> color_ {1.0, 1.0, 1.0};
@@ -41,6 +44,8 @@ private:
     T diffuse_ {0.9};
     T specular_ {0.9};
     T shininess_ {200.0};
+
+    std::optional<StripePattern<T>> pattern_ {};
 };
 
 template <typename T=fp_t>
@@ -65,8 +70,11 @@ inline auto lighting(Material<T> const & material,
                      Vector<T> const & normalv,
                      bool in_shadow) {
 
+    auto const pattern {material.pattern()};
+    auto const material_color {pattern ? stripe_at(*pattern, point) : material.color()};
+
     // Combine the surface color with the light's color/intensity
-    auto const effective_color = material.color() * light.intensity();
+    auto const effective_color = material_color * light.intensity();
 
     // Find the direction to the light source
     auto const lightv = normalize(light.position() - point);
