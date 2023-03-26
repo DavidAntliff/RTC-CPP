@@ -21,7 +21,7 @@ public:
 
     Matrix() = default;
 
-    Matrix(std::initializer_list<std::initializer_list<T>> const & elements)
+    explicit Matrix(std::initializer_list<std::initializer_list<T>> const & elements)
     {
         assert(elements.size() == N);
         unsigned int counter = 0;
@@ -33,7 +33,7 @@ public:
 
     // Populate a matrix with a linear vector.
     // Element values are in rows.
-    Matrix(std::vector<T> const & elements) {
+    explicit Matrix(std::vector<T> const & elements) {
         assert(elements.size() == N * N);
         typename std::vector<T>::const_iterator iter = elements.begin();
         for (auto r = 0U; r < N; ++r) {
@@ -173,7 +173,7 @@ inline Matrix<T, 3> operator*(Matrix<T, 3> const & a, Matrix<T, 3> const & b)
 template <typename T>
 inline Matrix<T, 4> operator*(Matrix<T, 4> const & a, Matrix<T, 4> const & b)
 {
-    return {
+    return Matrix<T, 4> {
         {mrc<T,0,0>(a, b), mrc<T,0,1>(a, b), mrc<T,0,2>(a, b), mrc<T,0,3>(a, b)},
         {mrc<T,1,0>(a, b), mrc<T,1,1>(a, b), mrc<T,1,2>(a, b), mrc<T,1,3>(a, b)},
         {mrc<T,2,0>(a, b), mrc<T,2,1>(a, b), mrc<T,2,2>(a, b), mrc<T,2,3>(a, b)},
@@ -193,7 +193,7 @@ inline TupleType operator*(Matrix<T, 4> const & a, TupleType const & t) {
 
 template <typename T>
 inline Matrix<T, 4> transpose(Matrix<T, 4> const & m) {
-    return {
+    return Matrix<T, 4> {
         {m(0, 0), m(1, 0), m(2, 0), m(3, 0)},
         {m(0, 1), m(1, 1), m(2, 1), m(3, 1)},
         {m(0, 2), m(1, 2), m(2, 2), m(3, 2)},

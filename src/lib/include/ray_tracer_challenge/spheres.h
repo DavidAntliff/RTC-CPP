@@ -23,7 +23,7 @@ template <typename T>
 class Sphere : public Shape<T> {
 public:
     Sphere() = default;
-    Sphere(int id) : id_{id} {}
+    explicit Sphere(int id) : id_{id} {}
 
     std::unique_ptr<Shape<T>> clone() const override {
         return std::make_unique<Sphere>(*this);
