@@ -88,6 +88,7 @@ int main(int argc, char * argv[]) {
                 auto eye = -r.direction();
 
                 auto color = lighting(h->object()->material(),
+                                      *h->object(),
                                       light,
                                       point,
                                       eye,

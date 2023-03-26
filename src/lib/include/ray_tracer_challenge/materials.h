@@ -64,7 +64,7 @@ inline auto material(Color<T> const & color,
 
 template <typename T=fp_t>
 inline auto lighting(Material<T> const & material,
-                     Shape<T> const & object,
+                     Shape<T> const & shape,
                      PointLight<T> const & light,
                      Point<T> const & point,
                      Vector<T> const & eyev,
@@ -72,7 +72,7 @@ inline auto lighting(Material<T> const & material,
                      bool in_shadow) {
 
     auto const pattern {material.pattern()};
-    auto const material_color {pattern ? stripe_at_object(*pattern, object, point) : material.color()};
+    auto const material_color {pattern ? pattern_at_shape(*pattern, shape, point) : material.color()};
 
     // Combine the surface color with the light's color/intensity
     auto const effective_color = material_color * light.intensity();

@@ -24,8 +24,8 @@ public:
         return {};
     }
 
-    Vector<double> local_normal_at(Point<double> const & world_point) const override {
-        return vector(world_point.x(), world_point.y(), world_point.z());
+    Vector<double> local_normal_at(Point<double> const & local_point) const override {
+        return vector(local_point.x(), local_point.y(), local_point.z());
     }
 
     mutable Ray<double> saved_ray {};

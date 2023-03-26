@@ -27,7 +27,7 @@ public:
 
     virtual Intersections<Intersection<fp_t>> local_intersect(Ray<T> const & local_ray) const = 0;
 
-    virtual Vector<T> local_normal_at(Point<T> const & world_point) const = 0;
+    virtual Vector<T> local_normal_at(Point<T> const & local_point) const = 0;
 
     auto operator<=>(Shape const &) const = default;
 
