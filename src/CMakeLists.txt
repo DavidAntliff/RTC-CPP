@@ -42,6 +42,7 @@ set(PROGRAMS_SRC
         chapter8.cpp
         chapter9.cpp
         chapter10_stripes.cpp
+        chapter10_gradients.cpp
 )
 
 foreach (FILE ${PROGRAMS_SRC})

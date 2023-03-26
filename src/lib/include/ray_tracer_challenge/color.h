@@ -60,6 +60,15 @@ inline auto color(T r, T g, T b) {
     return Color<T> {r, g, b};
 }
 
+// Blending function (linear interpolation)
+template <typename T>
+inline auto color(T t, Color<T> const & a, Color<T> const & b) {
+    auto const distance {b - a};
+    auto const fraction {t - floor(t)};
+    return a + distance * fraction;
+}
+
+
 const auto black {color(0.0, 0.0, 0.0)};
 const auto red {color(1.0, 0.0, 0.0)};
 const auto green {color(0.0, 1.0, 0.0)};

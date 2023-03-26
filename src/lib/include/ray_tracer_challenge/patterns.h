@@ -22,6 +22,8 @@ public:
     Pattern(Pattern const &) = default;
     Pattern& operator=(Pattern const &) = default;
 
+//    virtual std::unique_ptr<Pattern> clone() const = 0;
+
     auto operator<=>(Pattern const &) const = default;
 
     virtual Color<T> pattern_at(Point<T> const & local_point) const = 0;
@@ -30,6 +32,12 @@ public:
     inline void set_transform(matrix_t const & m) {
         transform_ = m;
     }
+
+    // https://stackoverflow.com/a/43263477
+    auto clone() const { return std::unique_ptr<Pattern>(clone_impl()); }
+
+protected:
+    virtual Pattern * clone_impl() const = 0;
 
 private:
     matrix_t transform_ {identity4x4()};
@@ -60,11 +68,13 @@ inline Color<T> pattern_at_shape(Pattern<T> const & pattern,
 template <typename T>
 class StripePattern : public Pattern<T> {
 public:
-    using matrix_t = Matrix<T, 4>;
-
     StripePattern() = default;
     StripePattern(Color<T> const & a, Color<T> const & b)
         : Pattern<T> {}, a_{a}, b_{b} {}
+
+//    std::unique_ptr<Pattern<T>> clone() const override {
+//        return std::make_unique<StripePattern>(*this);
+//    }
 
     auto const & a() const { return a_; }
     auto const & b() const { return b_; }
@@ -76,6 +86,10 @@ public:
         return b_;
     }
 
+protected:
+    // https://stackoverflow.com/a/43263477
+    virtual StripePattern * clone_impl() const override { return new StripePattern(*this); };
+
 private:
     Color<T> a_ {};
     Color<T> b_ {};
@@ -85,6 +99,40 @@ template <typename T>
 inline auto stripe_pattern(Color<T> const & a, Color<T> const & b) {
     return StripePattern {a, b};
 }
+
+
+template <typename T>
+class GradientPattern : public Pattern<T> {
+public:
+    GradientPattern() = default;
+    GradientPattern(Color<T> const & a, Color<T> const & b)
+        : Pattern<T> {}, a_{a}, b_{b} {}
+
+//    std::unique_ptr<Pattern<T>> clone() const override {
+//        return std::make_unique<GradientPattern>(*this);
+//    }
+
+    auto const & a() const { return a_; }
+    auto const & b() const { return b_; }
+
+    Color<T> pattern_at(Point<T> const & local_point) const override {
+        return color(local_point.x(), a_, b_);
+    }
+
+protected:
+    // https://stackoverflow.com/a/43263477
+    virtual GradientPattern * clone_impl() const override { return new GradientPattern(*this); };
+
+private:
+    Color<T> a_ {};
+    Color<T> b_ {};
+};
+
+template <typename T>
+inline auto gradient_pattern(Color<T> const & a, Color<T> const & b) {
+    return GradientPattern {a, b};
+}
+
 
 } // namespace rtc
 

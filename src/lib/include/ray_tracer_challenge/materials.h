@@ -21,7 +21,54 @@ public:
              T shininess) :
              color_{color}, ambient_{ambient}, diffuse_{diffuse}, specular_{specular}, shininess_{shininess} {}
 
-    auto operator<=>(Material const &) const = default;
+    // https://stackoverflow.com/a/43263477
+    ~Material() = default;
+    Material(Material const & other)
+        : color_{other.color_},
+          ambient_{other.ambient_},
+          diffuse_{other.diffuse_},
+          specular_{other.specular_},
+          shininess_{other.shininess_},
+          pattern_ {other.pattern_ ? other.pattern_->clone() : nullptr} {}
+    Material(Material &&) = default;
+    Material& operator=(Material const & other) {
+        pattern_ = other.pattern_ ? other.pattern_->clone() : nullptr;
+        color_ = other.color_;
+        ambient_ = other.ambient_;
+        diffuse_ = other.diffuse_;
+        specular_ = other.specular_;
+        shininess_ = other.shininess_;
+        return *this;
+    }
+    Material& operator=(Material &&) = default;
+
+    //auto operator<=>(Material const &) const = default;
+    friend bool operator==(const Material & lhs, const Material & rhs) {
+        auto equal = lhs.color_ == rhs.color_ &&
+                     lhs.ambient_ == rhs.ambient_ &&
+                     lhs.diffuse_ == rhs.diffuse_ &&
+                     lhs.specular_ == rhs.specular_ &&
+                     lhs.shininess_ == rhs.shininess_;
+
+        // Compare patterns, if not null
+        if (equal) {
+            if (lhs.pattern_) {  // lhs is not null
+                if (rhs.pattern_) {  // rhs is not null
+                    // then compare the patterns
+                    equal = *lhs.pattern_ == *rhs.pattern_;
+                } else {
+                    // rhs is null, must be unequal
+                    equal = false;
+                }
+            } else {  // lhs is null
+                if (rhs.pattern_) {  // rhs is not null
+                    equal = false;  // must be unequal
+                }
+                // else rhs is null, equal remains true
+            }
+        }
+        return equal;
+    }
 
     auto color() const { return color_; }
     auto ambient() const { return ambient_; }
@@ -35,8 +82,10 @@ public:
     void set_specular(T value) { specular_ = value; }
     void set_shininess(T value) { shininess_ = value; }
 
-    std::optional<StripePattern<T>> pattern() const { return pattern_; }
-    void set_pattern(StripePattern<T> const & pattern) { pattern_ = pattern; }
+    Pattern<T> * pattern() const { return pattern_.get(); }
+    void set_pattern(Pattern<T> const & pattern) {
+        pattern_ = pattern.clone();
+    }
 
 private:
     Color<T> color_ {1.0, 1.0, 1.0};
@@ -45,7 +94,7 @@ private:
     T specular_ {0.9};
     T shininess_ {200.0};
 
-    std::optional<StripePattern<T>> pattern_ {};
+    std::unique_ptr<Pattern<T>> pattern_ {};
 };
 
 template <typename T=fp_t>

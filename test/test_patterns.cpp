@@ -41,33 +41,33 @@ TEST(TestPatterns, stripe_pattern_alternates_in_x) {
     EXPECT_EQ(pattern_at(pattern, point(-1.1, 0.0, 0.0)), white);
 }
 
-//// Stripes with an object transformation
-//TEST(TestPatterns, stripes_with_an_object_transformation) {
-//    auto object = sphere(1);
-//    set_transform(object, scaling(2.0, 2.0, 2.0));
-//    auto pattern = stripe_pattern(white, black);
-//    auto c = stripe_at_object(pattern, object, point(1.5, 0.0, 0.0));
-//    EXPECT_EQ(c, white);
-//}
-//
-//// Stripes with a pattern transformation
-//TEST(TestPatterns, stripes_with_a_pattern_transformation) {
-//    auto object = sphere(1);
-//    auto pattern = stripe_pattern(white, black);
-//    set_pattern_transform(pattern, scaling(2.0, 2.0, 2.0));
-//    auto c = stripe_at_object(pattern, object, point(1.5, 0.0, 0.0));
-//    EXPECT_EQ(c, white);
-//}
-//
-//// Stripes with an object and a pattern transformation
-//TEST(TestPatterns, stripes_with_an_object_and_a_pattern_transformation) {
-//    auto object = sphere(1);
-//    set_transform(object, scaling(2.0, 2.0, 2.0));
-//    auto pattern = stripe_pattern(white, black);
-//    set_pattern_transform(pattern, translation(0.5, 0.0, 0.0));
-//    auto c = stripe_at_object(pattern, object, point(2.5, 0.0, 0.0));
-//    EXPECT_EQ(c, white);
-//}
+// Stripes with an object transformation
+TEST(TestPatterns, stripes_with_an_object_transformation) {
+    auto shape = sphere(1);
+    set_transform(shape, scaling(2.0, 2.0, 2.0));
+    auto pattern = stripe_pattern(white, black);
+    auto c = pattern_at_shape(pattern, shape, point(1.5, 0.0, 0.0));
+    EXPECT_EQ(c, white);
+}
+
+// Stripes with a pattern transformation
+TEST(TestPatterns, stripes_with_a_pattern_transformation) {
+    auto shape = sphere(1);
+    auto pattern = stripe_pattern(white, black);
+    set_pattern_transform(pattern, scaling(2.0, 2.0, 2.0));
+    auto c = pattern_at_shape(pattern, shape, point(1.5, 0.0, 0.0));
+    EXPECT_EQ(c, white);
+}
+
+// Stripes with an object and a pattern transformation
+TEST(TestPatterns, stripes_with_an_object_and_a_pattern_transformation) {
+    auto shape = sphere(1);
+    set_transform(shape, scaling(2.0, 2.0, 2.0));
+    auto pattern = stripe_pattern(white, black);
+    set_pattern_transform(pattern, translation(0.5, 0.0, 0.0));
+    auto c = pattern_at_shape(pattern, shape, point(2.5, 0.0, 0.0));
+    EXPECT_EQ(c, white);
+}
 
 // Towards Generic Patterns:
 
@@ -75,7 +75,7 @@ class TestPattern : public Pattern<double> {
 public:
     TestPattern() = default;
 
-//    std::unique_ptr<Shape<double>> clone() const override {
+//    std::unique_ptr<Pattern<double>> clone() const override {
 //        return std::make_unique<TestPattern>(*this);
 //    }
 
@@ -83,7 +83,9 @@ public:
         return {local_point.x(), local_point.y(), local_point.z()};
     }
 
-//    mutable Ray<double> saved_ray {};
+protected:
+    // https://stackoverflow.com/a/43263477
+    virtual TestPattern * clone_impl() const override { return new TestPattern(*this); };
 };
 
 TestPattern test_pattern() {
@@ -130,3 +132,15 @@ TEST(TestPatterns, pattern_with_an_object_and_a_pattern_transformation) {
     auto c = pattern_at_shape(pattern, shape, point(2.5, 3.0, 3.5));
     EXPECT_EQ(c, color(0.75, 0.5, 0.25));
 }
+
+// Gradients
+
+// A gradient linearly interpolates between colors
+TEST(TestPatterns, gradient_linearly_interpolates_between_colors) {
+    auto pattern = gradient_pattern(white, black);
+    EXPECT_EQ(pattern_at(pattern, point(0.0, 0.0, 0.0)), white);
+    EXPECT_EQ(pattern_at(pattern, point(0.25, 0.0, 0.0)), color(0.75, 0.75, 0.75));
+    EXPECT_EQ(pattern_at(pattern, point(0.5, 0.0, 0.0)), color(0.5, 0.5, 0.5));
+    EXPECT_EQ(pattern_at(pattern, point(0.75, 0.0, 0.0)), color(0.25, 0.25, 0.25));
+}
+
