@@ -44,6 +44,7 @@ set(PROGRAMS_SRC
         chapter10_stripes.cpp
         chapter10_gradients.cpp
         chapter10_rings.cpp
+        chapter10_checkers.cpp
 )
 
 foreach (FILE ${PROGRAMS_SRC})

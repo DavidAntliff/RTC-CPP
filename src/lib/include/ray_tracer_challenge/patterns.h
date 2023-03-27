@@ -165,6 +165,42 @@ inline auto ring_pattern(Color<T> const & a, Color<T> const & b) {
     return RingPattern {a, b};
 }
 
+template <typename T>
+class CheckersPattern : public Pattern<T> {
+public:
+    CheckersPattern() = default;
+    CheckersPattern(Color<T> const & a, Color<T> const & b)
+            : Pattern<T> {}, a_{a}, b_{b} {}
+
+    auto const & a() const { return a_; }
+    auto const & b() const { return b_; }
+
+    Color<T> pattern_at(Point<T> const & local_point) const override {
+        auto const sum = floor(local_point.x()) +
+                         floor(local_point.y()) +
+                         floor(local_point.z());
+        if (static_cast<int>(floor(sum)) % 2 == 0) {
+            return a_;
+        }
+        return b_;
+    }
+
+protected:
+    // https://stackoverflow.com/a/43263477
+    virtual CheckersPattern * clone_impl() const override { return new CheckersPattern(*this); };
+
+private:
+    Color<T> a_ {};
+    Color<T> b_ {};
+};
+
+template <typename T>
+inline auto checkers_pattern(Color<T> const & a, Color<T> const & b) {
+    return CheckersPattern {a, b};
+}
+
+// TODO: Spherical Texture Mapping - Page 138
+
 } // namespace rtc
 
 #endif // RTC_LIB_PATTERNS_H

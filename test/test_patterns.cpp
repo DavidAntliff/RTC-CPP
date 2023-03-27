@@ -155,3 +155,29 @@ TEST(TestPatterns, ring_extends_in_both_x_and_z) {
     EXPECT_EQ(pattern_at(pattern, point(0.0, 0.0, 1.0)), black);
     EXPECT_EQ(pattern_at(pattern, point(0.708, 0.0, 0.708)), black);
 }
+
+// 3D Checkers
+
+// Checkers should repeat in x
+TEST(TestPatterns, checkers_repeats_in_x) {
+    auto pattern = checkers_pattern(white, black);
+    EXPECT_EQ(pattern_at(pattern, point(0.0, 0.0, 0.0)), white);
+    EXPECT_EQ(pattern_at(pattern, point(0.99, 0.0, 0.0)), white);
+    EXPECT_EQ(pattern_at(pattern, point(1.01, 0.0, 0.0)), black);
+}
+
+// Checkers should repeat in y
+TEST(TestPatterns, checkers_repeats_in_y) {
+    auto pattern = checkers_pattern(white, black);
+    EXPECT_EQ(pattern_at(pattern, point(0.0, 0.0, 0.0)), white);
+    EXPECT_EQ(pattern_at(pattern, point(0.0, 0.99, 0.0)), white);
+    EXPECT_EQ(pattern_at(pattern, point(0.0, 1.01, 0.0)), black);
+}
+
+// Checkers should repeat in z
+TEST(TestPatterns, checkers_repeats_in_z) {
+    auto pattern = checkers_pattern(white, black);
+    EXPECT_EQ(pattern_at(pattern, point(0.0, 0.0, 0.0)), white);
+    EXPECT_EQ(pattern_at(pattern, point(0.0, 0.0, 0.99)), white);
+    EXPECT_EQ(pattern_at(pattern, point(0.0, 0.0, 1.01)), black);
+}
