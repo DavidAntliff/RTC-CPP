@@ -40,7 +40,7 @@ int main(int argc, char * argv[]) {
     wall.material().set_color(Color(1.0, 0.8, 0.8));
     wall.material().set_diffuse(0.3);
     wall.material().set_specular(0.0);
-    wall.material().set_pattern(stripe_pattern(black, red));
+    wall.material().set_pattern(gradient_pattern(black, red));
     w.add_object(wall);
 
     auto middle = sphere(4);
@@ -49,7 +49,7 @@ int main(int argc, char * argv[]) {
     middle.material().set_color(color(0.1, 1.0, 0.5));
     middle.material().set_diffuse(0.7);
     middle.material().set_specular(0.3);
-    auto middle_pattern = stripe_pattern(blue, white);
+    auto middle_pattern = gradient_pattern(blue, white);
     set_pattern_transform(middle_pattern, scaling(0.2, 0.2, 0.2).then(rotation_y(-pi / 8.0)));
     middle.material().set_pattern(middle_pattern);
     w.add_object(middle);
@@ -72,7 +72,7 @@ int main(int argc, char * argv[]) {
     left.material().set_color(color(1.0, 0.8, 0.1));
     left.material().set_diffuse(0.7);
     left.material().set_specular(0.3);
-    auto left_pattern = stripe_pattern(yellow, black);
+    auto left_pattern = gradient_pattern(yellow, black);
     set_pattern_transform(left_pattern, scaling(0.15, 0.15, 0.15));
     left.material().set_pattern(left_pattern);
     w.add_object(left);
