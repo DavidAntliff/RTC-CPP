@@ -12,6 +12,10 @@ find_package(Boost COMPONENTS filesystem REQUIRED)
 #set(THREADS_PREFER_PTHREAD_FLAG ON)
 #find_package(Threads REQUIRED)
 
+set(HDRS
+        support/support.h
+        )
+
 set(SRCS
         test_tuples.cpp
         test_color.cpp
@@ -30,7 +34,7 @@ set(SRCS
         test_patterns.cpp
         )
 
-add_executable(RayTracerChallengeTests ${SRCS})
+add_executable(RayTracerChallengeTests ${SRCS} ${HDRS})
 
 target_link_libraries(RayTracerChallengeTests
         PRIVATE

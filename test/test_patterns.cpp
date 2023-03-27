@@ -1,6 +1,7 @@
 // Chapter 10 - Patterns
 
 #include <gtest/gtest.h>
+#include "support/support.h"
 
 #include <ray_tracer_challenge/spheres.h>
 #include <ray_tracer_challenge/patterns.h>
@@ -181,4 +182,26 @@ TEST(TestPatterns, checkers_repeats_in_z) {
     EXPECT_EQ(pattern_at(pattern, point(0.0, 0.0, 0.0)), white);
     EXPECT_EQ(pattern_at(pattern, point(0.0, 0.0, 0.99)), white);
     EXPECT_EQ(pattern_at(pattern, point(0.0, 0.0, 1.01)), black);
+}
+
+// Radial Gradient
+TEST(TestPatterns, radial_gradient_linearly_interpolates_between_colors) {
+    auto pattern = radial_gradient_pattern(white, black);
+    EXPECT_EQ(pattern_at(pattern, point(0.0, 0.0, 0.0)), white);
+    EXPECT_EQ(pattern_at(pattern, point(0.25, 0.0, 0.0)), color(0.75, 0.75, 0.75));
+    EXPECT_EQ(pattern_at(pattern, point(0.5, 0.0, 0.0)), color(0.5, 0.5, 0.5));
+    EXPECT_EQ(pattern_at(pattern, point(0.75, 0.0, 0.0)), color(0.25, 0.25, 0.25));
+    EXPECT_TRUE(almost_equal(pattern_at(pattern, point(1.0 - EPSILON, 0.0, 0.0)), black));
+
+    auto side = [](double radius){ return sqrt(radius * radius / 2.0); };
+
+    // radially in x, z
+    auto x0 {side(0.25)};
+    auto x1 {side(0.5)};
+    auto x2 {side(0.75)};
+    auto x3 {side(1.0 - EPSILON)};
+    EXPECT_TRUE(AlmostEqual(pattern_at(pattern, point(x0, 0.0, x0)), color(0.75, 0.75, 0.75)));
+    EXPECT_TRUE(AlmostEqual(pattern_at(pattern, point(x1, 0.0, x1)), color(0.5, 0.5, 0.5)));
+    EXPECT_TRUE(AlmostEqual(pattern_at(pattern, point(x2, 0.0, x2)), color(0.25, 0.25, 0.25)));
+    EXPECT_TRUE(AlmostEqual(pattern_at(pattern, point(x3, 0.0, x3)), black));
 }

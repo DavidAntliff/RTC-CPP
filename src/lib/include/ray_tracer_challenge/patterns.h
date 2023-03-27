@@ -197,6 +197,39 @@ inline auto checkers_pattern(Color<T> const & a, Color<T> const & b) {
     return CheckersPattern {a, b};
 }
 
+template <typename T>
+class RadialGradientPattern : public Pattern<T> {
+public:
+    RadialGradientPattern() = default;
+    RadialGradientPattern(Color<T> const & a, Color<T> const & b, T y_factor = T(0))
+        : Pattern<T> {}, a_{a}, b_{b}, y_factor_{y_factor} {}
+
+    auto const & a() const { return a_; }
+    auto const & b() const { return b_; }
+
+    Color<T> pattern_at(Point<T> const & local_point) const override {
+        auto const distance {sqrt(local_point.x() * local_point.x() + y_factor_ * local_point.y() * local_point.y() + local_point.z() * local_point.z())};
+        return color(distance, a_, b_);
+    }
+
+protected:
+    // https://stackoverflow.com/a/43263477
+    virtual std::unique_ptr<Pattern<T>> clone_impl() const override {
+        return std::make_unique<RadialGradientPattern>(*this);
+    };
+
+private:
+    Color<T> a_ {};
+    Color<T> b_ {};
+
+    T y_factor_ {0};
+};
+
+template <typename T>
+inline auto radial_gradient_pattern(Color<T> const & a, Color<T> const & b, T y_factor = T(0)) {
+    return RadialGradientPattern {a, b, y_factor};
+}
+
 // TODO: Spherical Texture Mapping - Page 138
 
 
