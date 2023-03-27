@@ -85,7 +85,8 @@ public:
 
 protected:
     // https://stackoverflow.com/a/43263477
-    virtual TestPattern * clone_impl() const override { return new TestPattern(*this); };
+    virtual TestPattern * clone_impl() const override { return new TestPattern
+    (*this); };
 };
 
 TestPattern test_pattern() {
@@ -144,3 +145,13 @@ TEST(TestPatterns, gradient_linearly_interpolates_between_colors) {
     EXPECT_EQ(pattern_at(pattern, point(0.75, 0.0, 0.0)), color(0.25, 0.25, 0.25));
 }
 
+// Rings
+
+// A ring should extend in both x and z
+TEST(TestPatterns, ring_extends_in_both_x_and_z) {
+    auto pattern = ring_pattern(white, black);
+    EXPECT_EQ(pattern_at(pattern, point(0.0, 0.0, 0.0)), white);
+    EXPECT_EQ(pattern_at(pattern, point(1.0, 0.0, 0.0)), black);
+    EXPECT_EQ(pattern_at(pattern, point(0.0, 0.0, 1.0)), black);
+    EXPECT_EQ(pattern_at(pattern, point(0.708, 0.0, 0.708)), black);
+}

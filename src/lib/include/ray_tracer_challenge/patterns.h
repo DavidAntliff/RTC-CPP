@@ -133,6 +133,37 @@ inline auto gradient_pattern(Color<T> const & a, Color<T> const & b) {
     return GradientPattern {a, b};
 }
 
+template <typename T>
+class RingPattern : public Pattern<T> {
+public:
+    RingPattern() = default;
+    RingPattern(Color<T> const & a, Color<T> const & b)
+        : Pattern<T> {}, a_{a}, b_{b} {}
+
+    auto const & a() const { return a_; }
+    auto const & b() const { return b_; }
+
+    Color<T> pattern_at(Point<T> const & local_point) const override {
+        auto const distance {sqrt(local_point.x() * local_point.x() + local_point.z() * local_point.z())};
+        if (static_cast<int>(floor(distance)) % 2 == 0) {
+            return a_;
+        }
+        return b_;
+    }
+
+protected:
+    // https://stackoverflow.com/a/43263477
+    virtual RingPattern * clone_impl() const override { return new RingPattern(*this); };
+
+private:
+    Color<T> a_ {};
+    Color<T> b_ {};
+};
+
+template <typename T>
+inline auto ring_pattern(Color<T> const & a, Color<T> const & b) {
+    return RingPattern {a, b};
+}
 
 } // namespace rtc
 
