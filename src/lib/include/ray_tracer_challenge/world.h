@@ -107,7 +107,7 @@ inline auto shade_hit(World<T> const & world, IntersectionComputation<T> const &
     return lighting(comps.object->material(),
                     *comps.object,
                     *world.light(),
-                    comps.point,
+                    comps.over_point,  // avoid boundary issues
                     comps.eyev,
                     comps.normalv,
                     shadowed);
