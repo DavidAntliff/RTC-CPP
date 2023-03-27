@@ -85,8 +85,9 @@ public:
 
 protected:
     // https://stackoverflow.com/a/43263477
-    virtual TestPattern * clone_impl() const override { return new TestPattern
-    (*this); };
+    virtual std::unique_ptr<Pattern<double>> clone_impl() const override {
+        return std::make_unique<TestPattern>(*this);
+    };
 };
 
 TestPattern test_pattern() {

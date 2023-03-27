@@ -22,8 +22,6 @@ public:
     Pattern(Pattern const &) = default;
     Pattern& operator=(Pattern const &) = default;
 
-//    virtual std::unique_ptr<Pattern> clone() const = 0;
-
     auto operator<=>(Pattern const &) const = default;
 
     virtual Color<T> pattern_at(Point<T> const & local_point) const = 0;
@@ -34,10 +32,10 @@ public:
     }
 
     // https://stackoverflow.com/a/43263477
-    auto clone() const { return std::unique_ptr<Pattern>(clone_impl()); }
+    auto clone() const { return clone_impl(); }
 
 protected:
-    virtual Pattern * clone_impl() const = 0;
+    virtual std::unique_ptr<Pattern> clone_impl() const = 0;
 
 private:
     matrix_t transform_ {identity4x4()};
@@ -72,10 +70,6 @@ public:
     StripePattern(Color<T> const & a, Color<T> const & b)
         : Pattern<T> {}, a_{a}, b_{b} {}
 
-//    std::unique_ptr<Pattern<T>> clone() const override {
-//        return std::make_unique<StripePattern>(*this);
-//    }
-
     auto const & a() const { return a_; }
     auto const & b() const { return b_; }
 
@@ -88,7 +82,9 @@ public:
 
 protected:
     // https://stackoverflow.com/a/43263477
-    virtual StripePattern * clone_impl() const override { return new StripePattern(*this); };
+    virtual std::unique_ptr<Pattern<T>> clone_impl() const override {
+        return std::make_unique<StripePattern>(*this);
+    };
 
 private:
     Color<T> a_ {};
@@ -108,10 +104,6 @@ public:
     GradientPattern(Color<T> const & a, Color<T> const & b)
         : Pattern<T> {}, a_{a}, b_{b} {}
 
-//    std::unique_ptr<Pattern<T>> clone() const override {
-//        return std::make_unique<GradientPattern>(*this);
-//    }
-
     auto const & a() const { return a_; }
     auto const & b() const { return b_; }
 
@@ -121,7 +113,9 @@ public:
 
 protected:
     // https://stackoverflow.com/a/43263477
-    virtual GradientPattern * clone_impl() const override { return new GradientPattern(*this); };
+    virtual std::unique_ptr<Pattern<T>> clone_impl() const override {
+        return std::make_unique<GradientPattern>(*this);
+    };
 
 private:
     Color<T> a_ {};
@@ -153,7 +147,9 @@ public:
 
 protected:
     // https://stackoverflow.com/a/43263477
-    virtual RingPattern * clone_impl() const override { return new RingPattern(*this); };
+    virtual std::unique_ptr<Pattern<T>> clone_impl() const override {
+        return std::make_unique<RingPattern>(*this);
+    };
 
 private:
     Color<T> a_ {};
@@ -187,7 +183,9 @@ public:
 
 protected:
     // https://stackoverflow.com/a/43263477
-    virtual CheckersPattern * clone_impl() const override { return new CheckersPattern(*this); };
+    virtual std::unique_ptr<Pattern<T>> clone_impl() const override {
+        return std::make_unique<CheckersPattern>(*this);
+    };
 
 private:
     Color<T> a_ {};
@@ -200,6 +198,8 @@ inline auto checkers_pattern(Color<T> const & a, Color<T> const & b) {
 }
 
 // TODO: Spherical Texture Mapping - Page 138
+
+
 
 } // namespace rtc
 
