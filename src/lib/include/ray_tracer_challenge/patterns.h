@@ -47,8 +47,10 @@ inline void set_pattern_transform(Pattern<T> & pattern, Matrix const & m) {
 }
 
 template <typename T>
-inline Color<T> pattern_at(Pattern<T> const & pattern, Point<T> const & point) {
-    return pattern.pattern_at(point);
+inline Color<T> pattern_at(Pattern<T> const & pattern, Point<T> const & object_point) {
+    // Convert object-space point to pattern-space point:
+    auto const pattern_point {inverse(pattern.transform()) * object_point};
+    return pattern.pattern_at(pattern_point);
 }
 
 template <typename T>
@@ -57,9 +59,7 @@ inline Color<T> pattern_at_shape(Pattern<T> const & pattern,
                                  Point<T> const & world_point) {
     // Convert world-space point to object-space point:
     auto const object_point {inverse(shape.transform()) * world_point};
-    // Convert object-space point to pattern-space point:
-    auto const pattern_point {inverse(pattern.transform()) * object_point};
-    return pattern_at(pattern, pattern_point);
+    return pattern_at(pattern, object_point);
 }
 
 template <typename T>
@@ -72,6 +72,7 @@ public:
     auto operator<=>(SolidPattern const &) const = default;
 
     Color<T> pattern_at(Point<T> const & local_point) const override {
+        (void)local_point;
         return c_;
     }
 
@@ -154,6 +155,80 @@ inline auto stripe_pattern(A const & a, B const & b) {
     return StripePattern<fp_t> {a, b};
 }
 
+// CRTP Base Class for patterns that contain two sub-patterns
+template <typename T, typename Derived>
+class NestedPatterns2 : public Pattern<T> {
+public:
+    NestedPatterns2() = default;
+
+    template <typename A, typename B>
+    NestedPatterns2(A const & a, B const & b)
+        : Pattern<T> {},
+          a_{init_(a)},
+          b_{init_(b)} {}
+
+    ~NestedPatterns2() = default;
+    NestedPatterns2(NestedPatterns2 const & other)
+        : Pattern<T> {other},
+          a_{other.a_->clone()},
+          b_{other.b_->clone()} {}
+    NestedPatterns2(NestedPatterns2 &&) = default;
+    NestedPatterns2 & operator=(NestedPatterns2 const & other) {
+        a_ = other.a_.clone();
+        b_ = other.b_.clone();
+    }
+    NestedPatterns2 & operator=(NestedPatterns2 &&) = default;
+
+    friend bool operator==(NestedPatterns2 const & lhs, NestedPatterns2 const & rhs) {
+        return *lhs.a_ == *rhs.a_ &&
+               *lhs.b_ == *rhs.b_;
+    }
+
+    auto const & a() const { return *a_; }
+    auto const & b() const { return *b_; }
+
+private:
+    static auto init_(Color<T> const & c) {
+        return std::make_unique<SolidPattern<T>>(c);
+    }
+
+    static auto init_(Pattern<T> const & p) {
+        return p.clone();
+    }
+
+protected:
+    // https://stackoverflow.com/a/43263477
+    std::unique_ptr<Pattern<T>> clone_impl() const override {
+        auto p {std::make_unique<Derived>(*static_cast<Derived const *>(this))};
+        p->a_ = a_->clone();
+        p->b_ = b_->clone();
+        return p;
+    };
+
+protected:
+    std::unique_ptr<Pattern<T>> a_ {};
+    std::unique_ptr<Pattern<T>> b_ {};
+};
+
+template <typename T>
+class StripePattern2 : public NestedPatterns2<T, StripePattern2<T>> {
+public:
+    using NestedPatterns2<T, StripePattern2>::NestedPatterns2;
+
+    Color<T> pattern_at(Point<T> const & local_point) const override {
+        if (static_cast<int>(floor(local_point.x())) % 2 == 0) {
+            auto const pattern_point{inverse(this->a_->transform()) * local_point};
+            return this->a_->pattern_at(pattern_point);
+        }
+        auto const pattern_point{inverse(this->b_->transform()) * local_point};
+        return this->b_->pattern_at(pattern_point);
+    }
+};
+
+template <typename A, typename B>
+inline auto stripe_pattern2(A const & a, B const & b) {
+    return StripePattern2<fp_t> {a, b};
+}
 
 template <typename T>
 class GradientPattern : public Pattern<T> {

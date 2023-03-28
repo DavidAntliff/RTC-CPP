@@ -27,24 +27,30 @@ int main(int argc, char * argv[]) {
     floor.set_material(material());
     floor.material().set_color(color(1.0, 0.9, 0.9));
     floor.material().set_specular(0.0);
-    auto floor_pattern_1 = stripe_pattern(white, black);
+    auto floor_pattern_1 = stripe_pattern2(white, black);
     floor_pattern_1.set_transform(scaling(0.5, 0.5, 0.5));
-    auto floor_pattern_2 = stripe_pattern(red, green);
+    auto floor_pattern_2 = stripe_pattern2(red, green);
     floor_pattern_2.set_transform(scaling(0.5, 0.5, 0.5).then(rotation_y(pi / 2.0)));
-    auto floor_pattern = stripe_pattern(floor_pattern_1, floor_pattern_2);
+    auto floor_pattern = stripe_pattern2(floor_pattern_1, floor_pattern_2);
     floor.material().set_pattern(floor_pattern);
     w.add_object(floor);
 
     auto wall = plane();
     wall.set_transform(rotation_x(pi / 2.0)
-                        .then(rotation_y(0.3))
+    //                    .then(rotation_y(0.3))
                         .then(translation(0.0, 0.0, 7.0)));
     wall.set_material(material());
     wall.material().set_color(Color(1.0, 0.8, 0.8));
     wall.material().set_diffuse(0.3);
     wall.material().set_specular(0.0);
-    wall.material().set_pattern(radial_gradient_pattern(black, red));
-    //w.add_object(wall);
+    auto wall_pattern_1 = stripe_pattern2(white, black);
+    wall_pattern_1.set_transform(scaling(0.5, 0.5, 0.5));
+    auto wall_pattern_2 = stripe_pattern2(green, red);
+    wall_pattern_2.set_transform(scaling(0.5, 0.5, 0.5));
+    auto wall_pattern = stripe_pattern2(wall_pattern_1, wall_pattern_2);
+    wall_pattern.set_transform(scaling(0.5, 0.5, 0.5));
+    wall.material().set_pattern(wall_pattern);
+    w.add_object(wall);
 
     auto middle = sphere(4);
     middle.set_transform(translation(-0.5, 1.0, 0.5));

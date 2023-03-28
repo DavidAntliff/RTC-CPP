@@ -209,8 +209,14 @@ TEST(TestPatterns, radial_gradient_linearly_interpolates_between_colors) {
 // Nested Patterns
 TEST(TestPatterns, nested_patterns) {
     auto p0 = stripe_pattern(white, black);
+    p0.set_transform(scaling(0.5, 0.5, 0.5));    // four stripes per unit
     auto p1 = stripe_pattern(green, red);
-    p1.set_transform(rotation_y(std::numbers::pi / 2.0));
+    p1.set_transform(scaling(0.5, 0.5, 0.5));    // four stripes per unit
     auto pattern = stripe_pattern(p0, p1);
-    EXPECT_EQ(pattern_at(pattern, point(0.0, 0.0, 0.0)), white);
+    pattern.set_transform(scaling(0.5, 0.5, 0.5));  // two stripes per unit
+
+    EXPECT_EQ(pattern_at(pattern, point(0.125, 0.0, 0.0)), white);
+    EXPECT_EQ(pattern_at(pattern, point(0.375, 0.0, 0.0)), black);
+    EXPECT_EQ(pattern_at(pattern, point(0.625, 0.0, 0.0)), green);
+    EXPECT_EQ(pattern_at(pattern, point(0.875, 0.0, 0.0)), red);
 }
