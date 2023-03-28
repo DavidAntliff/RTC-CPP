@@ -62,38 +62,96 @@ inline Color<T> pattern_at_shape(Pattern<T> const & pattern,
     return pattern_at(pattern, pattern_point);
 }
 
-
 template <typename T>
-class StripePattern : public Pattern<T> {
+class SolidPattern : public Pattern<T> {
 public:
-    StripePattern() = default;
-    StripePattern(Color<T> const & a, Color<T> const & b)
-        : Pattern<T> {}, a_{a}, b_{b} {}
+    SolidPattern() = default;
+    explicit SolidPattern(Color<T> const & color)
+        : c_{color} {}
 
-    auto const & a() const { return a_; }
-    auto const & b() const { return b_; }
+    auto operator<=>(SolidPattern const &) const = default;
 
     Color<T> pattern_at(Point<T> const & local_point) const override {
-        if (static_cast<int>(floor(local_point.x())) % 2 == 0) {
-            return a_;
-        }
-        return b_;
+        return c_;
     }
 
 protected:
     // https://stackoverflow.com/a/43263477
     virtual std::unique_ptr<Pattern<T>> clone_impl() const override {
-        return std::make_unique<StripePattern>(*this);
+        return std::make_unique<SolidPattern>(*this);
     };
 
 private:
-    Color<T> a_ {};
-    Color<T> b_ {};
+    Color<T> c_ {};
 };
 
 template <typename T>
-inline auto stripe_pattern(Color<T> const & a, Color<T> const & b) {
-    return StripePattern {a, b};
+class StripePattern : public Pattern<T> {
+public:
+    StripePattern() = default;
+
+    template <typename A, typename B>
+    StripePattern(A const & a, B const & b)
+        : Pattern<T> {},
+          a_{init_(a)},
+          b_{init_(b)} {}
+
+    ~StripePattern() = default;
+    StripePattern(StripePattern const & other)
+        : Pattern<T> {other},
+          a_{other.a_->clone()},
+          b_{other.b_->clone()} {}
+    StripePattern(StripePattern &&) = default;
+    StripePattern & operator=(StripePattern const & other) {
+        a_ = other.a_.clone();
+        b_ = other.b_.clone();
+    }
+    StripePattern & operator=(StripePattern &&) = default;
+
+    friend bool operator==(StripePattern const & lhs, StripePattern const & rhs) {
+        return *lhs.a_ == *rhs.a_ &&
+               *lhs.b_ == *rhs.b_;
+    }
+
+    auto const & a() const { return *a_; }
+    auto const & b() const { return *b_; }
+
+    Color<T> pattern_at(Point<T> const & local_point) const override {
+        if (static_cast<int>(floor(local_point.x())) % 2 == 0) {
+            auto const pattern_point {inverse(a_->transform()) * local_point};
+            return a_->pattern_at(pattern_point);
+        }
+        auto const pattern_point {inverse(b_->transform()) * local_point};
+        return b_->pattern_at(pattern_point);
+    }
+
+private:
+    static auto init_(Color<T> const & c) {
+        return std::make_unique<SolidPattern<T>>(c);
+    }
+
+    static auto init_(Pattern<T> const & p) {
+        return p.clone();
+    }
+
+protected:
+    // https://stackoverflow.com/a/43263477
+    virtual std::unique_ptr<Pattern<T>> clone_impl() const override {
+        //return std::make_unique<StripePattern>(*this);
+        auto p {std::make_unique<StripePattern>(*this)};
+        p->a_ = a_->clone();
+        p->b_ = b_->clone();
+        return p;
+    };
+
+private:
+    std::unique_ptr<Pattern<T>> a_ {};
+    std::unique_ptr<Pattern<T>> b_ {};
+};
+
+template <typename A, typename B>
+inline auto stripe_pattern(A const & a, B const & b) {
+    return StripePattern<fp_t> {a, b};
 }
 
 

@@ -11,8 +11,8 @@ using namespace rtc;
 // Creating a stripe pattern
 TEST(TestPatterns, creating_a_stripe_pattern) {
     auto pattern = stripe_pattern(white, black);
-    EXPECT_EQ(pattern.a(), white);
-    EXPECT_EQ(pattern.b(), black);
+    EXPECT_EQ(pattern.a(), SolidPattern(white));
+    EXPECT_EQ(pattern.b(), SolidPattern(black));
 }
 
 // A stripe pattern is constant in y
@@ -184,7 +184,7 @@ TEST(TestPatterns, checkers_repeats_in_z) {
     EXPECT_EQ(pattern_at(pattern, point(0.0, 0.0, 1.01)), black);
 }
 
-// Radial Gradient
+// Radial Gradient in x, y, z
 TEST(TestPatterns, radial_gradient_linearly_interpolates_between_colors) {
     auto pattern = radial_gradient_pattern(white, black);
     EXPECT_EQ(pattern_at(pattern, point(0.0, 0.0, 0.0)), white);
@@ -204,4 +204,13 @@ TEST(TestPatterns, radial_gradient_linearly_interpolates_between_colors) {
     EXPECT_TRUE(AlmostEqual(pattern_at(pattern, point(x1, 0.0, x1)), color(0.5, 0.5, 0.5)));
     EXPECT_TRUE(AlmostEqual(pattern_at(pattern, point(x2, 0.0, x2)), color(0.25, 0.25, 0.25)));
     EXPECT_TRUE(AlmostEqual(pattern_at(pattern, point(x3, 0.0, x3)), black));
+}
+
+// Nested Patterns
+TEST(TestPatterns, nested_patterns) {
+    auto p0 = stripe_pattern(white, black);
+    auto p1 = stripe_pattern(green, red);
+    p1.set_transform(rotation_y(std::numbers::pi / 2.0));
+    auto pattern = stripe_pattern(p0, p1);
+    EXPECT_EQ(pattern_at(pattern, point(0.0, 0.0, 0.0)), white);
 }

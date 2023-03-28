@@ -43,7 +43,7 @@ public:
     Material& operator=(Material &&) = default;
 
     //auto operator<=>(Material const &) const = default;
-    friend bool operator==(const Material & lhs, const Material & rhs) {
+    friend bool operator==(Material const & lhs, Material const & rhs) {
         auto equal = lhs.color_ == rhs.color_ &&
                      lhs.ambient_ == rhs.ambient_ &&
                      lhs.diffuse_ == rhs.diffuse_ &&
