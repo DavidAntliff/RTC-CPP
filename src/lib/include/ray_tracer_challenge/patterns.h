@@ -86,75 +86,6 @@ private:
     Color<T> c_ {};
 };
 
-template <typename T>
-class StripePattern : public Pattern<T> {
-public:
-    StripePattern() = default;
-
-    template <typename A, typename B>
-    StripePattern(A const & a, B const & b)
-        : Pattern<T> {},
-          a_{init_(a)},
-          b_{init_(b)} {}
-
-    ~StripePattern() = default;
-    StripePattern(StripePattern const & other)
-        : Pattern<T> {other},
-          a_{other.a_->clone()},
-          b_{other.b_->clone()} {}
-    StripePattern(StripePattern &&) = default;
-    StripePattern & operator=(StripePattern const & other) {
-        a_ = other.a_.clone();
-        b_ = other.b_.clone();
-    }
-    StripePattern & operator=(StripePattern &&) = default;
-
-    friend bool operator==(StripePattern const & lhs, StripePattern const & rhs) {
-        return *lhs.a_ == *rhs.a_ &&
-               *lhs.b_ == *rhs.b_;
-    }
-
-    auto const & a() const { return *a_; }
-    auto const & b() const { return *b_; }
-
-    Color<T> pattern_at(Point<T> const & local_point) const override {
-        if (static_cast<int>(floor(local_point.x())) % 2 == 0) {
-            auto const pattern_point {inverse(a_->transform()) * local_point};
-            return a_->pattern_at(pattern_point);
-        }
-        auto const pattern_point {inverse(b_->transform()) * local_point};
-        return b_->pattern_at(pattern_point);
-    }
-
-private:
-    static auto init_(Color<T> const & c) {
-        return std::make_unique<SolidPattern<T>>(c);
-    }
-
-    static auto init_(Pattern<T> const & p) {
-        return p.clone();
-    }
-
-protected:
-    // https://stackoverflow.com/a/43263477
-    virtual std::unique_ptr<Pattern<T>> clone_impl() const override {
-        //return std::make_unique<StripePattern>(*this);
-        auto p {std::make_unique<StripePattern>(*this)};
-        p->a_ = a_->clone();
-        p->b_ = b_->clone();
-        return p;
-    };
-
-private:
-    std::unique_ptr<Pattern<T>> a_ {};
-    std::unique_ptr<Pattern<T>> b_ {};
-};
-
-template <typename A, typename B>
-inline auto stripe_pattern(A const & a, B const & b) {
-    return StripePattern<fp_t> {a, b};
-}
-
 // CRTP Base Class for patterns that contain two sub-patterns
 template <typename T, typename Derived>
 class NestedPatterns2 : public Pattern<T> {
@@ -211,9 +142,9 @@ protected:
 };
 
 template <typename T>
-class StripePattern2 : public NestedPatterns2<T, StripePattern2<T>> {
+class StripePattern : public NestedPatterns2<T, StripePattern<T>> {
 public:
-    using NestedPatterns2<T, StripePattern2>::NestedPatterns2;
+    using NestedPatterns2<T, StripePattern>::NestedPatterns2;
 
     Color<T> pattern_at(Point<T> const & local_point) const override {
         if (static_cast<int>(floor(local_point.x())) % 2 == 0) {
@@ -226,140 +157,97 @@ public:
 };
 
 template <typename A, typename B>
-inline auto stripe_pattern2(A const & a, B const & b) {
-    return StripePattern2<fp_t> {a, b};
+inline auto stripe_pattern(A const & a, B const & b) {
+    return StripePattern<fp_t> {a, b};
 }
 
 template <typename T>
-class GradientPattern : public Pattern<T> {
+class GradientPattern : public NestedPatterns2<T, GradientPattern<T>> {
 public:
-    GradientPattern() = default;
-    GradientPattern(Color<T> const & a, Color<T> const & b)
-        : Pattern<T> {}, a_{a}, b_{b} {}
+    using NestedPatterns2<T, GradientPattern>::NestedPatterns2;
 
-    auto const & a() const { return a_; }
-    auto const & b() const { return b_; }
-
-    Color<T> pattern_at(Point<T> const & local_point) const override {
-        return color(local_point.x(), a_, b_);
+    Color<T> pattern_at(Point<T> const &local_point) const override {
+        auto const pattern_point_a{inverse(this->a_->transform()) * local_point};
+        auto const pattern_point_b{inverse(this->b_->transform()) * local_point};
+        return color(local_point.x(),
+                     this->a_->pattern_at(pattern_point_a),
+                     this->b_->pattern_at(pattern_point_b));
     }
-
-protected:
-    // https://stackoverflow.com/a/43263477
-    virtual std::unique_ptr<Pattern<T>> clone_impl() const override {
-        return std::make_unique<GradientPattern>(*this);
-    };
-
-private:
-    Color<T> a_ {};
-    Color<T> b_ {};
 };
 
-template <typename T>
-inline auto gradient_pattern(Color<T> const & a, Color<T> const & b) {
-    return GradientPattern {a, b};
+template <typename A, typename B>
+inline auto gradient_pattern(A const & a, B const & b) {
+    return GradientPattern<fp_t> {a, b};
 }
 
 template <typename T>
-class RingPattern : public Pattern<T> {
+class RingPattern : public NestedPatterns2<T, RingPattern<T>> {
 public:
-    RingPattern() = default;
-    RingPattern(Color<T> const & a, Color<T> const & b)
-        : Pattern<T> {}, a_{a}, b_{b} {}
+    using NestedPatterns2<T, RingPattern>::NestedPatterns2;
 
-    auto const & a() const { return a_; }
-    auto const & b() const { return b_; }
-
-    Color<T> pattern_at(Point<T> const & local_point) const override {
+    Color<T> pattern_at(Point<T> const &local_point) const override {
         auto const distance {sqrt(local_point.x() * local_point.x() + local_point.z() * local_point.z())};
         if (static_cast<int>(floor(distance)) % 2 == 0) {
-            return a_;
+            auto const pattern_point_a{inverse(this->a_->transform()) * local_point};
+            return this->a_->pattern_at(pattern_point_a);
         }
-        return b_;
+        auto const pattern_point_b{inverse(this->b_->transform()) * local_point};
+        return this->b_->pattern_at(pattern_point_b);
     }
-
-protected:
-    // https://stackoverflow.com/a/43263477
-    virtual std::unique_ptr<Pattern<T>> clone_impl() const override {
-        return std::make_unique<RingPattern>(*this);
-    };
-
-private:
-    Color<T> a_ {};
-    Color<T> b_ {};
 };
 
-template <typename T>
-inline auto ring_pattern(Color<T> const & a, Color<T> const & b) {
-    return RingPattern {a, b};
+template <typename A, typename B>
+inline auto ring_pattern(A const & a, B const & b) {
+    return RingPattern<fp_t> {a, b};
 }
 
 template <typename T>
-class CheckersPattern : public Pattern<T> {
+class CheckersPattern : public NestedPatterns2<T, CheckersPattern<T>> {
 public:
-    CheckersPattern() = default;
-    CheckersPattern(Color<T> const & a, Color<T> const & b)
-            : Pattern<T> {}, a_{a}, b_{b} {}
+    using NestedPatterns2<T, CheckersPattern>::NestedPatterns2;
 
-    auto const & a() const { return a_; }
-    auto const & b() const { return b_; }
-
-    Color<T> pattern_at(Point<T> const & local_point) const override {
+    Color<T> pattern_at(Point<T> const &local_point) const override {
         auto const sum = floor(local_point.x()) +
                          floor(local_point.y()) +
                          floor(local_point.z());
         if (static_cast<int>(floor(sum)) % 2 == 0) {
-            return a_;
+            auto const pattern_point_a{inverse(this->a_->transform()) * local_point};
+            return this->a_->pattern_at(pattern_point_a);
         }
-        return b_;
+        auto const pattern_point_b{inverse(this->b_->transform()) * local_point};
+        return this->b_->pattern_at(pattern_point_b);
     }
-
-protected:
-    // https://stackoverflow.com/a/43263477
-    virtual std::unique_ptr<Pattern<T>> clone_impl() const override {
-        return std::make_unique<CheckersPattern>(*this);
-    };
-
-private:
-    Color<T> a_ {};
-    Color<T> b_ {};
 };
 
-template <typename T>
-inline auto checkers_pattern(Color<T> const & a, Color<T> const & b) {
-    return CheckersPattern {a, b};
+template <typename A, typename B>
+inline auto checkers_pattern(A const & a, B const & b) {
+    return CheckersPattern<fp_t> {a, b};
 }
 
 template <typename T>
-class RadialGradientPattern : public Pattern<T> {
+class RadialGradientPattern : public NestedPatterns2<T, RadialGradientPattern<T>> {
 public:
-    RadialGradientPattern() = default;
-    RadialGradientPattern(Color<T> const & a, Color<T> const & b, T y_factor = T(0))
-        : Pattern<T> {}, a_{a}, b_{b}, y_factor_{y_factor} {}
+    using NestedPatterns2<T, RadialGradientPattern>::NestedPatterns2;
 
-    auto const & a() const { return a_; }
-    auto const & b() const { return b_; }
+    template <typename A, typename B>
+    RadialGradientPattern(A const & a, B const & b, T y_factor = T(0))
+            : NestedPatterns2<T, RadialGradientPattern> {a, b}, y_factor_{y_factor} {}
 
-    Color<T> pattern_at(Point<T> const & local_point) const override {
+    Color<T> pattern_at(Point<T> const &local_point) const override {
         auto const distance {sqrt(local_point.x() * local_point.x() + y_factor_ * local_point.y() * local_point.y() + local_point.z() * local_point.z())};
-        return color(distance, a_, b_);
+        auto const pattern_point_a {inverse(this->a_->transform()) * local_point};
+        auto const pattern_point_b {inverse(this->b_->transform()) * local_point};
+        return color(distance,
+                     this->a_->pattern_at(pattern_point_a),
+                     this->b_->pattern_at(pattern_point_b));
     }
 
-protected:
-    // https://stackoverflow.com/a/43263477
-    virtual std::unique_ptr<Pattern<T>> clone_impl() const override {
-        return std::make_unique<RadialGradientPattern>(*this);
-    };
-
 private:
-    Color<T> a_ {};
-    Color<T> b_ {};
-
     T y_factor_ {0};
 };
 
-template <typename T>
-inline auto radial_gradient_pattern(Color<T> const & a, Color<T> const & b, T y_factor = T(0)) {
+template <typename A, typename B>
+inline auto radial_gradient_pattern(A const & a, B const & b, fp_t y_factor = 0) {
     return RadialGradientPattern {a, b, y_factor};
 }
 

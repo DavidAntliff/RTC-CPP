@@ -27,11 +27,11 @@ int main(int argc, char * argv[]) {
     floor.set_material(material());
     floor.material().set_color(color(1.0, 0.9, 0.9));
     floor.material().set_specular(0.0);
-    auto floor_pattern_1 = stripe_pattern2(white, black);
-    floor_pattern_1.set_transform(scaling(0.5, 0.5, 0.5));
-    auto floor_pattern_2 = stripe_pattern2(red, green);
+    auto floor_pattern_1 = gradient_pattern(white, black);
+    //floor_pattern_1.set_transform(scaling(0.5, 0.5, 0.5));
+    auto floor_pattern_2 = gradient_pattern(red, green);
     floor_pattern_2.set_transform(scaling(0.5, 0.5, 0.5).then(rotation_y(pi / 2.0)));
-    auto floor_pattern = stripe_pattern2(floor_pattern_1, floor_pattern_2);
+    auto floor_pattern = stripe_pattern(floor_pattern_1, floor_pattern_2);
     floor.material().set_pattern(floor_pattern);
     w.add_object(floor);
 
@@ -43,11 +43,11 @@ int main(int argc, char * argv[]) {
     wall.material().set_color(Color(1.0, 0.8, 0.8));
     wall.material().set_diffuse(0.3);
     wall.material().set_specular(0.0);
-    auto wall_pattern_1 = stripe_pattern2(white, black);
-    wall_pattern_1.set_transform(scaling(0.5, 0.5, 0.5));
-    auto wall_pattern_2 = stripe_pattern2(green, red);
-    wall_pattern_2.set_transform(scaling(0.5, 0.5, 0.5));
-    auto wall_pattern = stripe_pattern2(wall_pattern_1, wall_pattern_2);
+    auto wall_pattern_1 = radial_gradient_pattern(yellow, black);
+    //wall_pattern_1.set_transform(scaling(0.5, 0.5, 0.5));
+    auto wall_pattern_2 = radial_gradient_pattern(black, yellow);
+    //wall_pattern_2.set_transform(scaling(0.5, 0.5, 0.5));
+    auto wall_pattern = ring_pattern(wall_pattern_1, wall_pattern_2);
     wall_pattern.set_transform(scaling(0.5, 0.5, 0.5));
     wall.material().set_pattern(wall_pattern);
     w.add_object(wall);
@@ -58,10 +58,11 @@ int main(int argc, char * argv[]) {
     middle.material().set_color(color(0.1, 1.0, 0.5));
     middle.material().set_diffuse(0.7);
     middle.material().set_specular(0.3);
-    auto middle_pattern = radial_gradient_pattern(blue, white);
-    set_pattern_transform(middle_pattern, scaling(0.2, 0.2, 0.2).then(rotation_y(-pi / 8.0)));
+    auto middle_pattern_2 = stripe_pattern(white, black);
+    auto middle_pattern = ring_pattern(blue, middle_pattern_2);
+    set_pattern_transform(middle_pattern, scaling(0.2, 0.2, 0.2).then(rotation_x(pi / 2.0)));
     middle.material().set_pattern(middle_pattern);
-    //w.add_object(middle);
+    w.add_object(middle);
 
     auto right = sphere(5);
     right.set_transform(translation(1.5, 0.5, -0.5) * scaling(0.5, 0.5, 0.5));
@@ -69,10 +70,12 @@ int main(int argc, char * argv[]) {
     right.material().set_color(color(0.5, 1.0, 0.1));
     right.material().set_diffuse(0.7);
     right.material().set_specular(0.3);
-    auto right_pattern = radial_gradient_pattern(green, white);
+    auto right_pattern_2 = radial_gradient_pattern(white, black);
+    right_pattern_2.set_transform(rotation_x(pi / 2.0));
+    auto right_pattern = checkers_pattern(green, right_pattern_2);
     set_pattern_transform(right_pattern, scaling(1.0, 1.0, 1.0).then(rotation_z(-pi / 6.0).then(translation(0.5, 0.0, 0.0))));
     right.material().set_pattern(right_pattern);
-    //w.add_object(right);
+    w.add_object(right);
 
     auto left = sphere(6);
     left.set_transform(translation(-1.5, 0.33, -0.75) * scaling(0.33, 0.33, 0.33) * rotation_z(pi / 4.0));
