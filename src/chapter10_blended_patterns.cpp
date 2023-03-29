@@ -23,13 +23,19 @@ int main(int argc, char * argv[]) {
 
     auto w = world();
 
+    auto const color1 {white};
+    auto const color2 {color(40, 99, 40)};
+    auto const color3 {color(167, 83, 104)};
+    auto const color4 {color(124, 41, 62)};
+    auto const color5 {color(63, 63, 63)};
+    auto const color6 {color(104, 104, 104)};
+
+
     auto floor = plane();
     floor.set_material(material());
     floor.material().set_diffuse(1.0);
     floor.material().set_specular(0.0);
     auto const scale {0.5};
-    auto const color1 {white};
-    auto const color2 {color(40, 99, 40)};
     auto floor_pattern_1 = stripe_pattern(color1, color2);
     floor_pattern_1.set_transform(scaling(scale, scale, scale).then(rotation_y(pi / 4.0)));
     auto floor_pattern_2 = stripe_pattern(color1, color2);
@@ -42,20 +48,19 @@ int main(int argc, char * argv[]) {
     middle.set_transform(translation(-0.5, 1.0, 0.5));
     middle.material() = material();
     middle.material().set_color(color(0.1, 1.0, 0.5));
-    middle.material().set_diffuse(0.7);
-    middle.material().set_specular(0.3);
-    auto middle_pattern_1 = stripe_pattern(color1, color2);
+    middle.material().set_diffuse(0.8);
+    middle.material().set_specular(0.6);
+    middle.material().set_shininess(100.0);
+    auto middle_pattern_1 = ring_pattern(color1, color3);
     middle_pattern_1.set_transform(scaling(0.2, 0.2, 0.2));
-    auto middle_pattern_2 = stripe_pattern(color1, color2);
-    middle_pattern_2.set_transform(scaling(0.2, 0.2, 0.2).then(rotation_y(pi / 2.0)));
+    auto middle_pattern_2 = ring_pattern(color1, color4);
+    middle_pattern_2.set_transform(scaling(0.2, 0.2, 0.2).then(rotation_x(-pi / 4.0)));
     auto middle_pattern = blended_pattern(middle_pattern_1, middle_pattern_2);
     middle_pattern.set_transform(rotation_y(pi / 4.0).then(rotation_x(-pi / 4.0)));
-    //set_pattern_transform(middle_pattern, scaling(0.2, 0.2, 0.2).then(rotation_y(-pi / 8.0)));
-    //middle.material().set_pattern(middle_pattern);
     middle.material().set_pattern(middle_pattern);
     w.add_object(middle);
 
-    w.add_light(point_light(point(-10.0, 10.0, -10.0), color(1.0, 1.0, 1.0)));
+    w.add_light(point_light(point(10.0, 20.0, -10.0), color(1.0, 1.0, 1.0)));
 
     //auto cam = camera(100, 50, pi / 3.0);
     //auto cam = camera(400, 200, pi / 3.0);
