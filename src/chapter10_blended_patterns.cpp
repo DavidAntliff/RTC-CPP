@@ -25,15 +25,15 @@ int main(int argc, char * argv[]) {
 
     auto floor = plane();
     floor.set_material(material());
+    floor.material().set_diffuse(1.0);
     floor.material().set_specular(0.0);
     auto const scale {0.5};
-    //auto floor_pattern_1 = stripe_pattern(white, green);
-    auto floor_pattern_1 = stripe_pattern(white, black);
-    //floor_pattern_1.set_transform(scaling(scale, scale, scale).then(rotation_y(pi / 4.0)));
-    //auto floor_pattern_2 = stripe_pattern(white, green);
-    auto floor_pattern_2 = stripe_pattern(white, black);
-    //floor_pattern_2.set_transform(scaling(scale, scale, scale).then(rotation_y(-pi / 4.0)));
-    floor_pattern_2.set_transform(scaling(scale, scale, scale).then(rotation_y(pi / 2.0)));
+    auto const color1 {white};
+    auto const color2 {color(40, 99, 40)};
+    auto floor_pattern_1 = stripe_pattern(color1, color2);
+    floor_pattern_1.set_transform(scaling(scale, scale, scale).then(rotation_y(pi / 4.0)));
+    auto floor_pattern_2 = stripe_pattern(color1, color2);
+    floor_pattern_2.set_transform(scaling(scale, scale, scale).then(rotation_y(-pi / 4.0)));
     auto floor_pattern = blended_pattern(floor_pattern_1, floor_pattern_2);
     floor.material().set_pattern(floor_pattern);
     w.add_object(floor);

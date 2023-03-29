@@ -60,6 +60,11 @@ inline auto color(T r, T g, T b) {
     return Color<T> {r, g, b};
 }
 
+template <>
+inline auto color<int>(int r, int g, int b) {
+    return Color<fp_t> {r / 255.0, g / 255.0, b / 255.0};
+}
+
 // Blending function (linear interpolation)
 template <typename T>
 inline auto color(T t, Color<T> const & a, Color<T> const & b) {
