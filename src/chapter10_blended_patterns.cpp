@@ -38,6 +38,23 @@ int main(int argc, char * argv[]) {
     floor.material().set_pattern(floor_pattern);
     w.add_object(floor);
 
+    auto middle = sphere(4);
+    middle.set_transform(translation(-0.5, 1.0, 0.5));
+    middle.material() = material();
+    middle.material().set_color(color(0.1, 1.0, 0.5));
+    middle.material().set_diffuse(0.7);
+    middle.material().set_specular(0.3);
+    auto middle_pattern_1 = stripe_pattern(color1, color2);
+    middle_pattern_1.set_transform(scaling(0.2, 0.2, 0.2));
+    auto middle_pattern_2 = stripe_pattern(color1, color2);
+    middle_pattern_2.set_transform(scaling(0.2, 0.2, 0.2).then(rotation_y(pi / 2.0)));
+    auto middle_pattern = blended_pattern(middle_pattern_1, middle_pattern_2);
+    middle_pattern.set_transform(rotation_y(pi / 4.0).then(rotation_x(-pi / 4.0)));
+    //set_pattern_transform(middle_pattern, scaling(0.2, 0.2, 0.2).then(rotation_y(-pi / 8.0)));
+    //middle.material().set_pattern(middle_pattern);
+    middle.material().set_pattern(middle_pattern);
+    w.add_object(middle);
+
     w.add_light(point_light(point(-10.0, 10.0, -10.0), color(1.0, 1.0, 1.0)));
 
     //auto cam = camera(100, 50, pi / 3.0);
