@@ -251,6 +251,31 @@ inline auto radial_gradient_pattern(A const & a, B const & b, fp_t y_factor = 0)
     return RadialGradientPattern {a, b, y_factor};
 }
 
+
+template <typename T>
+class BlendedPattern : public NestedPatterns2<T, BlendedPattern<T>> {
+public:
+    using NestedPatterns2<T, BlendedPattern>::NestedPatterns2;
+
+//    template <typename A, typename B>
+//    BlendedPattern(A const & a, B const & b)
+//            : NestedPatterns2<T, BlendedPattern> {a, b} {}
+
+    Color<T> pattern_at(Point<T> const &local_point) const override {
+        auto const pattern_point_a {inverse(this->a_->transform()) * local_point};
+        auto const pattern_point_b {inverse(this->b_->transform()) * local_point};
+        auto const color_a = this->a_->pattern_at(pattern_point_a);
+        auto const color_b = this->b_->pattern_at(pattern_point_b);
+        return (color_a + color_b) / 2.0;
+    }
+};
+
+template <typename A, typename B>
+inline auto blended_pattern(A const & a, B const & b) {
+    return BlendedPattern<fp_t> {a, b};
+}
+
+
 // TODO: Spherical Texture Mapping - Page 138
 
 

@@ -4,6 +4,7 @@
 #include "support/support.h"
 
 #include <ray_tracer_challenge/spheres.h>
+#include <ray_tracer_challenge/canvas.h>
 #include <ray_tracer_challenge/patterns.h>
 
 using namespace rtc;
@@ -219,4 +220,31 @@ TEST(TestPatterns, nested_patterns) {
     EXPECT_EQ(pattern_at(pattern, point(0.375, 0.0, 0.0)), black);
     EXPECT_EQ(pattern_at(pattern, point(0.625, 0.0, 0.0)), green);
     EXPECT_EQ(pattern_at(pattern, point(0.875, 0.0, 0.0)), red);
+}
+
+// Blended Patterns
+TEST(TestPatterns, blended_patterns) {
+    auto p0 = stripe_pattern(white, black);
+    p0.set_transform(scaling(0.5, 0.5, 0.5));
+    auto p1 = stripe_pattern(white, black);
+    p1.set_transform(scaling(0.5, 0.5, 0.5).then(rotation_y(std::numbers::pi / 2.0)));
+    auto pattern = blended_pattern(p0, p1);
+
+//    auto image {canvas(10, 10)};
+//    for (int x = 0; x < 10; ++x) {
+//        for (int y = 0; y < 10; ++y) {
+//            double dx = x * 0.1;
+//            double dy = y * 0.1;
+//            write_pixel(image, x, y, pattern_at(pattern, point(dx, 0.0, dy)));
+//            //std::cout << "(" << dx << ", " << dy << ") = " << pattern_at(pattern, point(dx, 0.0, dy)) << '\n';
+//        }
+//    }
+//    auto ppm = ppm_from_canvas(image);
+//    write_to_file("test_blended_patterns.ppm", ppm);
+
+    auto const grey {color(0.5, 0.5, 0.5)};
+    EXPECT_EQ(pattern_at(pattern, point(0.25, 0.0, 0.25)), grey);
+    EXPECT_EQ(pattern_at(pattern, point(0.25, 0.0, 0.75)), white);
+    EXPECT_EQ(pattern_at(pattern, point(0.75, 0.0, 0.25)), black);
+    EXPECT_EQ(pattern_at(pattern, point(0.75, 0.0, 0.75)), grey);
 }

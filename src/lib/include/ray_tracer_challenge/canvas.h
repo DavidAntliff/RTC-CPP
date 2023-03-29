@@ -4,6 +4,7 @@
 #include <vector>
 #include <optional>
 #include <string>
+#include <fstream>
 
 #include <boost/format.hpp>
 
@@ -123,6 +124,12 @@ auto ppm_from_canvas(Canvas const & canvas) {
     }
 
     return header + data;
+}
+
+template <typename T>
+auto write_to_file(std::string const & filename, T const & obj) {
+    std::ofstream out(filename);
+    out << obj;
 }
 
 } // namespace rtc
