@@ -11,6 +11,7 @@ using namespace rtc;
 
 template <typename T>
 static void dump_pattern(Pattern<T> const & pattern, int size=128, double scale=1.0) {
+    std::string const suite_name {::testing::UnitTest::GetInstance()->current_test_info()->test_suite_name()};
     std::string const name {::testing::UnitTest::GetInstance()->current_test_info()->name()};
     auto image {canvas(size, size)};
     for (int x = 0; x < image.width(); ++x) {
@@ -19,11 +20,10 @@ static void dump_pattern(Pattern<T> const & pattern, int size=128, double scale=
             double const dy {scale * static_cast<double>(y) / image.height()};
             auto const v {pattern_at(pattern, point(dx, 0.0, dy))};
             write_pixel(image, x, y, v);
-            //std::cout << "(" << dx << ", " << dy << ") = " << pattern_at(pattern, point(dx, 0.0, dy)) << '\n';
         }
     }
     auto ppm {ppm_from_canvas(image)};
-    write_to_file(name + ".ppm", ppm);
+    write_to_file(suite_name + "_" + name + ".ppm", ppm);
 }
 
 // Creating a stripe pattern

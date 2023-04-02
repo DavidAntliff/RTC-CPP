@@ -21,6 +21,8 @@ int main(int argc, char * argv[]) {
     (void)argc;
     (void)argv;
 
+    double perturb_factor = 1.0;
+
     auto w = world();
 
     auto floor = plane();
@@ -28,8 +30,8 @@ int main(int argc, char * argv[]) {
     floor.material().set_color(color(1.0, 0.9, 0.9));
     floor.material().set_ambient(0.2);
     floor.material().set_specular(0.0);
-    auto floor_pattern_1 = perturbed_pattern(stripe_pattern(red, white), 2.0, 4, 0.9);
-    auto floor_pattern_2 = perturbed_pattern(stripe_pattern(red, white), 2.0, 4, 0.9);
+    auto floor_pattern_1 = perturbed_pattern(stripe_pattern(red, white), 2.0 * perturb_factor, 4, 0.9);
+    auto floor_pattern_2 = perturbed_pattern(stripe_pattern(red, white), 2.0 * perturb_factor, 4, 0.9);
     auto scale {0.4};
     floor_pattern_1.set_transform(scaling(scale, scale, scale).then(rotation_y(pi / 4.0)));
     floor_pattern_2.set_transform(scaling(scale, scale, scale).then(rotation_y(-pi / 4.0)));
@@ -46,7 +48,7 @@ int main(int argc, char * argv[]) {
     middle.material().set_specular(0.7);
     auto middle_pattern = perturbed_pattern(
             stripe_pattern(color(13, 104, 53), color(15, 158,79)),
-            2.0, 3, 0.8);
+            2.0 * perturb_factor, 3, 0.8);
     set_pattern_transform(middle_pattern, scaling(0.25, 0.25, 0.25)
                               .then(rotation_z(-pi / 4.0))
                               .then(rotation_y(-pi / 4.0)));
@@ -61,7 +63,7 @@ int main(int argc, char * argv[]) {
     right.material().set_specular(0.3);
     auto right_pattern = perturbed_pattern(
             gradient_pattern(color(200, 40, 0), color(200, 180, 0)),
-            0.8, 4, 0.9);
+            0.8 * perturb_factor, 4, 0.9);
     set_pattern_transform(right_pattern, scaling(2.2, 2.2, 2.2)
                                 .then(rotation_z(pi / 6.0))
                                 .then(translation(2.0, 0.0, 0.0)));
@@ -76,7 +78,7 @@ int main(int argc, char * argv[]) {
     left.material().set_specular(0.3);
     auto left_pattern = perturbed_pattern(
             ring_pattern(color(199, 240, 194), color(95, 191, 95)),
-            1.5, 4, 0.9);
+            1.5 * perturb_factor, 4, 0.9);
     set_pattern_transform(left_pattern, scaling(0.3, 0.3, 0.3)
                             .then(rotation_x(-pi / 3.0))
                             .then(rotation_y(-0.2)));
