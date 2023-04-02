@@ -170,15 +170,30 @@ inline Matrix<T, 3> operator*(Matrix<T, 3> const & a, Matrix<T, 3> const & b)
     };
 }
 
+//template <typename T>
+//inline Matrix<T, 4> operator*(Matrix<T, 4> const & a, Matrix<T, 4> const & b) {
+//    return Matrix<T, 4> {
+//        {mrc<T,0,0>(a, b), mrc<T,0,1>(a, b), mrc<T,0,2>(a, b), mrc<T,0,3>(a, b)},
+//        {mrc<T,1,0>(a, b), mrc<T,1,1>(a, b), mrc<T,1,2>(a, b), mrc<T,1,3>(a, b)},
+//        {mrc<T,2,0>(a, b), mrc<T,2,1>(a, b), mrc<T,2,2>(a, b), mrc<T,2,3>(a, b)},
+//        {mrc<T,3,0>(a, b), mrc<T,3,1>(a, b), mrc<T,3,2>(a, b), mrc<T,3,3>(a, b)},
+//    };
+//}
+
+// Experiment using Loop Interchange:
+// https://johnnysswlab.com/for-software-performance-the-way-data-is-accessed-matters/
+// However this does not seem to be any faster than the initialisation using mrc() above.
 template <typename T>
-inline Matrix<T, 4> operator*(Matrix<T, 4> const & a, Matrix<T, 4> const & b)
-{
-    return Matrix<T, 4> {
-        {mrc<T,0,0>(a, b), mrc<T,0,1>(a, b), mrc<T,0,2>(a, b), mrc<T,0,3>(a, b)},
-        {mrc<T,1,0>(a, b), mrc<T,1,1>(a, b), mrc<T,1,2>(a, b), mrc<T,1,3>(a, b)},
-        {mrc<T,2,0>(a, b), mrc<T,2,1>(a, b), mrc<T,2,2>(a, b), mrc<T,2,3>(a, b)},
-        {mrc<T,3,0>(a, b), mrc<T,3,1>(a, b), mrc<T,3,2>(a, b), mrc<T,3,3>(a, b)},
-    };
+inline Matrix<T, 4> operator*(Matrix<T, 4> const & a, Matrix<T, 4> const & b) {
+    Matrix<T, 4> m {};
+    for (int i = 0; i < 4; ++i) {
+        for (int k = 0; k < 4; ++k) {  // loop interchange
+            for (int j = 0; j < 4; ++j) {
+                m.unsafe_set(i, j, m(i, j) + a(i, k) * b(k, j));
+            }
+        }
+    }
+    return m;
 }
 
 template <typename T, typename TupleType>
