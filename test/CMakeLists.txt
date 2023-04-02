@@ -32,6 +32,7 @@ set(SRCS
         test_shapes.cpp
         test_planes.cpp
         test_patterns.cpp
+        test_perlin_noise.cpp
         )
 
 add_executable(RayTracerChallengeTests ${SRCS} ${HDRS})

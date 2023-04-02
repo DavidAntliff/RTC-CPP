@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.24)
 
+# Need at least one .cpp file to build the lib:
 set(SRCS
         tuple.cpp
-)
+        )
 
 set(HDRS
         include/ray_tracer_challenge/math.h
@@ -19,6 +20,7 @@ set(HDRS
         include/ray_tracer_challenge/shapes.h
         include/ray_tracer_challenge/planes.h
         include/ray_tracer_challenge/patterns.h
+        include/ray_tracer_challenge/perlin_noise.h
         )
 
 add_library(RayTracerChallenge-Lib ${SRCS} ${HDRS})

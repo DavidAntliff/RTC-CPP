@@ -49,6 +49,7 @@ set(PROGRAMS_SRC
         chapter10_nested_patterns.cpp
         chapter10_tiled_floor.cpp
         chapter10_blended_patterns.cpp
+        chapter10_perturbed_patterns.cpp
 )
 
 foreach (FILE ${PROGRAMS_SRC})

@@ -2,9 +2,4 @@
 
 namespace rtc {
 
-
-
-
 } // namespace rtc
-
-

@@ -3,6 +3,7 @@
 
 #include "color.h"
 #include "matrices.h"
+#include "perlin_noise.h"
 
 namespace rtc {
 
@@ -84,6 +85,54 @@ protected:
 
 private:
     Color<T> c_ {};
+};
+
+// CRTP Base Class for patterns that contain one sub-pattern
+template <typename T, typename Derived>
+class NestedPattern : public Pattern<T> {
+public:
+    NestedPattern() = default;
+
+    template <typename A>
+    NestedPattern(A const & a)
+            : Pattern<T> {},
+              a_{init_(a)} {}
+
+    ~NestedPattern() = default;
+    NestedPattern(NestedPattern const & other)
+            : Pattern<T> {other},
+              a_{other.a_->clone()} {}
+    NestedPattern(NestedPattern &&) = default;
+    NestedPattern & operator=(NestedPattern const & other) {
+        a_ = other.a_.clone();
+    }
+    NestedPattern & operator=(NestedPattern &&) = default;
+
+    friend bool operator==(NestedPattern const & lhs, NestedPattern const & rhs) {
+        return *lhs.a_ == *rhs.a_;
+    }
+
+    auto const & a() const { return *a_; }
+
+private:
+    static auto init_(Color<T> const & c) {
+        return std::make_unique<SolidPattern<T>>(c);
+    }
+
+    static auto init_(Pattern<T> const & p) {
+        return p.clone();
+    }
+
+protected:
+    // https://stackoverflow.com/a/43263477
+    std::unique_ptr<Pattern<T>> clone_impl() const override {
+        auto p {std::make_unique<Derived>(*static_cast<Derived const *>(this))};
+        p->a_ = a_->clone();
+        return p;
+    };
+
+protected:
+    std::unique_ptr<Pattern<T>> a_ {};
 };
 
 // CRTP Base Class for patterns that contain two sub-patterns
@@ -257,10 +306,6 @@ class BlendedPattern : public NestedPatterns2<T, BlendedPattern<T>> {
 public:
     using NestedPatterns2<T, BlendedPattern>::NestedPatterns2;
 
-//    template <typename A, typename B>
-//    BlendedPattern(A const & a, B const & b)
-//            : NestedPatterns2<T, BlendedPattern> {a, b} {}
-
     Color<T> pattern_at(Point<T> const &local_point) const override {
         auto const pattern_point_a {inverse(this->a_->transform()) * local_point};
         auto const pattern_point_b {inverse(this->b_->transform()) * local_point};
@@ -275,6 +320,51 @@ inline auto blended_pattern(A const & a, B const & b) {
     return BlendedPattern<fp_t> {a, b};
 }
 
+
+template <typename T>
+class PerturbedPattern : public NestedPattern<T, PerturbedPattern<T>> {
+public:
+    using NestedPattern<T, PerturbedPattern>::NestedPattern;
+
+    template <typename A>
+    PerturbedPattern(A const & a, T scale = T(0.5), int num_octaves = 1, T persistence = 0.9)
+            : NestedPattern<T, PerturbedPattern> {a},
+              scale_{scale},
+              num_octaves_{num_octaves},
+              persistence_{persistence} {}
+
+    Color<T> pattern_at(Point<T> const & local_point) const override {
+//        auto scale {0.2};
+//        auto octaves {8};
+//        auto persistence {0.6};
+//        auto new_x = local_point.x() + perlin_noise_.perlin(local_point.x(), local_point.y(), local_point.z()) * scale;
+//        auto new_y = local_point.y() + perlin_noise_.perlin(local_point.x(), local_point.y(), local_point.z() + 1.0) * scale;
+//        auto new_z = local_point.z() + perlin_noise_.perlin(local_point.x(), local_point.y(), local_point.z() + 2.0) * scale;
+        auto new_x = local_point.x() + perlin_noise_.octave_perlin(local_point.x(), local_point.y(), local_point.z(), num_octaves_, persistence_) * scale_;
+        auto new_y = local_point.y() + perlin_noise_.octave_perlin(local_point.x(), local_point.y(), local_point.z() + 1.0, num_octaves_, persistence_) * scale_;
+        auto new_z = local_point.z() + perlin_noise_.octave_perlin(local_point.x(), local_point.y(), local_point.z() + 2.0, num_octaves_, persistence_) * scale_;
+        auto perturbed_point = point(new_x, new_y, new_z);
+
+        auto const pattern_point_a {inverse(this->a_->transform()) * perturbed_point};
+        auto const color_a = this->a_->pattern_at(pattern_point_a);
+        return color_a;
+    }
+
+private:
+    PerlinNoise perlin_noise_ {};
+
+    fp_t scale_ {0.5};
+    int num_octaves_ {1};
+    fp_t persistence_ {0.9};
+};
+
+template <typename T>
+inline auto perturbed_pattern(Pattern<T> const & pattern,
+                              T scale = 1.0,
+                              int num_octaves = 1,
+                              T persistence = 0.9) {
+    return PerturbedPattern<T> {pattern, scale, num_octaves, persistence};
+}
 
 // TODO: Spherical Texture Mapping - Page 138
 
