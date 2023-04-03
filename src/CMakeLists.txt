@@ -41,6 +41,7 @@ set(PROGRAMS_SRC
         chapter7.cpp
         chapter8.cpp
         chapter9.cpp
+        chapter10_object_space_stripes.cpp
         chapter10_stripes.cpp
         chapter10_gradients.cpp
         chapter10_rings.cpp

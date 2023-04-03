@@ -48,8 +48,8 @@ public:
         width_(width), height_(height),
         pixels_(width_ * height_) {}
 
-    unsigned int width() const { return width_; }
-    unsigned int height() const { return height_; }
+    auto width() const { return width_; }
+    auto height() const { return height_; }
 
     std::optional<PixelType> pixel_at(unsigned int x, unsigned int y) const {
         auto index = index_of_(x, y);
