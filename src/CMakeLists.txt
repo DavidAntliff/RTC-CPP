@@ -2,7 +2,7 @@
 # Entry point for customers
 # Does not change development environment
 
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.20)
 project(RayTracerChallenge-Exe)
 
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
@@ -18,7 +18,8 @@ else()
     add_definitions(-DBOOST_LOG_DYN_LINK)  # Use dynamic linking for boost::log
 endif()
 
-find_package(Boost 1.81.0 COMPONENTS filesystem program_options log log_setup REQUIRED)
+#find_package(Boost 1.81.0 COMPONENTS filesystem program_options log log_setup REQUIRED)
+find_package(Boost 1.81.0 REQUIRED)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)

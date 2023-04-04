@@ -1,4 +1,7 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.20)
+
+# Boost headers only
+find_package(Boost 1.81.0 REQUIRED)
 
 # Need at least one .cpp file to build the lib:
 set(SRCS
@@ -31,6 +34,7 @@ target_compile_features(RayTracerChallenge-Lib PUBLIC cxx_std_20)
 target_compile_options(RayTracerChallenge-Lib PRIVATE -Wall -Wextra -Wpedantic)
 target_compile_options(RayTracerChallenge-Lib PRIVATE "$<$<CONFIG:Debug>:-O0>")
 target_include_directories(RayTracerChallenge-Lib PUBLIC include)
+target_link_libraries(RayTracerChallenge-Lib PRIVATE Boost::boost)
 
 # Modern CMake recommends use of an ALIAS, for better error handling:
 add_library(RayTracerChallenge::Lib ALIAS RayTracerChallenge-Lib)

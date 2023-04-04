@@ -1,13 +1,12 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.20)
 project(RayTracerChallengeTests)
-
-find_package(GTest REQUIRED)
 
 if (NOT TARGET RayTracerChallenge::Lib)
     find_package(RayTracerChallenge::Lib CONFIG REQUIRED)
 endif()
 
-find_package(Boost COMPONENTS filesystem REQUIRED)
+find_package(Boost 1.81.0 REQUIRED)
+find_package(GTest 1.12.1 REQUIRED)
 
 #set(THREADS_PREFER_PTHREAD_FLAG ON)
 #find_package(Threads REQUIRED)
@@ -41,9 +40,9 @@ target_link_libraries(RayTracerChallengeTests
         PRIVATE
             #Threads::Threads
             RayTracerChallenge::Lib
-            GTest::gtest
             GTest::gtest_main
-            ${Boost_LIBRARIES})
+            Boost::boost
+            )
 
 include(GoogleTest)
 gtest_discover_tests(RayTracerChallengeTests)

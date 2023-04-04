@@ -45,9 +45,14 @@ jobs:
               -DBUILD_TESTS=1 \
               -DUSE_STATIC_BOOST=1
 
+#    - name: Setup tmate session
+#      uses: mxschmitt/action-tmate@v3
+#      with:
+#        limit-access-to-actor: true
+
     - name: Build
       # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --parallel $(nproc)
 
     - name: Test
       working-directory: ${{github.workspace}}/build

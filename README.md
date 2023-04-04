@@ -43,11 +43,20 @@ $ conan install -if cmake-build-release . --build=missing -s build_type=Release 
 ### CMake
 
 ```
-$ cmake .. \
-    -DCMAKE_BUILD_TYPE=Debug
-    -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake
-    -DBUILD_TESTS=1
+$ cmake \
+    -B cmake-build-debug \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake \
+    -DBUILD_TESTS=1 \
     -DUSE_STATIC_BOOST=1
+```
+
+```
+$ cmake \
+    --build cmake-build-debug \
+    --config Release \
+    -j 8
+
 ```
 
 ## Development Notes

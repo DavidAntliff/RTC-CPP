@@ -14,7 +14,7 @@
 
 
 # Entry point for all development (IDE)
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.20)
 project(RayTracerChallenge-Dev)
 
 option(BUILD_TESTS "Build test binaries" OFF)
