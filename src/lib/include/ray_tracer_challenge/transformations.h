@@ -8,86 +8,79 @@
 
 namespace rtc {
 
-template <typename T>
-inline auto translation(T x, T y, T z) {
-    return Matrix<T, 4> {
-        {T(1), T(0), T(0), x},
-        {T(0), T(1), T(0), y},
-        {T(0), T(0), T(1), z},
-        {T(0), T(0), T(0), T(1)},
+inline auto translation(fp_t x, fp_t y, fp_t z) {
+    return Matrix<4> {
+        {1, 0, 0, x},
+        {0, 1, 0, y},
+        {0, 0, 1, z},
+        {0, 0, 0, 1},
     };
 }
 
-template <typename T>
-inline auto scaling(T x, T y, T z) {
-    return Matrix<T, 4> {
-        {   x, T(0), T(0), T(0)},
-        {T(0),    y, T(0), T(0)},
-        {T(0), T(0),    z, T(0)},
-        {T(0), T(0), T(0), T(1)},
+inline auto scaling(fp_t x, fp_t y, fp_t z) {
+    return Matrix<4> {
+        {x, 0, 0, 0},
+        {0, y, 0, 0},
+        {0, 0, z, 0},
+        {0, 0, 0, 1},
     };
 }
 
-template <typename T>
-inline auto rotation_x(T radians) {
-    const T cos_r = std::cos(radians);
-    const T sin_r = std::sin(radians);
-    return Matrix<T, 4> {
-        {T(1),  T(0),   T(0), T(0)},
-        {T(0), cos_r, -sin_r, T(0)},
-        {T(0), sin_r,  cos_r, T(0)},
-        {T(0),  T(0),   T(0), T(1)},
+inline auto rotation_x(fp_t radians) {
+    auto const cos_r = std::cos(radians);
+    auto const sin_r = std::sin(radians);
+    return Matrix<4> {
+        {1,     0,      0, 0},
+        {0, cos_r, -sin_r, 0},
+        {0, sin_r,  cos_r, 0},
+        {0,     0,      0, 1},
     };
 }
 
-template <typename T>
-inline auto rotation_y(T radians) {
-    const T cos_r = std::cos(radians);
-    const T sin_r = std::sin(radians);
-    return Matrix<T, 4> {
-        {cos_r,  T(0), sin_r, T(0)},
-        { T(0),  T(1),  T(0), T(0)},
-        {-sin_r, T(0), cos_r, T(0)},
-        { T(0),  T(0),  T(0), T(1)},
+inline auto rotation_y(fp_t radians) {
+    auto const cos_r = std::cos(radians);
+    auto const sin_r = std::sin(radians);
+    return Matrix<4> {
+        { cos_r,  0, sin_r, 0},
+        {     0,  1,     0, 0},
+        {-sin_r,  0, cos_r, 0},
+        {     0,  0,     0, 1},
     };
 }
 
-template <typename T>
-inline auto rotation_z(T radians) {
-    const T cos_r = std::cos(radians);
-    const T sin_r = std::sin(radians);
-    return Matrix<T, 4> {
-        {cos_r, -sin_r, T(0), T(0)},
-        {sin_r,  cos_r, T(0), T(0)},
-        { T(0),  T(0),  T(1), T(0)},
-        { T(0),  T(0),  T(0), T(1)},
+inline auto rotation_z(fp_t radians) {
+    auto const cos_r = std::cos(radians);
+    auto const sin_r = std::sin(radians);
+    return Matrix<4> {
+        {cos_r, -sin_r, 0, 0},
+        {sin_r,  cos_r, 0, 0},
+        {    0,      0, 1, 0},
+        {    0,      0, 0, 1},
     };
 }
 
-template <typename T>
-inline auto shearing(T xy, T xz, T yx, T yz, T zx, T zy) {
-    return Matrix<T, 4> {
-        {T(1),   xy,   xz, T(0)},
-        { yx,  T(1),   yz, T(0)},
-        { zx,    zy, T(1), T(0)},
-        {T(0), T(0), T(0), T(1)},
+inline auto shearing(fp_t xy, fp_t xz, fp_t yx, fp_t yz, fp_t zx, fp_t zy) {
+    return Matrix<4> {
+        { 1, xy, xz, 0},
+        {yx,  1, yz, 0},
+        {zx, zy,  1, 0},
+        { 0,  0,  0, 1},
     };
 }
 
-template <typename T>
-inline auto view_transform(Point<T> const & from,
-                           Point<T> const & to,
-                           Vector<T> const & up) {
+inline auto view_transform(Point const & from,
+                           Point const & to,
+                           Vector const & up) {
     auto const forward = normalize(to - from);
     auto const upn = normalize(up);
     auto const left = cross(forward, upn);
     auto const true_up = cross(left, forward);
 
-    Matrix<T, 4> const orientation {
-        {    left.x(),     left.y(),     left.z(), T(0)},
-        { true_up.x(),  true_up.y(),  true_up.z(), T(0)},
-        {-forward.x(), -forward.y(), -forward.z(), T(0)},
-        {        T(0),         T(0),         T(0), T(1)},
+    Matrix<4> const orientation {
+        {    left.x(),     left.y(),     left.z(), 0},
+        { true_up.x(),  true_up.y(),  true_up.z(), 0},
+        {-forward.x(), -forward.y(), -forward.z(), 0},
+        {           0,            0,            0, 1},
     };
 
     return orientation * translation(-from.x(), -from.y(), -from.z());

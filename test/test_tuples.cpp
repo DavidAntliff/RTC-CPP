@@ -24,7 +24,7 @@ TEST(TestTuples, invalid_access) {
 
 // A tuple with w=1.0 is a point
 TEST(TestTuples, tuple_is_a_point) {
-    auto a = tuple<float>(4.3, -4.2, 3.1, 1.0);
+    auto a = tuple(4.3, -4.2, 3.1, 1.0);
     EXPECT_FLOAT_EQ(a.x(), 4.3);
     EXPECT_FLOAT_EQ(a.y(), -4.2);
     EXPECT_FLOAT_EQ(a.z(), 3.1);
@@ -46,7 +46,7 @@ TEST(TestTuples, tuple_is_a_point) {
 
 // A tuple with w=0 is a vector
 TEST(TestTuples, tuple_is_a_vector) {
-    auto a = tuple<float>(4.3, -4.2, 3.1, 0.0);
+    auto a = tuple(4.3, -4.2, 3.1, 0.0);
     EXPECT_FLOAT_EQ(a.x(), 4.3);
     EXPECT_FLOAT_EQ(a.y(), -4.2);
     EXPECT_FLOAT_EQ(a.z(), 3.1);
@@ -158,7 +158,7 @@ TEST(TestTuples, compute_magnitude_vector_0_0_1) {
 
 // Computing the magnitude of vector(1, 2, 3)
 TEST(TestTuples, compute_magnitude_vector_1_2_3) {
-    auto v = vector<float>(1., 2., 3.);
+    auto v = vector(1., 2., 3.);
     EXPECT_FLOAT_EQ(magnitude(v), std::sqrt(14));
 }
 
@@ -183,15 +183,15 @@ TEST(TestTuples, normalizing_vector_1_2_3) {
 
 // The magnitude of a normalized vector
 TEST(TestTuples, magnitude_of_normalized_vector) {
-    auto v = vector<float>(1., 2., 3.);
+    auto v = vector(1., 2., 3.);
     auto norm = normalize(v);
     EXPECT_FLOAT_EQ(magnitude(norm), 1.0);
 }
 
 // The dot product of two tuples
 TEST(TestTuples, dot_product_of_two_tuples) {
-    auto a = vector<float>(1., 2., 3.);
-    auto b = vector<float>(2., 3., 4.);
+    auto a = vector(1., 2., 3.);
+    auto b = vector(2., 3., 4.);
     EXPECT_DOUBLE_EQ(dot(a, b), 20.0);
 }
 

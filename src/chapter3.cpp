@@ -9,7 +9,7 @@ int main(int argc, char * argv[]) {
     (void)argc;
     (void)argv;
 
-    std::cout << "Invert identity:" << inverse(identity4x4<double>()) << '\n';
+    std::cout << "Invert identity:" << inverse(identity4x4()) << '\n';
 
     auto a = matrix4x4({
         { 3.0,  -9.0,   7.0,   3.0},
@@ -30,7 +30,7 @@ int main(int argc, char * argv[]) {
     auto t = tuple(4.0, 3.0, 2.0, 1.0);
     std::cout << "Tuple: " << t << '\n';
 
-    auto i4 = identity4x4<double>();
+    auto i4 = identity4x4();
     i4.set(1, 1, 2.0);
     std::cout << "Modified I4 * tuple:" << i4 * t << '\n';
     // result is corresponding element in tuple is scaled

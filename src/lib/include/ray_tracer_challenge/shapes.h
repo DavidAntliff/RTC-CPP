@@ -2,17 +2,17 @@
 #define RTC_LIB_SHAPES_H
 
 #include "matrices.h"
-#include "intersections.h"
 #include "materials.h"
+#include "rays.h"
 
 namespace rtc {
 
-template <typename T>
+// Forward
+class Intersection;
+using Intersections = std::vector<Intersection>;
+
 class Shape {
 public:
-    using value_t = T;
-    using matrix_t = Matrix<T, 4>;
-
     Shape() = default;
     virtual ~Shape() = default;
 
@@ -25,36 +25,34 @@ public:
     // Just using 'clone' fails for multiple-inheritance, but deal with that another time
     virtual std::unique_ptr<Shape> clone() const = 0;
 
-    virtual Intersections<Intersection<fp_t>> local_intersect(Ray<T> const & local_ray) const = 0;
+    virtual Intersections local_intersect(Ray const & local_ray) const = 0;
 
-    virtual Vector<T> local_normal_at(Point<T> const & local_point) const = 0;
+    virtual Vector local_normal_at(Point const & local_point) const = 0;
 
     auto operator<=>(Shape const &) const = default;
 
-    inline matrix_t const & transform() const { return transform_; }
-    inline void set_transform(matrix_t const & m) {
+    Matrix<4> const & transform() const { return transform_; }
+    void set_transform(Matrix<4> const & m) {
         transform_ = m;
     }
 
-    inline auto const & material() const { return material_; }
-    inline auto & material() { return material_; }
+    auto const & material() const { return material_; }
+    auto & material() { return material_; }
 
-    inline void set_material(Material<T> const & material) {
+    void set_material(Material const & material) {
         material_ = material;
     }
 
 private:
-    matrix_t transform_ {identity4x4()};
-    Material<T> material_ {};
+    Matrix<4> transform_ {identity4x4()};
+    Material material_ {};
 };
 
-template <typename T, typename Matrix>
-inline void set_transform(Shape<T> & shape, Matrix const & m) {
+inline void set_transform(Shape & shape, Matrix<4> const & m) {
     shape.set_transform(m);
 }
 
-template <typename T>
-inline auto normal_at(Shape<T> const & shape, Point<T> const & world_point) {
+inline auto normal_at(Shape const & shape, Point const & world_point) {
     // Why multiply by the inverse transpose?
     // https://stackoverflow.com/questions/13654401/why-transform-normals-with-the-transpose-of-the-inverse-of-the-modelview-matrix
     auto const local_point {inverse(shape.transform()) * world_point};

@@ -11,24 +11,24 @@
 
 using namespace rtc;
 
-class TestShape : public Shape<double> {
+class TestShape : public Shape {
 public:
     TestShape() = default;
 
-    std::unique_ptr<Shape<double>> clone() const override {
+    std::unique_ptr<Shape> clone() const override {
         return std::make_unique<TestShape>(*this);
     }
 
-    Intersections<Intersection<fp_t>> local_intersect(Ray<double> const & local_ray) const override {
+    Intersections local_intersect(Ray const & local_ray) const override {
         saved_ray = local_ray;
         return {};
     }
 
-    Vector<double> local_normal_at(Point<double> const & local_point) const override {
+    Vector local_normal_at(Point const & local_point) const override {
         return vector(local_point.x(), local_point.y(), local_point.z());
     }
 
-    mutable Ray<double> saved_ray {};
+    mutable Ray saved_ray {};
 };
 
 TestShape test_shape() {

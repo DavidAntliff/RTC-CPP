@@ -21,8 +21,8 @@ TEST(TestMaterials, default_material) {
 
 class TestMaterialsFixture : public testing::Test {
 protected:
-    Material<double> m {material()};
-    Point<double> position {point(0.0, 0.0, 0.0)};
+    Material m {material()};
+    Point position {point(0.0, 0.0, 0.0)};
 };
 
 // Lighting with the eye between the light and the surface

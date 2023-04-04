@@ -10,18 +10,19 @@
 #include <boost/format.hpp>
 
 #include "./math.h"
+#include "tuples.h"
 
 namespace rtc {
 
 // Square Matrices only
-template <typename T=fp_t, unsigned int N=0>
+template <unsigned int N=0>
 class Matrix {
 public:
-    using value_t = T;
+    using value_t = fp_t;
 
     Matrix() = default;
 
-    explicit Matrix(std::initializer_list<std::initializer_list<T>> const & elements)
+    explicit Matrix(std::initializer_list<std::initializer_list<value_t>> const & elements)
     {
         assert(elements.size() == N);
         unsigned int counter = 0;
@@ -33,9 +34,9 @@ public:
 
     // Populate a matrix with a linear vector.
     // Element values are in rows.
-    explicit Matrix(std::vector<T> const & elements) {
+    explicit Matrix(std::vector<value_t> const & elements) {
         assert(elements.size() == N * N);
-        typename std::vector<T>::const_iterator iter = elements.begin();
+        typename std::vector<value_t>::const_iterator iter = elements.begin();
         for (auto r = 0U; r < N; ++r) {
             for (auto c = 0U; c < N; ++c) {
                 elements_[r][c] = *iter;
@@ -46,7 +47,7 @@ public:
 
     unsigned int dim() const { return N; }
 
-    std::optional<T> at(unsigned int row, unsigned int column) const {
+    std::optional<value_t> at(unsigned int row, unsigned int column) const {
         if (row >= N)
             return std::nullopt;
         if (column >= N)
@@ -55,15 +56,15 @@ public:
     }
 
     // No bounds checking - undefined behaviour if row/column are out of bounds
-    T operator()(unsigned int row, unsigned int column) const {
+    value_t operator()(unsigned int row, unsigned int column) const {
         return elements_[row][column];
     }
 
-    void unsafe_set(unsigned int row, unsigned int column, T value) {
+    void unsafe_set(unsigned int row, unsigned int column, value_t value) {
         elements_[row][column] = value;
     }
 
-    void set(unsigned int row, unsigned int column, T value) {
+    void set(unsigned int row, unsigned int column, value_t value) {
         if (row >= N)
             return;
         if (column >= N)
@@ -107,14 +108,11 @@ public:
     }
 
 private:
-    std::array<std::array<T, N>, N> elements_ {};
+    std::array<std::array<value_t, N>, N> elements_ {};
 };
 
-template <typename T>
-using Matrix4x4 = Matrix<T, 4>;
-
-template <typename T, unsigned int N>
-inline bool almost_equal(Matrix<T, N> const & lhs, Matrix<T, N> const & rhs) {
+template <unsigned int N>
+inline bool almost_equal(Matrix<N> const & lhs, Matrix<N> const & rhs) {
     using rtc::almost_equal;
     return almost_equal(lhs.x(), rhs.x())
            && almost_equal(lhs.y(), rhs.y())
@@ -122,61 +120,58 @@ inline bool almost_equal(Matrix<T, N> const & lhs, Matrix<T, N> const & rhs) {
            && almost_equal(lhs.w(), rhs.w());
 }
 
-template <typename T, unsigned int R, unsigned int C>
-T mrc(Matrix<T, 2> const & a, Matrix<T, 2> const & b) {
+template <unsigned int R, unsigned int C>
+inline auto mrc(Matrix<2> const & a, Matrix<2> const & b) {
     return a(R, 0) * b(0, C) +
            a(R, 1) * b(1, C);
 }
 
-template <typename T, unsigned int R, unsigned int C>
-T mrc(Matrix<T, 3> const & a, Matrix<T, 3> const & b) {
+template <unsigned int R, unsigned int C>
+inline auto mrc(Matrix<3> const & a, Matrix<3> const & b) {
     return a(R, 0) * b(0, C) +
            a(R, 1) * b(1, C) +
            a(R, 2) * b(2, C);
 }
 
-template <typename T, unsigned int R, unsigned int C>
-T mrc(Matrix<T, 4> const & a, Matrix<T, 4> const & b) {
+template <unsigned int R, unsigned int C>
+inline auto mrc(Matrix<4> const & a, Matrix<4> const & b) {
     return a(R, 0) * b(0, C) +
            a(R, 1) * b(1, C) +
            a(R, 2) * b(2, C) +
            a(R, 3) * b(3, C);
 }
 
-template <typename T, unsigned int R, typename TupleType>
-T mrc(Matrix<T, 4> const & a, TupleType const & t) {
+template <unsigned int R>
+inline auto mrc(Matrix<4> const & a, Tuple const & t) {
     return a(R, 0) * t(0) +
            a(R, 1) * t(1) +
            a(R, 2) * t(2) +
            a(R, 3) * t(3);
 }
 
-template <typename T>
-inline Matrix<T, 2> operator*(Matrix<T, 2> const & a, Matrix<T, 2> const & b)
+inline Matrix<2> operator*(Matrix<2> const & a, Matrix<2> const & b)
 {
-    return {
-        {mrc<T,0,0>(a, b), mrc<T,0,1>(a, b)},
-        {mrc<T,1,0>(a, b), mrc<T,1,1>(a, b)},
+    return Matrix<2> {
+        {mrc<0,0>(a, b), mrc<0,1>(a, b)},
+        {mrc<1,0>(a, b), mrc<1,1>(a, b)},
     };
 }
 
-template <typename T>
-inline Matrix<T, 3> operator*(Matrix<T, 3> const & a, Matrix<T, 3> const & b)
+inline Matrix<3> operator*(Matrix<3> const & a, Matrix<3> const & b)
 {
-    return {
-        {mrc<T,0,0>(a, b), mrc<T,0,1>(a, b), mrc<T,0,2>(a, b)},
-        {mrc<T,1,0>(a, b), mrc<T,1,1>(a, b), mrc<T,1,2>(a, b)},
-        {mrc<T,2,0>(a, b), mrc<T,2,1>(a, b), mrc<T,2,2>(a, b)},
+    return Matrix<3> {
+        {mrc<0,0>(a, b), mrc<0,1>(a, b), mrc<0,2>(a, b)},
+        {mrc<1,0>(a, b), mrc<1,1>(a, b), mrc<1,2>(a, b)},
+        {mrc<2,0>(a, b), mrc<2,1>(a, b), mrc<2,2>(a, b)},
     };
 }
 
-template <typename T>
-inline Matrix<T, 4> operator*(Matrix<T, 4> const & a, Matrix<T, 4> const & b) {
-    return Matrix<T, 4> {
-        {mrc<T,0,0>(a, b), mrc<T,0,1>(a, b), mrc<T,0,2>(a, b), mrc<T,0,3>(a, b)},
-        {mrc<T,1,0>(a, b), mrc<T,1,1>(a, b), mrc<T,1,2>(a, b), mrc<T,1,3>(a, b)},
-        {mrc<T,2,0>(a, b), mrc<T,2,1>(a, b), mrc<T,2,2>(a, b), mrc<T,2,3>(a, b)},
-        {mrc<T,3,0>(a, b), mrc<T,3,1>(a, b), mrc<T,3,2>(a, b), mrc<T,3,3>(a, b)},
+inline Matrix<4> operator*(Matrix<4> const & a, Matrix<4> const & b) {
+    return Matrix<4> {
+        {mrc<0,0>(a, b), mrc<0,1>(a, b), mrc<0,2>(a, b), mrc<0,3>(a, b)},
+        {mrc<1,0>(a, b), mrc<1,1>(a, b), mrc<1,2>(a, b), mrc<1,3>(a, b)},
+        {mrc<2,0>(a, b), mrc<2,1>(a, b), mrc<2,2>(a, b), mrc<2,3>(a, b)},
+        {mrc<3,0>(a, b), mrc<3,1>(a, b), mrc<3,2>(a, b), mrc<3,3>(a, b)},
     };
 }
 
@@ -184,8 +179,8 @@ inline Matrix<T, 4> operator*(Matrix<T, 4> const & a, Matrix<T, 4> const & b) {
 // https://johnnysswlab.com/for-software-performance-the-way-data-is-accessed-matters/
 // However this does not seem to be any faster than the initialisation using mrc() above.
 //template <typename T>
-//inline Matrix<T, 4> operator*(Matrix<T, 4> const & a, Matrix<T, 4> const & b) {
-//    Matrix<T, 4> m {};
+//inline Matrix<4> operator*(Matrix<4> const & a, Matrix<4> const & b) {
+//    Matrix<4> m {};
 //    for (int i = 0; i < 4; ++i) {
 //        for (int k = 0; k < 4; ++k) {  // loop interchange
 //            for (int j = 0; j < 4; ++j) {
@@ -196,19 +191,17 @@ inline Matrix<T, 4> operator*(Matrix<T, 4> const & a, Matrix<T, 4> const & b) {
 //    return m;
 //}
 
-template <typename T, typename TupleType>
-inline TupleType operator*(Matrix<T, 4> const & a, TupleType const & t) {
+inline Tuple operator*(Matrix<4> const & a, Tuple const & t) {
     return {
-        mrc<T,0>(a, t),
-        mrc<T,1>(a, t),
-        mrc<T,2>(a, t),
-        mrc<T,3>(a, t),
+        mrc<0>(a, t),
+        mrc<1>(a, t),
+        mrc<2>(a, t),
+        mrc<3>(a, t),
     };
 }
 
-template <typename T>
-inline Matrix<T, 4> transpose(Matrix<T, 4> const & m) {
-    return Matrix<T, 4> {
+inline Matrix<4> transpose(Matrix<4> const & m) {
+    return Matrix<4> {
         {m(0, 0), m(1, 0), m(2, 0), m(3, 0)},
         {m(0, 1), m(1, 1), m(2, 1), m(3, 1)},
         {m(0, 2), m(1, 2), m(2, 2), m(3, 2)},
@@ -216,15 +209,14 @@ inline Matrix<T, 4> transpose(Matrix<T, 4> const & m) {
     };
 }
 
-template <typename T>
-inline T determinant(Matrix<T, 2> const & m) {
+inline auto determinant(Matrix<2> const & m) {
     return m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0);
 }
 
 // ~20 seconds for chapter8.cpp, release build, 1024x768
-template <typename T, unsigned int N>
-inline auto submatrix_slow(Matrix<T, N> const & m, unsigned int row, unsigned int column) {
-    std::vector<T> el;
+template <unsigned int N>
+inline auto submatrix_slow(Matrix<N> const & m, unsigned int row, unsigned int column) {
+    std::vector<typename decltype(m)::value_type> el;
     el.reserve((N - 1) * (N - 1));
     for (auto r = 0U; r < N; ++r) {
         if (r != row) {
@@ -235,13 +227,13 @@ inline auto submatrix_slow(Matrix<T, N> const & m, unsigned int row, unsigned in
             }
         }
     }
-    return Matrix<T, N - 1> {el};
+    return Matrix<N - 1> {el};
 }
 
 // ~2 seconds for chapter8.cpp, release build, 1024x768
-template <typename T, unsigned int N>
-inline auto submatrix(Matrix<T, N> const & m, unsigned int row, unsigned int column) {
-    Matrix<T, N - 1> s{};
+template <unsigned int N>
+inline auto submatrix(Matrix<N> const & m, unsigned int row, unsigned int column) {
+    Matrix<N - 1> s{};
     for (auto r = 0U, sr = 0U; r < N; ++r) {
         if (r != row) {
             for (auto c = 0U, sc = 0U; c < N; ++c) {
@@ -256,37 +248,37 @@ inline auto submatrix(Matrix<T, N> const & m, unsigned int row, unsigned int col
     return s;
 }
 
-template <typename T, unsigned int N>
-inline auto minor(Matrix<T, N> const & m, unsigned int row, unsigned int column) {
+template <unsigned int N>
+inline auto minor(Matrix<N> const & m, unsigned int row, unsigned int column) {
     auto const b = submatrix(m, row, column);
     return determinant(b);
 }
 
-template <typename T, unsigned int N>
-inline auto cofactor(Matrix<T, N> const & m, unsigned int row, unsigned int column) {
+template <unsigned int N>
+inline auto cofactor(Matrix<N> const & m, unsigned int row, unsigned int column) {
     auto const factor = -2 * ((static_cast<int>(row + column)) % 2) + 1;
     return minor(m, row, column) * factor;
 }
 
-template <typename T, unsigned int N>
-inline T determinant(Matrix<T, N> const & m) {
-    T det {0};
+template <unsigned int N>
+inline auto determinant(Matrix<N> const & m) {
+    fp_t det {0};
     for (auto c = 0U; c < N; ++c) {
         det += m(0, c) * cofactor(m, 0, c);
     }
     return det;
 }
 
-template <typename T, unsigned int N>
-inline bool is_invertible(Matrix<T, N> const & m) {
-    return determinant(m) != T(0);
+template <unsigned int N>
+inline bool is_invertible(Matrix<N> const & m) {
+    return determinant(m) != 0;
 }
 
-template <typename T, unsigned int N>
-inline Matrix<T, N> inverse(Matrix<T, N> const & m) {
+template <unsigned int N>
+inline auto inverse(Matrix<N> const & m) {
     auto const det = determinant(m);
 
-    Matrix<T, N> m2;
+    Matrix<N> m2;
     for (auto row = 0U; row < N; ++row) {
         for (auto col = 0U; col < N; ++col) {
             auto const c = cofactor(m, row, col);
@@ -298,28 +290,24 @@ inline Matrix<T, N> inverse(Matrix<T, N> const & m) {
 }
 
 // Factory functions:
-template <typename T>
-inline auto matrix2x2(std::initializer_list<std::initializer_list<T>> const & elements) {
-    return Matrix<T, 2> {elements};
+inline auto matrix2x2(std::initializer_list<std::initializer_list<fp_t>> const & elements) {
+    return Matrix<2> {elements};
 }
 
-template <typename T>
-inline auto matrix3x3(std::initializer_list<std::initializer_list<T>> const & elements) {
-    return Matrix<T, 3> {elements};
+inline auto matrix3x3(std::initializer_list<std::initializer_list<fp_t>> const & elements) {
+    return Matrix<3> {elements};
 }
 
-template <typename T>
-inline auto matrix4x4(std::initializer_list<std::initializer_list<T>> const & elements) {
-    return Matrix<T, 4> {elements};
+inline auto matrix4x4(std::initializer_list<std::initializer_list<fp_t>> const & elements) {
+    return Matrix<4> {elements};
 }
 
-template <typename T=fp_t>
 inline auto identity4x4() {
-    return Matrix<T, 4> {
-        {T(1), T(0), T(0), T(0)},
-        {T(0), T(1), T(0), T(0)},
-        {T(0), T(0), T(1), T(0)},
-        {T(0), T(0), T(0), T(1)},
+    return Matrix<4> {
+        {1, 0, 0, 0},
+        {0, 1, 0, 0},
+        {0, 0, 1, 0},
+        {0, 0, 0, 1},
     };
 }
 

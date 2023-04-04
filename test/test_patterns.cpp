@@ -9,8 +9,7 @@
 
 using namespace rtc;
 
-template <typename T>
-static void dump_pattern(Pattern<T> const & pattern, int size=128, double scale=1.0) {
+static void dump_pattern(Pattern const & pattern, int size=128, double scale=1.0) {
     std::string const suite_name {::testing::UnitTest::GetInstance()->current_test_info()->test_suite_name()};
     std::string const name {::testing::UnitTest::GetInstance()->current_test_info()->name()};
     auto image {canvas(size, size)};
@@ -90,7 +89,7 @@ TEST(TestPatterns, stripes_with_an_object_and_a_pattern_transformation) {
 
 // Towards Generic Patterns:
 
-class TestPattern : public Pattern<double> {
+class TestPattern : public Pattern {
 public:
     TestPattern() = default;
 
@@ -98,13 +97,13 @@ public:
 //        return std::make_unique<TestPattern>(*this);
 //    }
 
-    Color<double> pattern_at(Point<double> const & local_point) const override {
+    Color pattern_at(Point const & local_point) const override {
         return {local_point.x(), local_point.y(), local_point.z()};
     }
 
 protected:
     // https://stackoverflow.com/a/43263477
-    virtual std::unique_ptr<Pattern<double>> clone_impl() const override {
+    virtual std::unique_ptr<Pattern> clone_impl() const override {
         return std::make_unique<TestPattern>(*this);
     };
 };

@@ -170,14 +170,14 @@ TEST(TestTransformations, chained_transformations_applied_in_reverse_order) {
 TEST(TestTransformations, fluent_api) {
     auto p = point(1.0, 0.0, 1.0);
 
-    auto M = identity4x4<double>()
+    auto M = identity4x4()
             .then(rotation_x(std::numbers::pi / 2.0))
             .then(scaling(5.0, 5.0, 5.0))
             .then(translation(10.0, 5.0, 7.0));
 
     EXPECT_EQ(M * p, point(15.0, 0.0, 7.0));
 
-    auto M2 = identity4x4<double>()
+    auto M2 = identity4x4()
             .then(rotation_x(std::numbers::pi / 2.0))
             .then(scaling(3.0, 3.0, 3.0))
             .then(translation(10.0, 5.0, 7.0));

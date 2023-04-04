@@ -15,7 +15,7 @@ namespace rtc {
 namespace detail {
 
 template <typename T>
-void add_value(std::string & row, T value) {
+inline void add_value(std::string & row, T value) {
     const auto v = std::min(std::max(value, 0.0), 1.0);
     const unsigned int ivalue = std::rint(v * 255);
     if (!row.empty()) {
@@ -84,13 +84,13 @@ private:
     std::vector<PixelType> pixels_ {};
 };
 
-template <typename PixelType=Color<>>
+template <typename PixelType=Color>
 auto canvas(unsigned int width, unsigned int height) {
     return Canvas<PixelType> {width, height};
 }
 
-template <typename PixelType=Color<>>
-auto pixel_at(Canvas<PixelType> const & canvas, unsigned int x, unsigned int y) {
+template <typename Canvas>
+auto pixel_at(Canvas const & canvas, unsigned int x, unsigned int y) {
     return canvas.pixel_at(x, y);
 }
 

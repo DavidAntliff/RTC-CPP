@@ -3,8 +3,8 @@
 
 #include <gtest/gtest.h>
 
-template <typename T>
-::testing::AssertionResult AlmostEqual(T const & a, T const & b, double epsilon=1e-5) {
+template <typename T, typename U>
+::testing::AssertionResult AlmostEqual(T const & a, U const & b, double epsilon=1e-5) {
     if (almost_equal(a, b, epsilon)) {
         return ::testing::AssertionSuccess();
     } else {

@@ -12,11 +12,8 @@
 
 namespace rtc {
 
-template <typename T=fp_t>
 class World {
 public:
-    using value_t = T;
-
     World() = default;
 
     auto & light() const {
@@ -24,7 +21,7 @@ public:
     }
 
     // TODO: add multiple lights
-    void add_light(PointLight<T> const & light) {
+    void add_light(PointLight const & light) {
         light_ = light;
     }
 
@@ -37,31 +34,29 @@ public:
         return objects_;
     }
 
-    Shape<T> * get_object(unsigned int i) {
+    Shape * get_object(unsigned int i) {
         if (i < objects_.size()) {
             return objects_[i].get();
         }
         return nullptr;
     }
 
-    void add_object(Shape<T> const & shape) {
+    void add_object(Shape const & shape) {
         objects_.push_back(shape.clone());
     }
 
 private:
-    std::optional<PointLight<T>> light_;
-    std::vector<std::unique_ptr<Shape<T>>> objects_;
+    std::optional<PointLight> light_;
+    std::vector<std::unique_ptr<Shape>> objects_;
 };
 
 
-template <typename T=fp_t>
-inline auto world() {
-    return World<T> {};
+inline World world() {
+    return {};
 }
 
-template <typename T=fp_t>
-inline auto default_world() {
-    auto dw = World<T> {};
+inline World default_world() {
+    auto dw = World {};
     dw.add_light(point_light(point(-10.0, 10.0, -10.0), color(1.0, 1.0, 1.0)));
 
     auto m = material(color(0.8, 1.0, 0.6),
@@ -80,11 +75,10 @@ inline auto default_world() {
     return dw;
 }
 
-template <typename T, typename Ray>
-inline Intersections<Intersection<T>> intersect_world(World<T> const & world,
-                                                      Ray const & ray) {
+inline Intersections intersect_world(World const & world,
+                                     Ray const & ray) {
 
-    Intersections<Intersection<T>> result {};
+    Intersections result {};
     result.reserve(2); // ~5% faster than no reserve
 
     // Intersections must be in sorted order
@@ -100,10 +94,23 @@ inline Intersections<Intersection<T>> intersect_world(World<T> const & world,
     return result;
 }
 
+inline bool is_shadowed(World const & world, Point const & point) {
+    if (!world.light()) return true;  // everything is in shadow
+
+    auto const v = (*world.light()).position() - point;
+    auto const distance = magnitude(v);
+    auto const direction = normalize(v);
+
+    Ray const ray {point, direction};
+    auto intersections = intersect_world(world, ray);
+
+    auto const h = hit(intersections);
+    return (h && (*h).t() < distance);
+}
+
 // Returns the color at the intersection encapsulated by comps, in the given world.
-template <typename T>
-inline auto shade_hit(World<T> const & world, IntersectionComputation<T> const & comps) {
-    auto const shadowed {is_shadowed(world, comps.over_point)};
+inline auto shade_hit(World const & world, IntersectionComputation const & comps) {
+    auto const shadowed = is_shadowed(world, comps.over_point);
     return lighting(comps.object->material(),
                     *comps.object,
                     *world.light(),
@@ -113,8 +120,7 @@ inline auto shade_hit(World<T> const & world, IntersectionComputation<T> const &
                     shadowed);
 }
 
-template <typename T>
-inline Color<T> color_at(World<T> const & world, Ray<T> const & ray) {
+inline Color color_at(World const & world, Ray const & ray) {
     auto xs = intersect_world(world, ray);
     auto const i = hit(xs);
     if (i) {
@@ -123,21 +129,6 @@ inline Color<T> color_at(World<T> const & world, Ray<T> const & ray) {
     } else {
         return Color(0.0, 0.0, 0.0);
     }
-}
-
-template <typename T>
-inline bool is_shadowed(World<T> const & world, Point<T> const & point) {
-    if (!world.light()) return true;  // everything is in shadow
-
-    auto const v = (*world.light()).position() - point;
-    auto const distance = magnitude(v);
-    auto const direction = normalize(v);
-
-    auto const ray = Ray<T>(point, direction);
-    auto intersections = intersect_world(world, ray);
-
-    auto const h = hit(intersections);
-    return (h && (*h).t() < distance);
 }
 
 } // namespace rtc

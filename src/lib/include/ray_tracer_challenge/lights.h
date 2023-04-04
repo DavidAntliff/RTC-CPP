@@ -6,11 +6,10 @@
 
 namespace rtc {
 
-template <typename T=fp_t>
 class PointLight {
 public:
     PointLight() = default;
-    PointLight(Point<T> const & position, Color<T> const & intensity) :
+    PointLight(Point const & position, Color const & intensity) :
         position_{position}, intensity_{intensity} {}
 
     auto operator<=>(PointLight const &) const = default;
@@ -19,13 +18,12 @@ public:
     auto intensity() const { return intensity_; }
 
 private:
-    Point<T> position_;
-    Color<T> intensity_;
+    Point position_;
+    Color intensity_;
 };
 
-template <typename T=fp_t>
-inline auto point_light(Point<T> const & position, Color<T> const & intensity) {
-    return PointLight<T> {position, intensity};
+inline auto point_light(Point const & position, Color const & intensity) {
+    return PointLight {position, intensity};
 }
 
 } // namespace rtc

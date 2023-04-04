@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <ray_tracer_challenge/color.h>
-//#include "support/tuples.h"
+#include "support/support.h"
 
 using namespace rtc;
 
@@ -26,8 +26,8 @@ TEST(TestColor, adding_colors) {
 TEST(TestColor, subtracting_colors) {
     auto c1 = color(0.9, 0.6, 0.75);
     auto c2 = color(0.7, 0.1, 0.25);
-    EXPECT_TRUE(almost_equal(c1 - c2, color(0.2, 0.5, 0.5)));
-    //EXPECT_TRUE(rtc::test::AlmostEqual<Tuple<double>>(c1 - c2, color(0.2, 0.5, 0.5)));
+    //EXPECT_TRUE(almost_equal(c1 - c2, color(0.2, 0.5, 0.5)));
+    EXPECT_TRUE(AlmostEqual(c1 - c2, color(0.2, 0.5, 0.5)));
 }
 
 // Multiplying a color by a scalar
@@ -40,6 +40,6 @@ TEST(TestColor, multiplying_color_by_scalar) {
 TEST(TestColor, multiplying_colors) {
     auto c1 = color(1.0, 0.2, 0.4);
     auto c2 = color(0.9, 1.0, 0.1);
-    EXPECT_TRUE(almost_equal(c1 * c2, color(0.9, 0.2, 0.04)));
-    EXPECT_TRUE(almost_equal(hadamard(c1, c2), color(0.9, 0.2, 0.04)));
+    EXPECT_TRUE(AlmostEqual(c1 * c2, color(0.9, 0.2, 0.04)));
+    EXPECT_TRUE(AlmostEqual(hadamard(c1, c2), color(0.9, 0.2, 0.04)));
 }

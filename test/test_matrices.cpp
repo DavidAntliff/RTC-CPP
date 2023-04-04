@@ -8,7 +8,7 @@
 using namespace rtc;
 
 TEST(TestMatrices, default_matrix_is_zero) {
-    Matrix<double, 4> A;
+    Matrix<4> A;
     for (auto r = 0; r < A.dim(); ++r) {
         for (auto c = 0; c < A.dim(); ++c) {
             EXPECT_EQ(A(r, c), 0.0);
@@ -21,7 +21,7 @@ TEST(TestMatrices, matrix_from_vector) {
     std::vector<double> el = {
         0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0,
     };
-    Matrix<double, 3> A {el};
+    Matrix<3> A {el};
     EXPECT_EQ(A, matrix3x3({
         { 0.0,  1.0,   2.0},
         { 3.0,  4.0,   5.0},
@@ -30,7 +30,7 @@ TEST(TestMatrices, matrix_from_vector) {
 }
 
 TEST(TestMatrices, invalid_access) {
-    auto M = Matrix<double, 4> {};
+    auto M = Matrix<4> {};
     EXPECT_EQ(M.at(0, -1), std::nullopt);
     EXPECT_EQ(M.at(-1, 0), std::nullopt);
     EXPECT_EQ(M.at(-1, -1), std::nullopt);
@@ -41,7 +41,7 @@ TEST(TestMatrices, invalid_access) {
 
 // Constructing and inspecting a 4x4 matrix
 TEST(TestMatrices, constructing_and_inspecting_4x4) {
-    Matrix<double, 4> M44 {
+    Matrix<4> M44 {
         { 1.0,  2.0,  3.0,  4.0},
         { 5.5,  6.5,  7.5,  8.5},
         { 9.0, 10.0, 11.0, 12.0},
@@ -66,7 +66,7 @@ TEST(TestMatrices, constructing_and_inspecting_4x4) {
 
 // Constructing and inspecting a 2x2 matrix
 TEST(TestMatrices, constructing_and_inspecting_2x2) {
-    Matrix<double, 2> M22 {
+    Matrix<2> M22 {
         { -3.0,  5.0},
         {  1.0, -2.0},
     };
@@ -84,7 +84,7 @@ TEST(TestMatrices, constructing_and_inspecting_2x2) {
 
 // Constructing and inspecting a 3x3 matrix
 TEST(TestMatrices, constructing_and_inspecting_3x3) {
-    Matrix<double, 3> M33 {
+    Matrix<3> M33 {
         { -3.0,  5.0,  0.0},
         {  1.0, -2.0, -7.0},
         {  0.0,  1.0,  1.0},
@@ -177,7 +177,7 @@ TEST(TestMatrices, matrix_multiplied_by_identity) {
         { 2.0,  4.0,  8.0, 16.0},
         { 4.0,  8.0, 16.0, 32.0},
     });
-    auto I = identity4x4<double>();
+    auto I = identity4x4();
     EXPECT_EQ(A * I, A);
     EXPECT_EQ(I * A, A);
 }
@@ -185,7 +185,7 @@ TEST(TestMatrices, matrix_multiplied_by_identity) {
 // Multiplying the identity matrix by a tuple
 TEST(TestMatrices, identity_multiplied_by_tuple) {
     auto a = tuple(1.0, 2.0, 3.0, 4.0);
-    auto I = identity4x4<double>();
+    auto I = identity4x4();
     EXPECT_EQ(I * a, a);
 }
 
@@ -208,7 +208,7 @@ TEST(TestMatrices, transposing_a_matrix) {
 
 // Transposing the identity matrix
 TEST(TestMatrices, transposing_the_identity) {
-    auto I = identity4x4<double>();
+    auto I = identity4x4();
     EXPECT_EQ(transpose(I), I);
 }
 

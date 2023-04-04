@@ -9,31 +9,27 @@
 
 namespace rtc {
 
-template <typename T=fp_t>
 class Sphere;
 
-template <typename T>
-Vector<T> local_normal_at(Sphere<T> const & sphere, Point<T> const & local_point);
+Vector local_normal_at(Sphere const & sphere, Point const & local_point);
 
-template <typename T>
-Intersections<Intersection<fp_t>> local_intersect(Sphere<T> const & sphere,
-                                                  Ray<T> const & local_ray);
+Intersections local_intersect(Sphere const & sphere,
+                              Ray const & local_ray);
 
-template <typename T>
-class Sphere : public Shape<T> {
+class Sphere : public Shape {
 public:
     Sphere() = default;
     explicit Sphere(int id) : id_{id} {}
 
-    std::unique_ptr<Shape<T>> clone() const override {
+    std::unique_ptr<Shape> clone() const override {
         return std::make_unique<Sphere>(*this);
     }
 
-    Intersections<Intersection<fp_t>> local_intersect(Ray<T> const & local_ray) const override {
+    Intersections local_intersect(Ray const & local_ray) const override {
         return rtc::local_intersect(*this, local_ray);
     }
 
-    Vector<T> local_normal_at(Point<T> const & local_point) const override {
+    Vector local_normal_at(Point const & local_point) const override {
         return rtc::local_normal_at(*this, local_point);
     }
 
@@ -41,13 +37,11 @@ private:
     int id_ {};
 };
 
-template <typename T=fp_t>
-inline auto sphere(int id) {
-    return Sphere<T> {id};
+inline Sphere sphere(int id) {
+    return Sphere {id};
 }
 
-template <typename T>
-inline Vector<T> local_normal_at(Sphere<T> const & sphere, Point<T> const & local_point) {
+inline Vector local_normal_at(Sphere const & sphere, Point const & local_point) {
     (void)sphere;
     // Assume the point is always on the surface of the sphere
     auto object_normal = local_point - point(0.0, 0.0, 0.0);
@@ -55,9 +49,8 @@ inline Vector<T> local_normal_at(Sphere<T> const & sphere, Point<T> const & loca
     return normalize(object_normal);
 }
 
-template <typename T>
-inline Intersections<Intersection<fp_t>> local_intersect(Sphere<T> const & sphere,
-                                                         Ray<T> const & local_ray) {
+inline Intersections local_intersect(Sphere const & sphere,
+                                     Ray const & local_ray) {
     // TODO: A more stable algorithm at:
     // https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html
 

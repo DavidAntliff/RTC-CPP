@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.24)
 # Need at least one .cpp file to build the lib:
 set(SRCS
         tuple.cpp
+        materials.cpp
+        patterns.cpp
         )
 
 set(HDRS

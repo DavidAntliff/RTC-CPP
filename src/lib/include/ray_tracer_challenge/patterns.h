@@ -7,14 +7,10 @@
 
 namespace rtc {
 
-template <typename T>
 class Shape;
 
-template <typename T>
 class Pattern {
 public:
-    using matrix_t = Matrix<T, 4>;
-
     Pattern() = default;
     virtual ~Pattern() = default;
 
@@ -25,10 +21,10 @@ public:
 
     auto operator<=>(Pattern const &) const = default;
 
-    virtual Color<T> pattern_at(Point<T> const & local_point) const = 0;
+    virtual Color pattern_at(Point const & local_point) const = 0;
 
-    inline matrix_t const & transform() const { return transform_; }
-    inline void set_transform(matrix_t const & m) {
+    inline Matrix<4> const & transform() const { return transform_; }
+    inline void set_transform(Matrix<4> const & m) {
         transform_ = m;
     }
 
@@ -39,72 +35,64 @@ protected:
     virtual std::unique_ptr<Pattern> clone_impl() const = 0;
 
 private:
-    matrix_t transform_ {identity4x4()};
+    Matrix<4> transform_ {identity4x4()};
 };
 
-template <typename T, typename Matrix>
-inline void set_pattern_transform(Pattern<T> & pattern, Matrix const & m) {
+inline void set_pattern_transform(Pattern & pattern, Matrix<4> const & m) {
     pattern.set_transform(m);
 }
 
-template <typename T>
-inline Color<T> pattern_at(Pattern<T> const & pattern, Point<T> const & object_point) {
+inline Color pattern_at(Pattern const & pattern, Point const & object_point) {
     // Convert object-space point to pattern-space point:
     auto const pattern_point {inverse(pattern.transform()) * object_point};
     return pattern.pattern_at(pattern_point);
 }
 
-template <typename T>
-inline Color<T> pattern_at_shape(Pattern<T> const & pattern,
-                                 Shape<T> const & shape,
-                                 Point<T> const & world_point) {
-    // Convert world-space point to object-space point:
-    auto const object_point {inverse(shape.transform()) * world_point};
-    return pattern_at(pattern, object_point);
-}
+Color pattern_at_shape(Pattern const & pattern,
+                       Shape const & shape,
+                       Point const & world_point);
 
-template <typename T>
-class SolidPattern : public Pattern<T> {
+class SolidPattern : public Pattern {
 public:
     SolidPattern() = default;
-    explicit SolidPattern(Color<T> const & color)
+    explicit SolidPattern(Color const & color)
         : c_{color} {}
 
     auto operator<=>(SolidPattern const &) const = default;
 
-    Color<T> pattern_at(Point<T> const & local_point) const override {
+    Color pattern_at(Point const & local_point) const override {
         (void)local_point;
         return c_;
     }
 
 protected:
     // https://stackoverflow.com/a/43263477
-    virtual std::unique_ptr<Pattern<T>> clone_impl() const override {
+    virtual std::unique_ptr<Pattern> clone_impl() const override {
         return std::make_unique<SolidPattern>(*this);
     };
 
 private:
-    Color<T> c_ {};
+    Color c_ {};
 };
 
 // CRTP Base Class for patterns that contain one sub-pattern
-template <typename T, typename Derived>
-class NestedPattern : public Pattern<T> {
+template <typename Derived>
+class NestedPattern : public Pattern {
 public:
     NestedPattern() = default;
 
     template <typename A>
     NestedPattern(A const & a)
-            : Pattern<T> {},
+            : Pattern {},
               a_{init_(a)} {}
 
     ~NestedPattern() = default;
     NestedPattern(NestedPattern const & other)
-            : Pattern<T> {other},
+            : Pattern {other},
               a_{other.a_->clone()} {}
     NestedPattern(NestedPattern &&) = default;
     NestedPattern & operator=(NestedPattern const & other) {
-        a_ = other.a_.clone();
+        a_ = other.a_->clone();
     }
     NestedPattern & operator=(NestedPattern &&) = default;
 
@@ -115,47 +103,47 @@ public:
     auto const & a() const { return *a_; }
 
 private:
-    static auto init_(Color<T> const & c) {
-        return std::make_unique<SolidPattern<T>>(c);
+    static auto init_(Color const & c) {
+        return std::make_unique<SolidPattern>(c);
     }
 
-    static auto init_(Pattern<T> const & p) {
+    static auto init_(Pattern const & p) {
         return p.clone();
     }
 
 protected:
     // https://stackoverflow.com/a/43263477
-    std::unique_ptr<Pattern<T>> clone_impl() const override {
+    std::unique_ptr<Pattern> clone_impl() const override {
         auto p {std::make_unique<Derived>(*static_cast<Derived const *>(this))};
         p->a_ = a_->clone();
         return p;
     };
 
 protected:
-    std::unique_ptr<Pattern<T>> a_ {};
+    std::unique_ptr<Pattern> a_ {};
 };
 
 // CRTP Base Class for patterns that contain two sub-patterns
-template <typename T, typename Derived>
-class NestedPatterns2 : public Pattern<T> {
+template <typename Derived>
+class NestedPatterns2 : public Pattern {
 public:
     NestedPatterns2() = default;
 
     template <typename A, typename B>
     NestedPatterns2(A const & a, B const & b)
-        : Pattern<T> {},
+        : Pattern {},
           a_{init_(a)},
           b_{init_(b)} {}
 
     ~NestedPatterns2() = default;
     NestedPatterns2(NestedPatterns2 const & other)
-        : Pattern<T> {other},
+        : Pattern {other},
           a_{other.a_->clone()},
           b_{other.b_->clone()} {}
     NestedPatterns2(NestedPatterns2 &&) = default;
     NestedPatterns2 & operator=(NestedPatterns2 const & other) {
-        a_ = other.a_.clone();
-        b_ = other.b_.clone();
+        a_ = other.a_->clone();
+        b_ = other.b_->clone();
     }
     NestedPatterns2 & operator=(NestedPatterns2 &&) = default;
 
@@ -168,17 +156,17 @@ public:
     auto const & b() const { return *b_; }
 
 private:
-    static auto init_(Color<T> const & c) {
-        return std::make_unique<SolidPattern<T>>(c);
+    static auto init_(Color const & c) {
+        return std::make_unique<SolidPattern>(c);
     }
 
-    static auto init_(Pattern<T> const & p) {
+    static auto init_(Pattern const & p) {
         return p.clone();
     }
 
 protected:
     // https://stackoverflow.com/a/43263477
-    std::unique_ptr<Pattern<T>> clone_impl() const override {
+    std::unique_ptr<Pattern> clone_impl() const override {
         auto p {std::make_unique<Derived>(*static_cast<Derived const *>(this))};
         p->a_ = a_->clone();
         p->b_ = b_->clone();
@@ -186,16 +174,15 @@ protected:
     };
 
 protected:
-    std::unique_ptr<Pattern<T>> a_ {};
-    std::unique_ptr<Pattern<T>> b_ {};
+    std::unique_ptr<Pattern> a_ {};
+    std::unique_ptr<Pattern> b_ {};
 };
 
-template <typename T>
-class StripePattern : public NestedPatterns2<T, StripePattern<T>> {
+class StripePattern : public NestedPatterns2<StripePattern> {
 public:
-    using NestedPatterns2<T, StripePattern>::NestedPatterns2;
+    using NestedPatterns2<StripePattern>::NestedPatterns2;
 
-    Color<T> pattern_at(Point<T> const & local_point) const override {
+    Color pattern_at(Point const & local_point) const override {
         if (static_cast<int>(floor(local_point.x())) % 2 == 0) {
             auto const pattern_point{inverse(this->a_->transform()) * local_point};
             return this->a_->pattern_at(pattern_point);
@@ -207,15 +194,14 @@ public:
 
 template <typename A, typename B>
 inline auto stripe_pattern(A const & a, B const & b) {
-    return StripePattern<fp_t> {a, b};
+    return StripePattern {a, b};
 }
 
-template <typename T>
-class GradientPattern : public NestedPatterns2<T, GradientPattern<T>> {
+class GradientPattern : public NestedPatterns2<GradientPattern> {
 public:
-    using NestedPatterns2<T, GradientPattern>::NestedPatterns2;
+    using NestedPatterns2<GradientPattern>::NestedPatterns2;
 
-    Color<T> pattern_at(Point<T> const &local_point) const override {
+    Color pattern_at(Point const &local_point) const override {
         auto const pattern_point_a{inverse(this->a_->transform()) * local_point};
         auto const pattern_point_b{inverse(this->b_->transform()) * local_point};
         return color(local_point.x(),
@@ -226,15 +212,14 @@ public:
 
 template <typename A, typename B>
 inline auto gradient_pattern(A const & a, B const & b) {
-    return GradientPattern<fp_t> {a, b};
+    return GradientPattern {a, b};
 }
 
-template <typename T>
-class RingPattern : public NestedPatterns2<T, RingPattern<T>> {
+class RingPattern : public NestedPatterns2<RingPattern> {
 public:
-    using NestedPatterns2<T, RingPattern>::NestedPatterns2;
+    using NestedPatterns2<RingPattern>::NestedPatterns2;
 
-    Color<T> pattern_at(Point<T> const &local_point) const override {
+    Color pattern_at(Point const &local_point) const override {
         auto const distance {sqrt(local_point.x() * local_point.x() + local_point.z() * local_point.z())};
         if (static_cast<int>(floor(distance)) % 2 == 0) {
             auto const pattern_point_a{inverse(this->a_->transform()) * local_point};
@@ -247,15 +232,14 @@ public:
 
 template <typename A, typename B>
 inline auto ring_pattern(A const & a, B const & b) {
-    return RingPattern<fp_t> {a, b};
+    return RingPattern {a, b};
 }
 
-template <typename T>
-class CheckersPattern : public NestedPatterns2<T, CheckersPattern<T>> {
+class CheckersPattern : public NestedPatterns2<CheckersPattern> {
 public:
-    using NestedPatterns2<T, CheckersPattern>::NestedPatterns2;
+    using NestedPatterns2<CheckersPattern>::NestedPatterns2;
 
-    Color<T> pattern_at(Point<T> const &local_point) const override {
+    Color pattern_at(Point const &local_point) const override {
         auto const sum = floor(local_point.x()) +
                          floor(local_point.y()) +
                          floor(local_point.z());
@@ -270,19 +254,18 @@ public:
 
 template <typename A, typename B>
 inline auto checkers_pattern(A const & a, B const & b) {
-    return CheckersPattern<fp_t> {a, b};
+    return CheckersPattern {a, b};
 }
 
-template <typename T>
-class RadialGradientPattern : public NestedPatterns2<T, RadialGradientPattern<T>> {
+class RadialGradientPattern : public NestedPatterns2<RadialGradientPattern> {
 public:
-    using NestedPatterns2<T, RadialGradientPattern>::NestedPatterns2;
+    using NestedPatterns2<RadialGradientPattern>::NestedPatterns2;
 
     template <typename A, typename B>
-    RadialGradientPattern(A const & a, B const & b, T y_factor = T(0))
-            : NestedPatterns2<T, RadialGradientPattern> {a, b}, y_factor_{y_factor} {}
+    RadialGradientPattern(A const & a, B const & b, fp_t y_factor = 0)
+            : NestedPatterns2<RadialGradientPattern> {a, b}, y_factor_{y_factor} {}
 
-    Color<T> pattern_at(Point<T> const &local_point) const override {
+    Color pattern_at(Point const &local_point) const override {
         auto const distance {sqrt(local_point.x() * local_point.x() + y_factor_ * local_point.y() * local_point.y() + local_point.z() * local_point.z())};
         auto const pattern_point_a {inverse(this->a_->transform()) * local_point};
         auto const pattern_point_b {inverse(this->b_->transform()) * local_point};
@@ -292,7 +275,7 @@ public:
     }
 
 private:
-    T y_factor_ {0};
+    fp_t y_factor_ {0};
 };
 
 template <typename A, typename B>
@@ -301,12 +284,11 @@ inline auto radial_gradient_pattern(A const & a, B const & b, fp_t y_factor = 0)
 }
 
 
-template <typename T>
-class BlendedPattern : public NestedPatterns2<T, BlendedPattern<T>> {
+class BlendedPattern : public NestedPatterns2<BlendedPattern> {
 public:
-    using NestedPatterns2<T, BlendedPattern>::NestedPatterns2;
+    using NestedPatterns2<BlendedPattern>::NestedPatterns2;
 
-    Color<T> pattern_at(Point<T> const &local_point) const override {
+    Color pattern_at(Point const &local_point) const override {
         auto const pattern_point_a {inverse(this->a_->transform()) * local_point};
         auto const pattern_point_b {inverse(this->b_->transform()) * local_point};
         auto const color_a = this->a_->pattern_at(pattern_point_a);
@@ -317,29 +299,22 @@ public:
 
 template <typename A, typename B>
 inline auto blended_pattern(A const & a, B const & b) {
-    return BlendedPattern<fp_t> {a, b};
+    return BlendedPattern {a, b};
 }
 
 
-template <typename T>
-class PerturbedPattern : public NestedPattern<T, PerturbedPattern<T>> {
+class PerturbedPattern : public NestedPattern<PerturbedPattern> {
 public:
-    using NestedPattern<T, PerturbedPattern>::NestedPattern;
+    using NestedPattern<PerturbedPattern>::NestedPattern;
 
     template <typename A>
-    PerturbedPattern(A const & a, T scale = T(0.5), int num_octaves = 1, T persistence = 0.9)
-            : NestedPattern<T, PerturbedPattern> {a},
+    PerturbedPattern(A const & a, fp_t scale = 0.5, int num_octaves = 1, fp_t persistence = 0.9)
+            : NestedPattern<PerturbedPattern> {a},
               scale_{scale},
               num_octaves_{num_octaves},
               persistence_{persistence} {}
 
-    Color<T> pattern_at(Point<T> const & local_point) const override {
-//        auto scale {0.2};
-//        auto octaves {8};
-//        auto persistence {0.6};
-//        auto new_x = local_point.x() + perlin_noise_.perlin(local_point.x(), local_point.y(), local_point.z()) * scale;
-//        auto new_y = local_point.y() + perlin_noise_.perlin(local_point.x(), local_point.y(), local_point.z() + 1.0) * scale;
-//        auto new_z = local_point.z() + perlin_noise_.perlin(local_point.x(), local_point.y(), local_point.z() + 2.0) * scale;
+    Color pattern_at(Point const & local_point) const override {
         auto new_x = local_point.x() + perlin_noise_.octave_perlin(local_point.x(), local_point.y(), local_point.z(), num_octaves_, persistence_) * scale_;
         auto new_y = local_point.y() + perlin_noise_.octave_perlin(local_point.x(), local_point.y(), local_point.z() + 1.0, num_octaves_, persistence_) * scale_;
         auto new_z = local_point.z() + perlin_noise_.octave_perlin(local_point.x(), local_point.y(), local_point.z() + 2.0, num_octaves_, persistence_) * scale_;
@@ -358,12 +333,11 @@ private:
     fp_t persistence_ {0.9};
 };
 
-template <typename T>
-inline auto perturbed_pattern(Pattern<T> const & pattern,
-                              T scale = 1.0,
+inline auto perturbed_pattern(Pattern const & pattern,
+                              fp_t scale = 1.0,
                               int num_octaves = 1,
-                              T persistence = 0.9) {
-    return PerturbedPattern<T> {pattern, scale, num_octaves, persistence};
+                              fp_t persistence = 0.9) {
+    return PerturbedPattern {pattern, scale, num_octaves, persistence};
 }
 
 // TODO: Spherical Texture Mapping - Page 138

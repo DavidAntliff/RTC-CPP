@@ -8,41 +8,35 @@
 
 namespace rtc {
 
-template <typename T=fp_t>
 class Plane;
 
-template <typename T>
-Vector<T> local_normal_at(Plane<T> const & plane, Point<T> const & local_point);
+Vector local_normal_at(Plane const & plane, Point const & local_point);
 
-template <typename T>
-Intersections<Intersection<fp_t>> local_intersect(Plane<T> const & plane,
-                                                  Ray<T> const & local_ray);
+Intersections local_intersect(Plane const & plane,
+                              Ray const & local_ray);
 
-template <typename T>
-class Plane : public Shape<T> {
+class Plane : public Shape {
 public:
     Plane() = default;
 
-    std::unique_ptr<Shape<T>> clone() const override {
+    std::unique_ptr<Shape> clone() const override {
         return std::make_unique<Plane>(*this);
     }
 
-    Intersections<Intersection<fp_t>> local_intersect(Ray<T> const & local_ray) const override {
+    Intersections local_intersect(Ray const & local_ray) const override {
         return rtc::local_intersect(*this, local_ray);
     }
 
-    Vector<T> local_normal_at(Point<T> const & local_point) const override {
+    Vector local_normal_at(Point const & local_point) const override {
         return rtc::local_normal_at(*this, local_point);
     }
 };
 
-template <typename T=fp_t>
-inline auto plane() {
-    return Plane<T> {};
+inline Plane plane() {
+    return {};
 }
 
-template <typename T>
-inline Vector<T> local_normal_at(Plane<T> const & plane, Point<T> const & local_point) {
+inline Vector local_normal_at(Plane const & plane, Point const & local_point) {
     (void)plane;
     (void)local_point;
 
@@ -50,9 +44,8 @@ inline Vector<T> local_normal_at(Plane<T> const & plane, Point<T> const & local_
     return vector(0.0, 1.0, 0.0);
 }
 
-template <typename T>
-inline Intersections<Intersection<fp_t>> local_intersect(Plane<T> const & plane,
-                                                         Ray<T> const & local_ray) {
+inline Intersections local_intersect(Plane const & plane,
+                                     Ray const & local_ray) {
     // The plane is at the origin, extending infinitely in both X and Z directions.
     //
     // 4 cases:

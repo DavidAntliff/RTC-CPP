@@ -23,12 +23,12 @@
 
 namespace rtc {
 
-template <typename T=fp_t, unsigned int N=4>
+constexpr int TUPLE_N = 4;
+
 struct Tuple {
-    using value_t = T;
 
     Tuple() = default;
-    Tuple(T x, T y, T z, T w) :
+    Tuple(fp_t x, fp_t y, fp_t z, fp_t w) :
         x_ {x}, y_ {y}, z_{z}, w_{w} {}
 
     virtual ~Tuple() = default;
@@ -40,29 +40,29 @@ struct Tuple {
 
     auto operator<=>(Tuple const &) const = default;
 
-    T x() const { return x_; }
-    T y() const { return y_; }
-    T z() const { return z_; }
-    T w() const { return w_; }
+    fp_t x() const { return x_; }
+    fp_t y() const { return y_; }
+    fp_t z() const { return z_; }
+    fp_t w() const { return w_; }
 
-    std::optional<T> at(unsigned int i) const {
-        if (i < N)
+    std::optional<fp_t> at(unsigned int i) const {
+        if (i < TUPLE_N)
             return operator()(i);
         else
             return std::nullopt;
     }
 
-    T operator()(int i) const {
+    fp_t operator()(int i) const {
         switch (i) {
             case 0: return x_;
             case 1: return y_;
             case 2: return z_;
             case 3: return w_;
-            default: return T(0);
+            default: return 0;
         }
     }
 
-    void set(unsigned int i, T value) {
+    void set(unsigned int i, fp_t value) {
         switch (i) {
             case 0: x_ = value; break;
             case 1: y_ = value; break;
@@ -72,10 +72,10 @@ struct Tuple {
         }
     }
 
-    void set_x(T value) { x_ = value; }
-    void set_y(T value) { y_ = value; }
-    void set_z(T value) { z_ = value; }
-    void set_w(T value) { w_ = value; }
+    void set_x(fp_t value) { x_ = value; }
+    void set_y(fp_t value) { y_ = value; }
+    void set_z(fp_t value) { z_ = value; }
+    void set_w(fp_t value) { w_ = value; }
 
     bool is_point() const {
         return w_ == 1.0;
@@ -131,34 +131,26 @@ struct Tuple {
     }
 
 //    // Converting constructor
-//    Tuple(Color<T> const & color) :
+//    Tuple(Color const & color) :
 //        x_{color.red()},
 //        y_{color.green()},
 //        z_{color.blue()},
 //        w_{0} {}
 
 protected:
-    T x_ {};
-    T y_ {};
-    T z_ {};
-    T w_ {};
+    fp_t x_ {};
+    fp_t y_ {};
+    fp_t z_ {};
+    fp_t w_ {};
 };
 
 // TODO: still deciding if these are useful...
 // Don't want a subclass because of speed, but maybe a static polymorphic subclass?
-template <typename T=fp_t>
-using Point = Tuple<T>;
-
-template <typename T=fp_t>
-using Vector = Tuple<T>;
-
-//using Point = Tuple<>;
-//using Vector = Tuple<>;
+using Point = Tuple;
+using Vector = Tuple;
 
 // Free functions:
-
-template <typename T>
-inline bool almost_equal(Tuple<T> const & lhs, Tuple<T> const & rhs, T epsilon=1e-5) {
+inline bool almost_equal(Tuple const & lhs, Tuple const & rhs, fp_t epsilon=1e-5) {
     using rtc::almost_equal;
     return almost_equal(lhs.x(), rhs.x(), epsilon)
            && almost_equal(lhs.y(), rhs.y(), epsilon)
@@ -166,41 +158,35 @@ inline bool almost_equal(Tuple<T> const & lhs, Tuple<T> const & rhs, T epsilon=1
            && almost_equal(lhs.w(), rhs.w(), epsilon);
 }
 
-template <typename T>
-inline Tuple<T> operator+(Tuple<T> lhs, Tuple<T> const & rhs)
+inline Tuple operator+(Tuple lhs, Tuple const & rhs)
 {
     lhs += rhs;
     return lhs;
 }
 
-template <typename T>
-inline Tuple<T> operator-(Tuple<T> lhs, Tuple<T> const & rhs)
+inline Tuple operator-(Tuple lhs, Tuple const & rhs)
 {
     lhs -= rhs;
     return lhs;
 }
 
-template <typename T>
-inline Tuple<T> operator*(Tuple<T> lhs, T const & rhs)
+inline Tuple operator*(Tuple lhs, fp_t const & rhs)
 {
     lhs *= rhs;
     return lhs;
 }
 
-template <typename T>
-inline Tuple<T> operator*(T const & lhs, Tuple<T> rhs)
+inline Tuple operator*(fp_t const & lhs, Tuple rhs)
 {
     return rhs * lhs;
 }
 
-template <typename T>
-inline Tuple<T> operator/(Tuple<T> lhs, T const & rhs)
+inline Tuple operator/(Tuple lhs, fp_t const & rhs)
 {
     return lhs /= rhs;
 }
 
-template <typename T>
-inline T magnitude(Tuple<T> const & t)
+inline fp_t magnitude(Tuple const & t)
 {
     return std::sqrt(t.x() * t.x()
         + t.y() * t.y()
@@ -208,14 +194,12 @@ inline T magnitude(Tuple<T> const & t)
         + t.w() * t.w());
 }
 
-template <typename T>
-inline Tuple<T> normalize(Tuple<T> const & t)
+inline Tuple normalize(Tuple const & t)
 {
     return t / magnitude(t);
 }
 
-template <typename T>
-inline T dot(Tuple<T> const & a, Tuple<T> const & b) {
+inline fp_t dot(Tuple const & a, Tuple const & b) {
     return a.x() * b.x()
          + a.y() * b.y()
          + a.z() * b.z()
@@ -223,34 +207,29 @@ inline T dot(Tuple<T> const & a, Tuple<T> const & b) {
 }
 
 // 3D cross-product, ignore .w
-template <typename T>
-inline Tuple<T> cross(Tuple<T> const & a, Tuple<T> const & b) {
+inline Tuple cross(Tuple const & a, Tuple const & b) {
     return {a.y() * b.z() - a.z() * b.y(),
             a.z() * b.x() - a.x() * b.z(),
             a.x() * b.y() - a.y() * b.x(),
-            T(0)};
+            0};
 }
 
-template <typename T>
-inline auto reflect(Vector<T> const & in, Vector<T> const & normal) {
-    return in - normal * T(2) * dot(in, normal);
+inline auto reflect(Vector const & in, Vector const & normal) {
+    return in - normal * 2.0 * dot(in, normal);
 }
 
 
 // Factory functions:
-template <typename T=fp_t>
-inline auto tuple(T x, T y, T z, T w) {
-    return Tuple<T> {x, y, z, w};
+inline auto tuple(fp_t x, fp_t y, fp_t z, fp_t w) {
+    return Tuple {x, y, z, w};
 }
 
-template <typename T=fp_t>
-inline auto point(T x, T y, T z) {
-    return Tuple<T> {x, y, z, 1};
+inline auto point(fp_t x, fp_t y, fp_t z) {
+    return Tuple {x, y, z, 1};
 }
 
-template <typename T=fp_t>
-inline auto vector(T x, T y, T z) {
-    return Tuple<T> {x, y, z, 0};
+inline auto vector(fp_t x, fp_t y, fp_t z) {
+    return Tuple {x, y, z, 0};
 }
 
 } // namespace rtc

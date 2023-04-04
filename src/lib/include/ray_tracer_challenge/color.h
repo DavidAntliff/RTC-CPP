@@ -5,74 +5,74 @@
 
 namespace rtc {
 
-template <typename T=fp_t>
-struct Color : Tuple<T> {
-    using Base = Tuple<T>;
-    using value_t = T;
+struct Color : Tuple {
 
     Color() = default;
-    Color(value_t red, value_t green, value_t blue) :
-        Base(red, green, blue, 0) {}
+    Color(fp_t red, fp_t green, fp_t blue) :
+        Tuple(red, green, blue, 0) {}
 
-    value_t red() const { return Base::x_; }
-    value_t green() const { return Base::y_; }
-    value_t blue() const { return Base::z_; }
+    fp_t red() const { return Tuple::x_; }
+    fp_t green() const { return Tuple::y_; }
+    fp_t blue() const { return Tuple::z_; }
 
     Color & operator*=(Color const & rhs) {
-        Base::x_ *= rhs.red();
-        Base::y_ *= rhs.green();
-        Base::z_ *= rhs.blue();
+        Tuple::x_ *= rhs.red();
+        Tuple::y_ *= rhs.green();
+        Tuple::z_ *= rhs.blue();
         return *this;
     }
 
     // Convert a Tuple into a Color
-    Color(Base const & t) : Base{t} {}
+    Color(Tuple const & t) : Tuple{t} {}
 
 };
 
-template <typename T>
-inline bool almost_equal(Color<T> const & lhs, Color<T> const & rhs) {
+inline bool almost_equal(Color const & lhs, Color const & rhs) {
     return almost_equal(lhs.red(), rhs.red())
            && almost_equal(lhs.green(), rhs.green())
            && almost_equal(lhs.blue(), rhs.blue());
 }
 
+// Resolve ambiguity
+inline bool almost_equal(Tuple const & lhs, Color const & rhs) {
+    return almost_equal(lhs.x(), rhs.red())
+           && almost_equal(lhs.y(), rhs.green())
+           && almost_equal(lhs.z(), rhs.blue());
+}
+
+// Resolve ambiguity
+inline bool almost_equal(Color const & lhs, Tuple const & rhs) {
+    return almost_equal(lhs.red(), rhs.x())
+           && almost_equal(lhs.green(), rhs.y())
+           && almost_equal(lhs.blue(), rhs.z());
+}
+
 // Hadamard or Shur Product
-template <typename T>
-inline Color<T> operator*(Color<T> lhs, Color<T> const & rhs)
+inline Color operator*(Color lhs, Color const & rhs)
 {
     lhs *= rhs;
     return lhs;
 }
 
-// This is broken in the language, as template types can't be deduced:
-//template<typename T>
-//const auto hadamard = operator*<T>;
-
-// Instead, use a wrapper function:
-template <typename T>
-Color<T> hadamard(Color<T> const & lhs, Color<T> const & rhs) {
-    return lhs * rhs;
-}
+// Function alias
+const auto hadamard = static_cast<Color(*)(Color, Color const &)>(operator*);
 
 template <typename T>
 inline auto color(T r, T g, T b) {
-    return Color<T> {r, g, b};
+    return Color {r, g, b};
 }
 
 template <>
 inline auto color<int>(int r, int g, int b) {
-    return Color<fp_t> {r / 255.0, g / 255.0, b / 255.0};
+    return Color {r / 255.0, g / 255.0, b / 255.0};
 }
 
 // Blending function (linear interpolation)
-template <typename T>
-inline auto color(T t, Color<T> const & a, Color<T> const & b) {
+inline auto color(fp_t t, Color const & a, Color const & b) {
     auto const distance {b - a};
     auto const fraction {t - floor(t)};
     return a + distance * fraction;
 }
-
 
 const auto black {color(0.0, 0.0, 0.0)};
 const auto red {color(1.0, 0.0, 0.0)};

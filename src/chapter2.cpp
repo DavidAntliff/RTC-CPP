@@ -10,13 +10,13 @@
 using namespace rtc;
 
 struct Projectile {
-    Point<double> position;
-    Vector<double> velocity;
+    Point position;
+    Vector velocity;
 };
 
 struct Environment {
-    Vector<double> gravity;
-    Vector<double> wind;
+    Vector gravity;
+    Vector wind;
 };
 
 Projectile tick(Environment const & environment,
